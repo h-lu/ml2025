@@ -384,6 +384,7 @@ print("\n类别标签映射关系:\n", label_mapping)
 - **鼓励各小组选择不同的数据集，以提高项目实践的多样性**
 
 示例数据集：[阿里巴巴天池 - 淘宝用户行为数据](https://tianchi.aliyun.com/dataset/dataDetail?dataId=649)
+
 - 包含 2000 万条淘宝用户的行为记录
 - 字段：用户ID、商品ID、商品类目ID、行为类型、时间戳
 - 数据已简化处理，便于教学使用

@@ -8,9 +8,11 @@ book:
   date: today
   chapters:
     - index.qmd  # 首页文件 (可选，如果需要)
-    - syllabus.qmd # 课程大纲作为第一章
-    - week1.qmd  # 第一周内容作为第二章
-    - week2.qmd  # 第二周内容作为第三章
+    - syllabus.qmd
+    - week1.qmd
+    - week2.qmd
+    - week3.qmd
+    - week4.qmd
     # - ...
 
 format:
