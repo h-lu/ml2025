@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第二周：数据预处理与特征工程基础 – 机器学习 (Python)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week1.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xkm/sYwpb+ilR5gUw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+
+<link rel="stylesheet" href="styles/custom.css">
+<link rel="stylesheet" href="styles/mermaid.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week2.html"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习 (Python)</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习 (Python)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./syllabus.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">课程大纲</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#第一次课数据预处理与特征工程基础" id="toc-第一次课数据预处理与特征工程基础" class="nav-link active" data-scroll-target="#第一次课数据预处理与特征工程基础">第一次课：数据预处理与特征工程基础</a>
+  <ul class="collapse">
+  <li><a href="#数据加载与探索" id="toc-数据加载与探索" class="nav-link" data-scroll-target="#数据加载与探索">1. 数据加载与探索</a></li>
+  <li><a href="#数据清洗" id="toc-数据清洗" class="nav-link" data-scroll-target="#数据清洗">2. 数据清洗</a></li>
+  <li><a href="#特征工程基础" id="toc-特征工程基础" class="nav-link" data-scroll-target="#特征工程基础">3. 特征工程基础</a></li>
+  <li><a href="#scikit-learn-数据预处理和特征工程常用模块" id="toc-scikit-learn-数据预处理和特征工程常用模块" class="nav-link" data-scroll-target="#scikit-learn-数据预处理和特征工程常用模块">4. Scikit-learn 数据预处理和特征工程常用模块</a></li>
+  <li><a href="#小组项目一电商用户行为数据探索与预处理" id="toc-小组项目一电商用户行为数据探索与预处理" class="nav-link" data-scroll-target="#小组项目一电商用户行为数据探索与预处理">5. 小组项目一：电商用户行为数据探索与预处理</a></li>
+  </ul></li>
+  <li><a href="#第二次课小组项目一实践" id="toc-第二次课小组项目一实践" class="nav-link" data-scroll-target="#第二次课小组项目一实践">第二次课：小组项目一实践</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+本周学习目标
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>掌握使用 <code>Pandas</code> 进行数据加载和探索的方法，包括数据读取、查看、统计分析和可视化。</li>
+<li>掌握常见的数据清洗方法，包括缺失值处理 (删除、填充) 和异常值处理 (检测与处理)。</li>
+<li>理解特征工程的基本概念和方法，包括数值特征处理 (特征缩放、特征转换) 和类别特征处理 (独热编码、标签编码)。</li>
+<li>掌握使用 <code>Scikit-learn</code> 进行数据预处理和特征工程的常用方法。</li>
+<li>能够使用 AI 辅助编程工具完成数据预处理和特征工程的编程练习。</li>
+<li>了解小组项目一：电商用户行为数据探索与预处理 的目标、数据集和任务要求。</li>
+</ul>
+</div>
+</div>
+<section id="第一次课数据预处理与特征工程基础" class="level2">
+<h2 class="anchored" data-anchor-id="第一次课数据预处理与特征工程基础">第一次课：数据预处理与特征工程基础</h2>
+<section id="数据加载与探索" class="level3">
+<h3 class="anchored" data-anchor-id="数据加载与探索">1. 数据加载与探索</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+数据加载基础知识
+</div>
+</div>
+<section id="使用-pandas-读取数据" class="level4 callout-body-container callout-body">
+<h4 class="anchored" data-anchor-id="使用-pandas-读取数据">1.1 使用 Pandas 读取数据</h4>
+<p><strong>常用函数:</strong> <code>pd.read_csv()</code>, <code>pd.read_excel()</code> 等</p>
+<p><strong>常用参数:</strong></p>
+<ul>
+<li><code>filepath_or_buffer</code>: 文件路径 (必需)</li>
+<li><code>sep</code> 或 <code>delimiter</code>: 分隔符 (默认为 <code>,</code>)</li>
+<li><code>header</code>: 列名行 (默认为 <code>0</code>)</li>
+<li><code>index_col</code>: 索引列</li>
+<li><code>encoding</code>: 文件编码 (例如 <code>utf-8</code>, <code>gbk</code>)</li>
+</ul>
+<p><strong>注意:</strong> 如果读取 CSV 文件出现乱码，可以尝试更换 <code>encoding</code> 参数。</p>
+</section>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+数据查看常用方法
+</div>
+</div>
+<section id="数据查看" class="level4 callout-body-container callout-body">
+<h4 class="anchored" data-anchor-id="数据查看">1.2 数据查看</h4>
+<ul>
+<li><code>df.head(n)</code>: 查看前 <code>n</code> 行</li>
+<li><code>df.tail(n)</code>: 查看后 <code>n</code> 行</li>
+<li><code>df.info()</code>: 查看数据摘要信息 (<strong>重要</strong>)</li>
+<li><code>df.describe()</code>: 查看数值列统计信息</li>
+<li><code>df.shape</code>, <code>df.columns</code>, <code>df.index</code>, <code>df.dtypes</code>: 查看数据结构信息</li>
+</ul>
+</section>
+</div>
+</section>
+<section id="数据清洗" class="level3">
+<h3 class="anchored" data-anchor-id="数据清洗">2. 数据清洗</h3>
+<section id="缺失值处理" class="level4">
+<h4 class="anchored" data-anchor-id="缺失值处理">2.1 缺失值处理</h4>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+缺失值检测与处理
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<section id="检测缺失值" class="level5">
+<h5 class="anchored" data-anchor-id="检测缺失值">2.1.1 检测缺失值</h5>
+<ul>
+<li><code>df.isnull()</code></li>
+<li><code>df.sum()</code></li>
+<li><code>df.isnull().sum()</code></li>
+<li><code>missingno</code> 库 (可视化)</li>
+</ul>
+</section>
+<section id="缺失值处理策略" class="level5">
+<h5 class="anchored" data-anchor-id="缺失值处理策略">2.1.2 缺失值处理策略</h5>
+<ul>
+<li><strong>删除法:</strong> <code>df.dropna()</code> (<strong>慎用</strong>)</li>
+<li><strong>填充法:</strong> <code>df.fillna(value)</code>
+<ul>
+<li>固定值填充</li>
+<li>均值/中位数/众数填充 (使用 <code>SimpleImputer</code>)</li>
+</ul></li>
+</ul>
+</section>
+</div>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.impute <span class="im">import</span> SimpleImputer</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建包含缺失值的 DataFrame</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> {<span class="st">'数值特征'</span>: [<span class="dv">1</span>, <span class="dv">2</span>, np.nan, <span class="dv">4</span>, <span class="dv">5</span>, np.nan],</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">'类别特征'</span>: [<span class="st">'A'</span>, <span class="st">'B'</span>, <span class="st">'C'</span>, np.nan, <span class="st">'A'</span>, <span class="st">'B'</span>]}</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"原始数据:</span><span class="ch">\n</span><span class="st">"</span>, df)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 均值填充数值特征</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>mean_imputer <span class="op">=</span> SimpleImputer(strategy<span class="op">=</span><span class="st">'mean'</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'数值特征_mean_填充'</span>] <span class="op">=</span> mean_imputer.fit_transform(df[[<span class="st">'数值特征'</span>]])</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">均值填充后:</span><span class="ch">\n</span><span class="st">"</span>, df)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 中位数填充数值特征</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>median_imputer <span class="op">=</span> SimpleImputer(strategy<span class="op">=</span><span class="st">'median'</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'数值特征_median_填充'</span>] <span class="op">=</span> median_imputer.fit_transform(df[[<span class="st">'数值特征'</span>]])</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">中位数填充后:</span><span class="ch">\n</span><span class="st">"</span>, df)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 众数填充类别特征 (或数值特征)</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>mode_imputer <span class="op">=</span> SimpleImputer(strategy<span class="op">=</span><span class="st">'most_frequent'</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'类别特征_mode_填充'</span>] <span class="op">=</span> mode_imputer.fit_transform(df[[<span class="st">'类别特征'</span>]])</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">众数填充后:</span><span class="ch">\n</span><span class="st">"</span>, df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+其他缺失值处理方法
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>插值法:</strong> <code>df.interpolate()</code></li>
+<li><strong>高级方法:</strong> 模型预测 (本课程不深入)</li>
+</ul>
+<p>选择合适的缺失值处理策略需要根据具体情况和业务理解。</p>
+</div>
+</div>
+</section>
+<section id="异常值处理" class="level4">
+<h4 class="anchored" data-anchor-id="异常值处理">2.2 异常值处理</h4>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+异常值检测与处理方法
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<section id="异常值检测方法" class="level5">
+<h5 class="anchored" data-anchor-id="异常值检测方法">2.2.1 异常值检测方法</h5>
+<ul>
+<li><strong>箱线图 (Boxplot)</strong></li>
+<li><strong>Z-score</strong></li>
+<li><strong>IQR (四分位距)</strong></li>
+<li>其他方法 (聚类, LOF 等)</li>
+</ul>
+</section>
+<section id="异常值处理策略" class="level5">
+<h5 class="anchored" data-anchor-id="异常值处理策略">2.2.2 异常值处理策略</h5>
+<ul>
+<li>删除法 (<strong>慎用</strong>)</li>
+<li>替换法</li>
+<li>视为缺失值</li>
+<li>不处理</li>
+</ul>
+<p><strong>注意:</strong> 异常值处理同样需要根据具体情况和业务理解。</p>
+</section>
+</div>
+</div>
+</section>
+</section>
+<section id="特征工程基础" class="level3">
+<h3 class="anchored" data-anchor-id="特征工程基础">3. 特征工程基础</h3>
+<section id="数值特征处理" class="level4">
+<h4 class="anchored" data-anchor-id="数值特征处理">3.1 数值特征处理</h4>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+特征缩放
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>特征缩放 (Feature Scaling):</strong> 将数值特征缩放到一定范围，避免特征量纲不一致和数值过大/过小带来的问题。</p>
+<ol type="1">
+<li><strong>标准化 (Standardization):</strong>
+<ul>
+<li>将特征缩放到均值为 0，标准差为 1 的分布</li>
+<li>公式：<code>x_scaled = (x - mean) / std</code></li>
+<li><code>sklearn.preprocessing.StandardScaler</code></li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建示例数据</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>data_scaling <span class="op">=</span> {<span class="st">'数值特征'</span>: np.array([[<span class="dv">10</span>], [<span class="dv">20</span>], [<span class="dv">30</span>], [<span class="dv">40</span>], [<span class="dv">50</span>]])}</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>df_scaling <span class="op">=</span> pd.DataFrame(data_scaling)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"原始数据:</span><span class="ch">\n</span><span class="st">"</span>, df_scaling)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 StandardScaler 进行标准化</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>df_scaling[<span class="st">'数值特征_标准化'</span>] <span class="op">=</span> scaler.fit_transform(df_scaling[[<span class="st">'数值特征'</span>]])</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">StandardScaler 标准化后:</span><span class="ch">\n</span><span class="st">"</span>, df_scaling)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+标准化使用场景
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>标准化适用于大多数机器学习算法，特别是： - 基于距离度量的算法 (例如 KNN, 聚类) - 梯度下降算法 (例如 线性回归, 逻辑回归, 神经网络)</p>
+<p>标准化后，数据分布的形态可能会发生改变，但不会改变数据的相对大小关系。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+归一化
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>归一化 (Normalization):</strong> - 将特征缩放到 0 和 1 之间 (也称 Min-Max 缩放) - 公式：<code>x_scaled = (x - min) / (max - min)</code> - <code>sklearn.preprocessing.MinMaxScaler</code></p>
+</div>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> MinMaxScaler</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 继续使用上面的示例数据</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>df_scaling_minmax <span class="op">=</span> pd.DataFrame(data_scaling)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"原始数据:</span><span class="ch">\n</span><span class="st">"</span>, df_scaling_minmax)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 MinMaxScaler 进行归一化</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>minmax_scaler <span class="op">=</span> MinMaxScaler()</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>df_scaling_minmax[<span class="st">'数值特征_归一化'</span>] <span class="op">=</span> minmax_scaler.fit_transform(df_scaling_minmax[[<span class="st">'数值特征'</span>]])</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">MinMaxScaler 归一化后:</span><span class="ch">\n</span><span class="st">"</span>, df_scaling_minmax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+归一化使用场景
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>归一化通常用于对数值范围敏感的算法 (例如 神经网络)</li>
+<li>归一化后，数据会被压缩到 [0, 1] 区间</li>
+<li>数据分布的形态会发生改变</li>
+<li>如果数据中存在 outliers，MinMaxScaler 对 outliers 比较敏感</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+其他缩放方法
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><code>RobustScaler</code>: 使用 IQR (四分位距) 进行缩放，对 outliers 鲁棒</li>
+<li><code>MaxAbsScaler</code>: 将特征缩放到 [-1, 1] 区间，适用于稀疏数据</li>
+</ul>
+<p>选择合适的缩放方法需要根据数据分布和模型特点。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+特征转换
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>特征转换 (Feature Transformation):</strong> 对数值特征进行函数变换，使其更符合模型假设或业务需求。</p>
+<ol type="1">
+<li><strong>多项式特征:</strong>
+<ul>
+<li>通过多项式扩展，增加特征的非线性</li>
+<li><code>sklearn.preprocessing.PolynomialFeatures</code></li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> PolynomialFeatures</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建示例数据</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>data_poly <span class="op">=</span> {<span class="st">'数值特征'</span>: np.array([[<span class="dv">1</span>], [<span class="dv">2</span>], [<span class="dv">3</span>], [<span class="dv">4</span>]])}</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>df_poly <span class="op">=</span> pd.DataFrame(data_poly)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"原始数据:</span><span class="ch">\n</span><span class="st">"</span>, df_poly)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 PolynomialFeatures 创建 2 次多项式特征</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>poly <span class="op">=</span> PolynomialFeatures(degree<span class="op">=</span><span class="dv">2</span>, include_bias<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>poly_features <span class="op">=</span> poly.fit_transform(df_poly[[<span class="st">'数值特征'</span>]])</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>poly_feature_names <span class="op">=</span> poly.get_feature_names_out([<span class="st">'数值特征'</span>])</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>df_poly_encoded <span class="op">=</span> pd.DataFrame(poly_features, columns<span class="op">=</span>poly_feature_names)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">PolynomialFeatures 2 次多项式特征:</span><span class="ch">\n</span><span class="st">"</span>, df_poly_encoded)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+多项式特征注意事项
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>多项式特征可以捕捉特征之间的非线性关系</li>
+<li>适用于线性模型处理非线性数据</li>
+<li>但多项式特征会增加特征维度</li>
+<li>高次多项式容易过拟合</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+对数变换
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>对数变换:</strong> 对特征取对数，压缩数据范围，平滑数据分布，处理长尾分布。</p>
+<ul>
+<li><code>numpy.log</code>, <code>numpy.log1p</code> (推荐使用 log1p，避免 log(0) 错误)</li>
+</ul>
+</div>
+</div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建示例数据 (模拟长尾分布)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>data_log <span class="op">=</span> {<span class="st">'数值特征'</span>: np.exp(np.random.normal(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">100</span>))}</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>df_log <span class="op">=</span> pd.DataFrame(data_log)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制原始数据直方图</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>df_log[<span class="st">'数值特征'</span>].hist(bins<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'原始数据直方图 (长尾分布)'</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 进行对数变换</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>df_log[<span class="st">'数值特征_对数变换'</span>] <span class="op">=</span> np.log1p(df_log[<span class="st">'数值特征'</span>])</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制对数变换后数据直方图</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>df_log[<span class="st">'数值特征_对数变换'</span>].hist(bins<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'对数变换后数据直方图'</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+对数变换使用场景
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>适用于处理长尾分布数据，例如用户行为数据、商品销量数据等</li>
+<li>对数变换可以减小数据的偏度，使其更接近正态分布</li>
+<li>有利于一些模型的训练</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+幂变换
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>幂变换:</strong> 对特征进行幂运算，调整数据分布形态。</p>
+<ul>
+<li><strong>Box-Cox 变换, Yeo-Johnson 变换:</strong> 更通用的幂变换，可以处理不同分布的数据</li>
+<li><code>sklearn.preprocessing.PowerTransformer</code></li>
+</ul>
+<p>选择合适的特征转换方法需要根据业务理解和数据探索选择。</p>
+</div>
+</div>
+</section>
+<section id="类别特征处理" class="level4">
+<h4 class="anchored" data-anchor-id="类别特征处理">3.2 类别特征处理</h4>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+独热编码
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>独热编码 (One-Hot Encoding):</strong></p>
+<ul>
+<li>将类别特征转换为多个二元特征</li>
+<li>每个类别对应一列，存在该类别则为 1，否则为 0</li>
+<li>适用于类别之间没有顺序关系的情况 (例如：颜色、城市)</li>
+<li><code>pandas.get_dummies</code>, <code>sklearn.preprocessing.OneHotEncoder</code></li>
+</ul>
+</div>
+</div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建类别特征数据</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>data_onehot <span class="op">=</span> {<span class="st">'颜色'</span>: [<span class="st">'红'</span>, <span class="st">'绿'</span>, <span class="st">'蓝'</span>, <span class="st">'红'</span>, <span class="st">'绿'</span>],</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">'城市'</span>: [<span class="st">'北京'</span>, <span class="st">'上海'</span>, <span class="st">'广州'</span>, <span class="st">'北京'</span>, <span class="st">'深圳'</span>]}</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>df_onehot <span class="op">=</span> pd.DataFrame(data_onehot)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"原始数据:</span><span class="ch">\n</span><span class="st">"</span>, df_onehot)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 pandas.get_dummies 进行独热编码</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>df_onehot_dummies <span class="op">=</span> pd.get_dummies(df_onehot, columns<span class="op">=</span>[<span class="st">'颜色'</span>, <span class="st">'城市'</span>])</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">pandas.get_dummies 独热编码后:</span><span class="ch">\n</span><span class="st">"</span>, df_onehot_dummies)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 OneHotEncoder 进行独热编码</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>encoder <span class="op">=</span> OneHotEncoder(sparse_output<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>onehot_features <span class="op">=</span> encoder.fit_transform(df_onehot[[<span class="st">'颜色'</span>, <span class="st">'城市'</span>]])</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>feature_names <span class="op">=</span> encoder.get_feature_names_out([<span class="st">'颜色'</span>, <span class="st">'城市'</span>])</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>df_onehot_encoded <span class="op">=</span> pd.DataFrame(onehot_features, columns<span class="op">=</span>feature_names)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">OneHotEncoder 独热编码后:</span><span class="ch">\n</span><span class="st">"</span>, df_onehot_encoded)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+独热编码注意事项
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>处理高基数类别特征 (类别数量过多) 可能导致维度灾难。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+标签编码
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>标签编码 (Label Encoding):</strong></p>
+<ul>
+<li>将类别特征转换为数值标签，每个类别对应一个整数</li>
+<li>适用于类别之间有顺序关系的情况 (例如：学历、等级)</li>
+<li><code>sklearn.preprocessing.LabelEncoder</code></li>
+</ul>
+</div>
+</div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建类别特征数据</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>data_label <span class="op">=</span> {<span class="st">'学历'</span>: [<span class="st">'本科'</span>, <span class="st">'硕士'</span>, <span class="st">'博士'</span>, <span class="st">'本科'</span>, <span class="st">'硕士'</span>]}</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>df_label <span class="op">=</span> pd.DataFrame(data_label)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"原始数据:</span><span class="ch">\n</span><span class="st">"</span>, df_label)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 LabelEncoder 进行标签编码</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>label_encoder <span class="op">=</span> LabelEncoder()</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>df_label[<span class="st">'学历_标签编码'</span>] <span class="op">=</span> label_encoder.fit_transform(df_label[<span class="st">'学历'</span>])</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">LabelEncoder 标签编码后:</span><span class="ch">\n</span><span class="st">"</span>, df_label)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看类别标签映射关系</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>label_mapping <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>(label_encoder.classes_, label_encoder.transform(label_encoder.classes_)))</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">类别标签映射关系:</span><span class="ch">\n</span><span class="st">"</span>, label_mapping)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+标签编码注意事项
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>标签编码可能会引入类别之间的顺序关系，如果类别没有实际顺序意义，可能不适用。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+其他类别特征编码方法
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>顺序编码 (Ordinal Encoding):</strong> 类似于标签编码，但可以自定义类别顺序
+<ul>
+<li>适用于类别之间有明确顺序关系的情况</li>
+<li><code>sklearn.preprocessing.OrdinalEncoder</code></li>
+</ul></li>
+<li><strong>二进制编码 (Binary Encoding)</strong></li>
+<li><strong>效应编码 (Effect Encoding)</strong></li>
+<li><strong>目标编码 (Target Encoding)</strong></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="scikit-learn-数据预处理和特征工程常用模块" class="level3">
+<h3 class="anchored" data-anchor-id="scikit-learn-数据预处理和特征工程常用模块">4. Scikit-learn 数据预处理和特征工程常用模块</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+常用模块概览
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><code>sklearn.preprocessing</code>: 提供了各种数据预处理和特征工程的函数和类
+<ul>
+<li><code>StandardScaler</code>, <code>MinMaxScaler</code>, <code>RobustScaler</code>, <code>MaxAbsScaler</code> (特征缩放)</li>
+<li><code>PolynomialFeatures</code>, <code>PowerTransformer</code> (特征转换)</li>
+<li><code>OneHotEncoder</code>, <code>LabelEncoder</code>, <code>OrdinalEncoder</code> (类别特征编码)</li>
+<li><code>SimpleImputer</code> (缺失值填充)</li>
+</ul></li>
+<li><code>sklearn.impute</code>: 提供了缺失值填充的类
+<ul>
+<li><code>SimpleImputer</code>, <code>KNNImputer</code> (KNN 填充)</li>
+<li><code>IterativeImputer</code> (迭代填充)</li>
+</ul></li>
+<li><code>sklearn.feature_selection</code>: 提供了特征选择的类 (下周讲解)</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="小组项目一电商用户行为数据探索与预处理" class="level3">
+<h3 class="anchored" data-anchor-id="小组项目一电商用户行为数据探索与预处理">5. 小组项目一：电商用户行为数据探索与预处理</h3>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+项目概述
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>项目背景:</strong> 电商平台积累了大量的用户行为数据，例如用户的点击、浏览、购买、加购、收藏等行为。通过分析这些数据，可以了解用户兴趣偏好、购买行为模式，为个性化推荐、精准营销、用户增长等提供数据支持。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+数据集说明
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>鼓励学生小组自主选择数据集</strong>，建议选择电商或零售行业的用户行为数据集</li>
+<li>数据集应包含用户行为数据，数据量适中，特征维度不低于10个</li>
+<li><strong>鼓励各小组选择不同的数据集，以提高项目实践的多样性</strong></li>
+</ul>
+<p>示例数据集：<a href="https://tianchi.aliyun.com/dataset/dataDetail?dataId=649">阿里巴巴天池 - 淘宝用户行为数据</a> - 包含 2000 万条淘宝用户的行为记录 - 字段：用户ID、商品ID、商品类目ID、行为类型、时间戳 - 数据已简化处理，便于教学使用</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+项目任务
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><strong>数据探索:</strong>
+<ul>
+<li>加载数据集，查看数据基本信息</li>
+<li>分析用户行为类型分布、时间分布等</li>
+<li>可视化用户行为数据</li>
+</ul></li>
+<li><strong>数据清洗:</strong>
+<ul>
+<li>处理缺失值</li>
+<li>检测和处理异常值</li>
+<li>根据数据探索结果进行必要的清洗操作</li>
+</ul></li>
+<li><strong>特征工程:</strong>
+<ul>
+<li>构建用户特征和商品特征</li>
+<li>尝试构建交叉特征或衍生特征</li>
+<li>对特征进行必要的预处理</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+提交要求
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>预处理后的数据集 (CSV 格式)</li>
+<li>Python 代码 (Jupyter Notebook 或 Python 脚本)
+<ul>
+<li>包含数据探索、清洗和特征工程的完整代码</li>
+<li>代码需要有清晰的注释</li>
+</ul></li>
+<li>小组分工说明 (可选)</li>
+</ul>
+<p><strong>评分标准:</strong> 数据预处理的完整性、代码的规范性、数据探索的深入程度、特征工程的合理性</p>
+</div>
+</div>
+</section>
+</section>
+<section id="第二次课小组项目一实践" class="level2">
+<h2 class="anchored" data-anchor-id="第二次课小组项目一实践">第二次课：小组项目一实践</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+课程安排
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>学生分组进行小组项目一</li>
+<li>教师巡回指导，解答问题</li>
+<li>完成小组项目一代码初稿</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+课后作业
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>继续完善小组项目一的数据预处理代码</li>
+<li>课前提交预处理结果</li>
+<li>预习下周课程：特征选择与降维</li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+相关资源
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><a href="https://pandas.pydata.org/docs/">Pandas 官方文档</a></li>
+<li><a href="https://scikit-learn.org/stable/">Scikit-learn 官方文档</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/preprocessing.html">Scikit-learn Preprocessing 模块文档</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/impute.html">Scikit-learn Impute 模块文档</a></li>
+<li><a href="https://jakevdp.github.io/PythonDataScienceHandbook/">Python Data Science Handbook</a></li>
+<li><a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/">Hands-On Machine Learning with Scikit-Learn, Keras &amp; TensorFlow</a></li>
+<li><a href="https://tianchi.aliyun.com/dataset/dataDetail?dataId=649">阿里巴巴天池 - 淘宝用户行为数据</a></li>
+</ul>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./week1.html" class="pagination-link" aria-label="第一周：机器学习导论与Python环境搭建">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

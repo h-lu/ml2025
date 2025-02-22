@@ -138,20 +138,17 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#第二次课数据预处理与特征工程基础" id="toc-第二次课数据预处理与特征工程基础" class="nav-link active" data-scroll-target="#第二次课数据预处理与特征工程基础">第二次课：数据预处理与特征工程基础</a>
+  <li><a href="#第一次课数据预处理与特征工程基础" id="toc-第一次课数据预处理与特征工程基础" class="nav-link active" data-scroll-target="#第一次课数据预处理与特征工程基础">第一次课：数据预处理与特征工程基础</a>
   <ul class="collapse">
   <li><a href="#课程目标" id="toc-课程目标" class="nav-link" data-scroll-target="#课程目标">课程目标</a></li>
   <li><a href="#内容概要" id="toc-内容概要" class="nav-link" data-scroll-target="#内容概要">内容概要</a></li>
+  </ul></li>
+  <li><a href="#第二次课小组项目一电商用户行为数据探索与预处理-数据分析与代码实践" id="toc-第二次课小组项目一电商用户行为数据探索与预处理-数据分析与代码实践" class="nav-link" data-scroll-target="#第二次课小组项目一电商用户行为数据探索与预处理-数据分析与代码实践">第二次课：小组项目一：电商用户行为数据探索与预处理 (数据分析与代码实践)</a>
+  <ul class="collapse">
+  <li><a href="#内容概要-1" id="toc-内容概要-1" class="nav-link" data-scroll-target="#内容概要-1">内容概要</a></li>
   <li><a href="#实践环节" id="toc-实践环节" class="nav-link" data-scroll-target="#实践环节">实践环节</a></li>
   <li><a href="#课后作业" id="toc-课后作业" class="nav-link" data-scroll-target="#课后作业">课后作业</a></li>
   <li><a href="#相关资源" id="toc-相关资源" class="nav-link" data-scroll-target="#相关资源">相关资源</a></li>
-  </ul></li>
-  <li><a href="#第三次课特征选择与降维-下周内容预告" id="toc-第三次课特征选择与降维-下周内容预告" class="nav-link" data-scroll-target="#第三次课特征选择与降维-下周内容预告">第三次课：特征选择与降维 (下周内容预告)</a>
-  <ul class="collapse">
-  <li><a href="#课程目标-下周" id="toc-课程目标-下周" class="nav-link" data-scroll-target="#课程目标-下周">课程目标 (下周)</a></li>
-  <li><a href="#内容概要-下周" id="toc-内容概要-下周" class="nav-link" data-scroll-target="#内容概要-下周">内容概要 (下周)</a></li>
-  <li><a href="#课后作业-下周" id="toc-课后作业-下周" class="nav-link" data-scroll-target="#课后作业-下周">课后作业 (下周)</a></li>
-  <li><a href="#相关资源-下周" id="toc-相关资源-下周" class="nav-link" data-scroll-target="#相关资源-下周">相关资源 (下周)</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -178,8 +175,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="第二次课数据预处理与特征工程基础" class="level2">
-<h2 class="anchored" data-anchor-id="第二次课数据预处理与特征工程基础">第二次课：数据预处理与特征工程基础</h2>
+<section id="第一次课数据预处理与特征工程基础" class="level2">
+<h2 class="anchored" data-anchor-id="第一次课数据预处理与特征工程基础">第一次课：数据预处理与特征工程基础</h2>
 <section id="课程目标" class="level3">
 <h3 class="anchored" data-anchor-id="课程目标">课程目标</h3>
 <ul>
@@ -199,27 +196,40 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>使用 <code>Pandas</code> 读取数据:</strong>
 <ul>
 <li><code>pd.read_csv()</code>, <code>pd.read_excel()</code> 等常用数据读取函数。</li>
-<li>常用参数：<code>filepath_or_buffer</code>, <code>sep</code>, <code>header</code>, <code>index_col</code>, <code>encoding</code> 等。</li>
+<li>常用参数：
+<ul>
+<li><code>filepath_or_buffer</code>: 文件路径或文件型对象 (必需参数)。</li>
+<li><code>sep</code> 或 <code>delimiter</code>: 字段分隔符，默认为逗号 <code>,</code>。 可以使用 <code>\t</code> (制表符), <code>';'</code> 等。</li>
+<li><code>header</code>: 指定哪一行作为列名，默认为 <code>header=0</code> (第一行作为列名)。 如果数据没有列名，可以设置为 <code>header=None</code>，Pandas 会自动生成默认列名 (0, 1, 2, …)。</li>
+<li><code>index_col</code>: 指定哪一列作为行索引，可以是列索引号或列名。</li>
+<li><code>encoding</code>: 指定文件编码格式，常用编码格式包括：
+<ul>
+<li><code>utf-8</code>: 通用 Unicode 编码，推荐使用。</li>
+<li><code>gbk</code>, <code>gb2312</code>: 中文常用编码。</li>
+<li><code>latin1</code>: ISO-8859-1，用于西欧语言。</li>
+<li><strong>如果读取 CSV 文件出现乱码，可以尝试更换 <code>encoding</code> 参数，例如尝试 <code>encoding='gbk'</code> 或 <code>encoding='latin1'</code>。</strong></li>
+</ul></li>
+</ul></li>
 </ul></li>
 <li><strong>数据查看:</strong>
 <ul>
-<li><code>df.head()</code>, <code>df.tail()</code>, <code>df.sample()</code>: 查看数据的前几行、后几行或随机抽样行。</li>
-<li><code>df.info()</code>: 查看数据类型、缺失值情况、内存占用等信息。</li>
-<li><code>df.describe()</code>: 查看数值特征的统计描述 (均值、标准差、最小值、最大值、分位数等)。</li>
-<li><code>df.shape</code>, <code>df.columns</code>, <code>df.index</code>, <code>df.dtypes</code>: 查看数据维度、列名、索引和数据类型。</li>
+<li><code>df.head(n)</code>, <code>df.tail(n)</code>, <code>df.sample(n)</code>: 查看数据的前 <code>n</code> 行、后 <code>n</code> 行或随机抽样 <code>n</code> 行，默认 <code>n=5</code>。</li>
+<li><code>df.info()</code>: 查看 DataFrame 的摘要信息，包括列名、数据类型、非空值数量、内存使用情况等。 <strong>非常重要，用于快速了解数据的大致情况。</strong></li>
+<li><code>df.describe()</code>: 查看数值型列的统计描述信息，包括计数、均值、标准差、最小值、四分位数、最大值等。 <strong>默认只对数值型列进行统计，可以使用 <code>df.describe(include='all')</code> 查看所有列的统计信息 (包括类别型列)。</strong></li>
+<li><code>df.shape</code>, <code>df.columns</code>, <code>df.index</code>, <code>df.dtypes</code>: 查看 DataFrame 的形状 (行数和列数)、列名、索引和每列的数据类型。</li>
 </ul></li>
 <li><strong>数据基本统计分析:</strong>
 <ul>
 <li>数值特征统计：<code>df['列名'].mean()</code>, <code>df['列名'].median()</code>, <code>df['列名'].std()</code>, <code>df['列名'].max()</code>, <code>df['列名'].min()</code>, <code>df['列名'].value_counts()</code> 等。</li>
 <li>类别特征统计：<code>df['列名'].value_counts()</code>, <code>df['列名'].unique()</code>, <code>df['列名'].nunique()</code> 等。</li>
-<li>相关性分析：<code>df.corr()</code> (计算特征之间的相关系数)。</li>
+<li>相关性分析：<code>df.corr()</code> (计算特征之间的相关系数，默认计算 Pearson 相关系数)。 <strong>可以使用 <code>method</code> 参数指定相关系数类型，例如 <code>method='spearman'</code> (Spearman 等级相关系数), <code>method='kendall'</code> (Kendall Tau 相关系数)。</strong></li>
 </ul></li>
 <li><strong>数据可视化 (初步):</strong>
 <ul>
-<li>直方图：<code>df['列名'].hist()</code> (查看数值特征分布)。</li>
-<li>箱线图：<code>df.boxplot(column=['列名'])</code> (查看数值特征的箱线图，检测异常值)。</li>
-<li>散点图：<code>df.plot.scatter(x='列名1', y='列名2')</code> (查看两个数值特征之间的关系)。</li>
-<li>柱状图：<code>df['列名'].value_counts().plot.bar()</code> (查看类别特征的分布)。</li>
+<li>直方图：<code>df['列名'].hist()</code> (查看数值特征的分布，快速了解数据分布形态)。</li>
+<li>箱线图：<code>df.boxplot(column=['列名'])</code> (查看数值特征的箱线图，检测异常值和数据分布的偏态)。</li>
+<li>散点图：<code>df.plot.scatter(x='列名1', y='列名2')</code> (查看两个数值特征之间的关系，初步判断是否存在线性或非线性相关性)。</li>
+<li>柱状图：<code>df['列名'].value_counts().plot.bar()</code> (查看类别特征的分布，了解各类别样本数量)。</li>
 <li><strong>使用 <code>matplotlib</code> 和 <code>seaborn</code> 进行更高级的数据可视化 (下周详细讲解)。</strong></li>
 </ul></li>
 </ul></li>
@@ -232,6 +242,32 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li><strong>删除法:</strong> <code>df.dropna()</code> (删除包含缺失值的行或列，慎用，可能丢失信息)。</li>
 <li><strong>填充法:</strong> <code>df.fillna(value)</code>, <code>df['列名'].fillna(value)</code> (使用固定值、均值、中位数、众数等填充缺失值)。</li>
+</ul>
+<pre class="python:数据清洗示例代码"><code>import pandas as pd
+from sklearn.impute import SimpleImputer
+import numpy as np
+
+# 创建包含缺失值的 DataFrame
+data = {'数值特征': [1, 2, np.nan, 4, 5, np.nan],
+        '类别特征': ['A', 'B', 'C', np.nan, 'A', 'B']}
+df = pd.DataFrame(data)
+print("原始数据:\n", df)
+
+# 均值填充数值特征
+mean_imputer = SimpleImputer(strategy='mean')
+df['数值特征_mean_填充'] = mean_imputer.fit_transform(df[['数值特征']])
+print("\n均值填充后:\n", df)
+
+# 中位数填充数值特征
+median_imputer = SimpleImputer(strategy='median')
+df['数值特征_median_填充'] = median_imputer.fit_transform(df[['数值特征']])
+print("\n中位数填充后:\n", df)
+
+# 众数填充类别特征 (或数值特征)
+mode_imputer = SimpleImputer(strategy='most_frequent')
+df['类别特征_mode_填充'] = mode_imputer.fit_transform(df[['类别特征']])
+print("\n众数填充后:\n", df)</code></pre>
+<ul>
 <li><strong>插值法:</strong> <code>df.interpolate()</code> (使用插值方法估计缺失值，例如线性插值、多项式插值等)。</li>
 <li><strong>高级方法:</strong> 使用模型预测缺失值 (例如 KNN 填充、回归填充等，本课程不深入讲解)。</li>
 </ul></li>
@@ -246,19 +282,43 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>需要根据具体情况和业务理解。</p>
+<p>需要根据具体情况和业务理解。 <strong>例如，如果缺失值比例很小，且是完全随机缺失，可以考虑删除；如果缺失值比例较大，或者不是随机缺失，则应该考虑填充或其他更复杂的方法。 对于数值特征，均值和中位数填充是常用方法；对于类别特征，众数填充较为常用。</strong></p>
 </div>
 </div></li>
 <li><strong>异常值处理:</strong>
 <ul>
-<li><strong>异常值检测方法:</strong>
+<li><p><strong>异常值检测方法:</strong></p>
 <ul>
-<li><strong>箱线图 (Boxplot):</strong> 箱线图以外的点通常被认为是异常值。</li>
-<li><strong>Z-score:</strong> 计算 Z-score，绝对值大于阈值 (例如 3) 的被认为是异常值。</li>
-<li><strong>IQR (四分位距):</strong> 超出 Q1 - 1.5IQR 或 Q3 + 1.5IQR 范围的值被认为是异常值。</li>
+<li><strong>箱线图 (Boxplot):</strong> 箱线图以外的点通常被认为是异常值。 <strong>箱线图可以直观地展示数据的分布、中位数、四分位数和异常值。</strong></li>
+</ul>
+<pre class="python:箱线图异常值检测示例代码"><code>import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# 创建包含异常值的 DataFrame (这里使用随机数据模拟)
+np.random.seed(42)
+data_boxplot = {'数值特征': np.concatenate([np.random.normal(0, 1, 100), np.random.normal(5, 1, 10)])} # 模拟一些异常值
+df_boxplot = pd.DataFrame(data_boxplot)
+
+# 绘制箱线图
+sns.boxplot(x=df_boxplot['数值特征'])
+plt.title('箱线图 - 异常值检测')
+plt.show()</code></pre>
+<ul>
+<li><strong>Z-score:</strong> 计算 Z-score，绝对值大于阈值 (例如 3) 的被认为是异常值。 <strong>Z-score 表示数据点偏离均值的程度，阈值通常设置为 2 或 3。</strong></li>
+</ul>
+<p>```python:Z-score 异常值检测示例代码 import pandas as pd import numpy as np</p>
+<h1 id="创建包含异常值的-dataframe-这里继续使用随机数据模拟">创建包含异常值的 DataFrame (这里继续使用随机数据模拟)</h1>
+<p>np.random.seed(42) data_zscore = {‘数值特征’: np.concatenate([np.random.normal(0, 1, 100), np.random.normal(5, 1, 10)])} df_zscore = pd.DataFrame(data_zscore)</p>
+<h1 id="计算-z-score">计算 Z-score</h1>
+<p>df_zscore[‘Z-score’] = (df_zscore[‘数值特征’] - df_zscore[‘数值特征’].mean()) / df_zscore[‘数值特征’].std()</p>
+<h1 id="设置-z-score-阈值">设置 Z-score 阈值</h1>
+<p>threshold = 3 outliers_zscore = df_zscore[abs(df_zscore[‘Z-score’]) &gt; threshold] print(“Z-score 异常值:”, outliers_zscore) ```</p>
+<ul>
+<li><strong>IQR (四分位距):</strong> 超出 Q1 - 1.5IQR 或 Q3 + 1.5IQR 范围的值被认为是异常值。 <strong>IQR 是上下四分位数的差值，基于 IQR 的方法对异常值更鲁棒。</strong></li>
 <li><strong>其他方法:</strong> 聚类、LOF (局部离群因子) 等算法 (本课程不深入讲解)。</li>
 </ul></li>
-<li><strong>异常值处理策略:</strong>
+<li><p><strong>异常值处理策略:</strong></p>
 <ul>
 <li><strong>删除法:</strong> 直接删除异常值 (慎用，可能丢失信息)。</li>
 <li><strong>替换法:</strong> 使用均值、中位数、边界值等替换异常值。</li>
@@ -276,7 +336,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>同样需要根据具体情况和业务理解。</p>
+<p>同样需要根据具体情况和业务理解。 <strong>需要根据异常值的类型、比例以及对模型的影响来选择合适的处理策略。 在某些情况下，异常值可能是错误数据，需要处理；而在另一些情况下，异常值可能代表着特殊事件或规律，需要保留。</strong></p>
 </div>
 </div></li>
 </ul></li>
@@ -286,17 +346,29 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li><strong>特征缩放 (Feature Scaling):</strong> 将数值特征缩放到一定范围，避免特征量纲不一致和数值过大/过小带来的问题。
 <ul>
-<li><strong>标准化 (Standardization):</strong> 将特征缩放到均值为 0，标准差为 1 的分布 (也称 Z-score 归一化)。
+<li><p><strong>标准化 (Standardization):</strong> 将特征缩放到均值为 0，标准差为 1 的分布 (也称 Z-score 归一化)。</p>
 <ul>
 <li>公式：<code>x_scaled = (x - mean) / std</code></li>
 <li><code>sklearn.preprocessing.StandardScaler</code></li>
-</ul></li>
-<li><strong>归一化 (Normalization):</strong> 将特征缩放到 0 和 1 之间 (也称 Min-Max 缩放)。
+</ul>
+<p>```python:StandardScaler 示例代码 import pandas as pd from sklearn.preprocessing import StandardScaler import numpy as np</p>
+<h1 id="创建示例数据">创建示例数据</h1>
+<p>data_scaling = {‘数值特征’: np.array([[10], [20], [30], [40], [50]])} df_scaling = pd.DataFrame(data_scaling) print(“原始数据:”, df_scaling)</p>
+<h1 id="使用-standardscaler-进行标准化">使用 StandardScaler 进行标准化</h1>
+<p>scaler = StandardScaler() df_scaling[‘数值特征_标准化’] = scaler.fit_transform(df_scaling[[‘数值特征’]]) print(“标准化后:”, df_scaling) ```</p>
+<p><strong>标准化适用于大多数机器学习算法，特别是基于距离度量的算法 (例如 KNN, 聚类) 和梯度下降算法 (例如 线性回归, 逻辑回归, 神经网络)。 标准化后，数据分布的形态可能会发生改变，但不会改变数据的相对大小关系。</strong></p></li>
+<li><p><strong>归一化 (Normalization):</strong> 将特征缩放到 0 和 1 之间 (也称 Min-Max 缩放)。</p>
 <ul>
 <li>公式：<code>x_scaled = (x - min) / (max - min)</code></li>
 <li><code>sklearn.preprocessing.MinMaxScaler</code></li>
-</ul></li>
-<li><strong>其他缩放方法:</strong> <code>RobustScaler</code> (基于四分位距缩放，对异常值更鲁棒), <code>MaxAbsScaler</code> (绝对值最大值缩放) 等。</li>
+</ul>
+<p>```python:MinMaxScaler 示例代码 import pandas as pd from sklearn.preprocessing import MinMaxScaler import numpy as np</p>
+<h1 id="继续使用上面的示例数据">继续使用上面的示例数据</h1>
+<p>df_scaling_minmax = pd.DataFrame(data_scaling) print(“原始数据:”, df_scaling_minmax)</p>
+<h1 id="使用-minmaxscaler-进行归一化">使用 MinMaxScaler 进行归一化</h1>
+<p>minmax_scaler = MinMaxScaler() df_scaling_minmax[‘数值特征_归一化’] = minmax_scaler.fit_transform(df_scaling_minmax[[‘数值特征’]]) print(“归一化后:”, df_scaling_minmax) ```</p>
+<p><strong>归一化对异常值比较敏感，如果数据中存在异常值，归一化后的数据范围可能会受到影响。 归一化后，数据分布的形态不会发生改变，但会改变数据的绝对数值大小。 常用于图像处理和神经网络等领域。</strong></p></li>
+<li><p><strong>其他缩放方法:</strong> <code>RobustScaler</code> (基于四分位距缩放，对异常值更鲁棒), <code>MaxAbsScaler</code> (绝对值最大值缩放) 等。</p></li>
 </ul></li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -309,24 +381,55 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>需要根据数据分布和模型特点。</p>
+<p>需要根据数据分布和模型特点。 <strong>如果数据分布近似正态分布，且不包含太多异常值，StandardScaler 通常是更好的选择。 如果数据分布不均匀，或者包含较多异常值，可以考虑使用 RobustScaler 或 MinMaxScaler。 对于稀疏数据 (例如文本特征)，MaxAbsScaler 效果较好。 没有绝对最优的缩放方法，需要根据实际情况尝试和选择。</strong></p>
 </div>
 </div>
 <ul>
 <li><strong>特征转换 (Feature Transformation):</strong> 对数值特征进行函数变换，使其更符合模型假设或业务需求。
 <ul>
-<li><strong>多项式特征:</strong> 将特征进行多项式扩展，增加特征的非线性性。
+<li><p><strong>多项式特征:</strong> 将特征进行多项式扩展，增加特征的非线性性。</p>
 <ul>
 <li>例如：将特征 <code>x</code> 转换为 <code>x</code>, <code>x^2</code>, <code>x^3</code> 等。</li>
 <li><code>sklearn.preprocessing.PolynomialFeatures</code></li>
-</ul></li>
-<li><strong>对数变换:</strong> 对特征取对数，减小数值范围，平滑数据分布，处理长尾分布。
+</ul>
+<p>```python:PolynomialFeatures 示例代码 import pandas as pd from sklearn.preprocessing import PolynomialFeatures import numpy as np</p>
+<h1 id="创建单特征数据">创建单特征数据</h1>
+<p>data_poly = {‘特征X’: np.array([[1], [2], [3], [4]])} df_poly = pd.DataFrame(data_poly) print(“原始数据:”, df_poly)</p>
+<h1 id="使用-polynomialfeatures-创建-2-次多项式特征">使用 PolynomialFeatures 创建 2 次多项式特征</h1>
+<p>poly = PolynomialFeatures(degree=2, include_bias=False) # degree=2 表示 2 次多项式 poly_features = poly.fit_transform(df_poly[[‘特征X’]]) df_poly_transformed = pd.DataFrame(poly_features, columns=poly.get_feature_names_out([‘特征X’])) print(“转换后:”, df_poly_transformed) ```</p>
+<p><strong>多项式特征可以用于捕捉特征之间的非线性关系，提高模型的复杂度。 但多项式特征的阶数不宜过高，否则容易导致维度灾难和过拟合。</strong></p></li>
+<li><p><strong>对数变换:</strong> 对特征取对数，减小数值范围，平滑数据分布，处理长尾分布。</p>
 <ul>
 <li>例如：<code>log(x + 1)</code> (加 1 是为了避免对 0 取对数)。</li>
 <li><code>numpy.log1p</code>, <code>sklearn.preprocessing.PowerTransformer</code></li>
-</ul></li>
-<li><strong>指数变换:</strong> 对特征取指数。</li>
-<li><strong>Box-Cox 变换, Yeo-Johnson 变换:</strong> 更通用的幂变换，可以处理不同分布的数据。
+</ul>
+<pre class="python:对数变换示例代码"><code>import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 创建长尾分布数据 (例如模拟用户点击次数)
+np.random.seed(42)
+data_log = {'点击次数': np.random.zipf(2, 1000)} # Zipf 分布模拟长尾数据
+df_log = pd.DataFrame(data_log)
+
+# 绘制原始数据直方图
+plt.figure(figsize=(8, 4))
+plt.subplot(1, 2, 1)
+sns.histplot(df_log['点击次数'], kde=True)
+plt.title('原始数据 - 点击次数分布')
+
+# 进行对数变换
+df_log['点击次数_log'] = np.log1p(df_log['点击次数'])
+
+# 绘制对数变换后数据直方图
+plt.subplot(1, 2, 2)
+sns.histplot(df_log['点击次数_log'], kde=True)
+plt.title('对数变换后 - 点击次数分布')
+plt.tight_layout()
+plt.show()</code></pre>
+<p><strong>对数变换常用于处理具有长尾分布的数据，例如用户行为数据、收入数据等。 对数变换可以压缩数值范围，减小数据偏度，使其更接近正态分布，有利于一些模型的训练。</strong></p></li>
+<li><p><strong>指数变换:</strong> 对特征取指数。</p></li>
+<li><p><strong>Box-Cox 变换, Yeo-Johnson 变换:</strong> 更通用的幂变换，可以处理不同分布的数据。</p>
 <ul>
 <li><code>sklearn.preprocessing.PowerTransformer</code></li>
 </ul></li>
@@ -342,7 +445,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>根据业务理解和数据探索选择。</p>
+<p>根据业务理解和数据探索选择。 <strong>特征转换的目的通常是为了使数据更符合模型的假设，或者提取出更有意义的特征。 例如，对数变换可以处理长尾分布，多项式特征可以捕捉非线性关系。 需要结合实际问题和数据特点选择合适的转换方法。</strong></p>
 </div>
 </div></li>
 <li><strong>类别特征处理:</strong>
@@ -351,7 +454,26 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>适用于类别之间没有顺序关系的情况 (例如：颜色、城市)。</li>
 <li><code>pandas.get_dummies</code>, <code>sklearn.preprocessing.OneHotEncoder</code></li>
-</ul></li>
+</ul>
+<pre class="python:独热编码示例代码"><code>import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+# 创建类别特征数据
+data_onehot = {'颜色': ['红', '绿', '蓝', '红', '绿'],
+               '城市': ['北京', '上海', '广州', '北京', '深圳']}
+df_onehot = pd.DataFrame(data_onehot)
+print("原始数据:\n", df_onehot)
+
+# 使用 pandas.get_dummies 进行独热编码
+df_onehot_dummies = pd.get_dummies(df_onehot, columns=['颜色', '城市'])
+print("\npandas.get_dummies 独热编码后:\n", df_onehot_dummies)
+
+# 使用 OneHotEncoder 进行独热编码
+encoder = OneHotEncoder(sparse_output=False) # sparse=False 返回 NumPy 数组，而不是稀疏矩阵
+onehot_features = encoder.fit_transform(df_onehot[['颜色', '城市']])
+feature_names = encoder.get_feature_names_out(['颜色', '城市']) # 获取编码后的特征名
+df_onehot_encoded = pd.DataFrame(onehot_features, columns=feature_names)
+print("\nOneHotEncoder 独热编码后:\n", df_onehot_encoded)</code></pre></li>
 </ul>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -363,7 +485,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>处理高基数类别特征 (类别数量过多) 可能导致维度灾难。</p>
+<p>处理高基数类别特征 (类别数量过多) 可能导致维度灾难。 <strong>例如，如果一个类别特征有 1000 个不同的取值，独热编码后会生成 1000 列新的特征，导致特征维度急剧增加，可能降低模型性能，增加计算复杂度。 对于高基数类别特征，可以考虑使用其他编码方法 (例如目标编码、哈希编码) 或进行特征降维。</strong></p>
 </div>
 </div>
 <ul>
@@ -371,7 +493,23 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>适用于类别之间有顺序关系的情况 (例如：学历、等级)。</li>
 <li><code>sklearn.preprocessing.LabelEncoder</code></li>
-</ul></li>
+</ul>
+<pre class="python:标签编码示例代码"><code>import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+
+# 创建类别特征数据
+data_label = {'学历': ['本科', '硕士', '博士', '本科', '硕士']}
+df_label = pd.DataFrame(data_label)
+print("原始数据:\n", df_label)
+
+# 使用 LabelEncoder 进行标签编码
+label_encoder = LabelEncoder()
+df_label['学历_标签编码'] = label_encoder.fit_transform(df_label['学历'])
+print("\nLabelEncoder 标签编码后:\n", df_label)
+
+# 查看类别标签映射关系
+label_mapping = dict(zip(label_encoder.classes_, label_encoder.transform(label_encoder.classes_)))
+print("\n类别标签映射关系:\n", label_mapping)</code></pre></li>
 </ul>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -383,7 +521,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>标签编码可能会引入类别之间的顺序关系，如果类别没有实际顺序意义，可能不适用。</p>
+<p>标签编码可能会引入类别之间的顺序关系，如果类别没有实际顺序意义，可能不适用。 <strong>例如，对于颜色 (红、绿、蓝) 这样的类别特征，使用标签编码可能会错误地引入 “红 &lt; 绿 &lt; 蓝” 这样的顺序关系，这在实际应用中是没有意义的。 因此，对于没有顺序关系的类别特征，应该优先使用独热编码。</strong></p>
 </div>
 </div>
 <ul>
@@ -404,7 +542,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>需要根据数据特点和模型需求。</p>
+<p>需要根据数据特点和模型需求。 <strong>对于没有顺序关系的类别特征，优先使用独热编码；对于有顺序关系的类别特征，可以使用标签编码或顺序编码；对于高基数类别特征，需要谨慎选择编码方法，避免维度灾难。 目标编码等高级编码方法可以用于提高模型性能，但可能会引入数据泄露的风险，需要谨慎使用。</strong></p>
 </div>
 </div></li>
 </ul></li>
@@ -429,7 +567,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>可以高效地进行数据预处理和特征工程。</p>
+<p>可以高效地进行数据预处理和特征工程。 <strong>Scikit-learn 提供了丰富的预处理和特征工程工具，掌握这些工具可以大大提高数据处理的效率和代码的规范性。 建议学生多查阅 Scikit-learn 官方文档，学习各种工具的使用方法和参数。</strong></p>
 </div>
 </div></li>
 </ul></li>
@@ -474,25 +612,30 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 </ol>
 </section>
+</section>
+<section id="第二次课小组项目一电商用户行为数据探索与预处理-数据分析与代码实践" class="level2">
+<h2 class="anchored" data-anchor-id="第二次课小组项目一电商用户行为数据探索与预处理-数据分析与代码实践">第二次课：小组项目一：电商用户行为数据探索与预处理 (数据分析与代码实践)</h2>
+<section id="内容概要-1" class="level3">
+<h3 class="anchored" data-anchor-id="内容概要-1">内容概要</h3>
+<ul>
+<li><strong>学生分组进行小组项目一：电商用户行为数据探索与预处理</strong></li>
+<li><strong>教师巡回指导，解答学生在数据分析和代码实现中遇到的问题。</strong></li>
+</ul>
+</section>
 <section id="实践环节" class="level3">
 <h3 class="anchored" data-anchor-id="实践环节">实践环节</h3>
-<ol type="1">
-<li><strong>数据加载与探索练习:</strong> 使用 <code>Pandas</code> 读取 CSV 数据集 (提供示例数据集)，进行数据查看、统计分析和可视化练习。</li>
-<li><strong>数据清洗练习:</strong> 对示例数据集进行缺失值和异常值处理练习，尝试不同的处理策略，并比较效果。</li>
-<li><strong>特征工程基础练习:</strong> 对示例数据集进行数值特征缩放、特征转换和类别特征编码练习，使用 <code>Scikit-learn</code> 提供的工具。</li>
-<li><strong>小组项目一：数据探索与预处理实践:</strong> 小组合作，开始进行电商用户行为数据集的数据探索、数据清洗和特征工程，完成数据预处理代码初稿。</li>
-<li><strong>使用 AI 工具辅助完成数据预处理和特征工程代码，提高代码编写效率。</strong></li>
-</ol>
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，进行电商用户行为数据探索、数据清洗和特征工程。</li>
+<li>完成小组项目一代码初稿。</li>
+</ul>
 </section>
 <section id="课后作业" class="level3">
 <h3 class="anchored" data-anchor-id="课后作业">课后作业</h3>
-<ol type="1">
-<li><strong>完成数据加载、数据查看、数据基本统计分析和可视化的编程练习，并将代码上传到 GitHub 仓库。</strong></li>
-<li><strong>完成数据清洗 (缺失值处理、异常值处理) 和特征工程 (数值特征处理、类别特征处理) 的编程练习，并将代码上传到 GitHub 仓库。</strong></li>
-<li><strong>小组合作完成小组项目一：电商用户行为数据探索与预处理 的数据预处理代码，并提交预处理后的数据集和代码到指定平台 (例如 GitHub 仓库)。</strong></li>
+<ul>
+<li><strong>继续完善小组项目一：电商用户行为数据探索与预处理 的数据预处理代码。</strong></li>
+<li><strong>课前提交小组项目一的数据预处理结果 (预处理后的数据集和代码)。</strong></li>
 <li><strong>预习下周课程内容：特征选择与降维。</strong></li>
-<li><strong>思考题：</strong> 在数据预处理和特征工程中，如何选择合适的方法和策略？ 数据预处理和特征工程对机器学习模型性能的影响？</li>
-</ol>
+</ul>
 </section>
 <section id="相关资源" class="level3">
 <h3 class="anchored" data-anchor-id="相关资源">相关资源</h3>
@@ -504,68 +647,6 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>《Python Data Science Handbook》:</strong> <a href="https://jakevdp.github.io/PythonDataScienceHandbook/">jakevdp.github.io/PythonDataScienceHandbook/</a> (Chapter 3, Chapter 4, Chapter 5)</li>
 <li><strong>《Hands-On Machine Learning with Scikit-Learn, Keras &amp; TensorFlow》:</strong> <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/">www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/</a> (Chapter 2, Chapter 3)</li>
 <li><strong>阿里巴巴天池 - 淘宝用户行为数据:</strong> <a href="https://tianchi.aliyun.com/dataset/dataDetail?dataId=649">https://tianchi.aliyun.com/dataset/dataDetail?dataId=649</a></li>
-</ul>
-<hr>
-</section>
-</section>
-<section id="第三次课特征选择与降维-下周内容预告" class="level2">
-<h2 class="anchored" data-anchor-id="第三次课特征选择与降维-下周内容预告">第三次课：特征选择与降维 (下周内容预告)</h2>
-<section id="课程目标-下周" class="level3">
-<h3 class="anchored" data-anchor-id="课程目标-下周">课程目标 (下周)</h3>
-<ul>
-<li>理解特征选择和降维的目的和意义。</li>
-<li>掌握常用的特征选择方法，包括过滤式、包裹式和嵌入式方法。</li>
-<li>掌握常用的降维方法，包括 PCA 和 t-SNE。</li>
-<li>能够使用 <code>Scikit-learn</code> 进行特征选择和降维操作。</li>
-</ul>
-</section>
-<section id="内容概要-下周" class="level3">
-<h3 class="anchored" data-anchor-id="内容概要-下周">内容概要 (下周)</h3>
-<ol type="1">
-<li><strong>特征选择</strong>
-<ul>
-<li>特征选择的目的和意义：降维、去除冗余特征、提高模型性能、可解释性。</li>
-<li>特征选择方法：
-<ul>
-<li><strong>过滤式 (Filter methods):</strong> 基于特征与目标变量之间的统计指标进行选择 (例如：方差选择、相关系数、卡方检验、互信息)。</li>
-<li><strong>包裹式 (Wrapper methods):</strong> 将特征子集的选择看作搜索问题，使用模型性能作为评价指标进行选择 (例如：递归特征消除 RFE)。</li>
-<li><strong>嵌入式 (Embedded methods):</strong> 将特征选择融入到模型训练过程中 (例如：L1 正则化、树模型特征重要性)。</li>
-</ul></li>
-<li><code>Scikit-learn</code> 特征选择模块：<code>sklearn.feature_selection</code>。</li>
-</ul></li>
-<li><strong>降维</strong>
-<ul>
-<li>降维的目的和意义：降维、可视化、去除噪声、提高计算效率。</li>
-<li>常用降维方法：
-<ul>
-<li><strong>主成分分析 (PCA):</strong> 线性降维方法，通过正交变换将数据投影到低维空间，使得投影后的数据方差最大化。</li>
-<li><strong>t-SNE:</strong> 非线性降维方法，用于高维数据可视化，将高维数据映射到低维空间，保持数据点的局部邻域结构。</li>
-<li><code>Scikit-learn</code> 降维模块：<code>sklearn.decomposition</code> (PCA), <code>sklearn.manifold</code> (t-SNE)。</li>
-</ul></li>
-</ul></li>
-<li><strong>实践环节 (下周)</strong>
-<ul>
-<li>使用 <code>Scikit-learn</code> 进行特征选择和降维的编程练习。</li>
-<li>结合实际数据集，应用特征选择和降维方法，并评估模型性能。</li>
-</ul></li>
-</ol>
-</section>
-<section id="课后作业-下周" class="level3">
-<h3 class="anchored" data-anchor-id="课后作业-下周">课后作业 (下周)</h3>
-<ul>
-<li>完成特征选择和降维的编程练习，并将代码上传到 GitHub 仓库。</li>
-<li>查阅资料，深入了解特征选择和降维的原理和应用场景。</li>
-<li>思考题：特征选择和降维的区别和联系？ 如何根据实际问题选择合适的特征选择和降维方法？</li>
-</ul>
-</section>
-<section id="相关资源-下周" class="level3">
-<h3 class="anchored" data-anchor-id="相关资源-下周">相关资源 (下周)</h3>
-<ul>
-<li><strong><code>Scikit-learn</code> Feature Selection 模块文档:</strong> <a href="https://scikit-learn.org/stable/modules/feature_selection.html">scikit-learn.org/stable/modules/feature_selection.html</a></li>
-<li><strong><code>Scikit-learn</code> Decomposition 模块文档 (PCA):</strong> <a href="https://scikit-learn.org/stable/modules/decomposition.html">scikit-learn.org/stable/modules/decomposition.html</a></li>
-<li><strong><code>Scikit-learn</code> Manifold 模块文档 (t-SNE):</strong> <a href="https://scikit-learn.org/stable/modules/manifold.html">scikit-learn.org/stable/modules/manifold.html</a></li>
-<li><strong>《Python Data Science Handbook》:</strong> <a href="https://jakevdp.github.io/PythonDataScienceHandbook/">jakevdp.github.io/PythonDataScienceHandbook/</a> (Chapter 5)</li>
-<li><strong>《Hands-On Machine Learning with Scikit-Learn, Keras &amp; TensorFlow》:</strong> <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/">www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/</a> (Chapter 7, Chapter 8)</li>
 </ul>
 <hr>
 

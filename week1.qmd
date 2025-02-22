@@ -1,266 +1,250 @@
 # 第一周：机器学习导论与Python环境搭建
 
+::: {.callout-tip}
+## 本周学习目标
+- 了解机器学习的核心概念和类型 (监督学习、无监督学习、强化学习)
+- 理解机器学习与传统统计分析、数据挖掘的区别与联系
+- 认识机器学习和生成式AI 在商业领域的应用前景
+- **掌握 Python 和 VS Code 的安装配置，包括 Python 解释器、VS Code 编辑器、Python 插件、虚拟环境 `venv` 的使用**
+- 初步体验 AI 辅助编程工具，如 GitHub Copilot, 通义灵码, Cline
+:::
+
 ## 第一次课：机器学习导论与Python环境搭建
 
-### 课程目标
+### 1. 机器学习导论
 
-*   了解机器学习的核心概念和类型 (监督学习、无监督学习、强化学习)。
-*   理解机器学习与传统统计分析、数据挖掘的区别与联系。
-*   认识机器学习和生成式AI 在商业领域的应用前景。
-*   **掌握 Python 和 VS Code 的安装配置，包括 Python 解释器、VS Code 编辑器、Python 插件、虚拟环境 `venv` 的使用。**
-*   初步体验 AI 辅助编程工具，如 GitHub Copilot, 通义灵码, Cline。
+::: {.callout-note}
+## 什么是机器学习
+无需显式编程，让计算机从数据中学习规律和知识。
 
-### 内容概要
+**与传统编程的区别：** 传统编程 (显式规则) vs. 机器学习 (从数据中学习规则)。
+:::
 
-1.  **机器学习导论**
-    *   什么是机器学习？
+::: {.callout-important}
+## 机器学习的核心概念
 
-    ::: callout-note
-    ## 定义
-    无需显式编程，让计算机从数据中学习规律和知识。
-    :::
+#### 监督学习 (Supervised Learning)
+从带有标签的数据中学习，用于分类和回归任务。
 
-    ::: callout-note
-    ## 与传统编程的区别
-    传统编程 (显式规则) vs. 机器学习 (从数据中学习规则)。
-    :::
+- **示例：** 垃圾邮件识别 (分类)、房价预测 (回归)
 
-    *   机器学习的核心概念
-        *   **监督学习 (Supervised Learning):**  从带有标签的数据中学习，用于分类和回归任务。
+#### 无监督学习 (Unsupervised Learning)
+从无标签数据中学习数据结构和模式，用于聚类、降维、关联规则挖掘等任务。
 
-        ::: callout-tip
-        ## 示例
-        垃圾邮件识别 (分类)、房价预测 (回归)。
-        :::
+- **示例：** 用户分群 (聚类)、商品推荐 (关联规则)
 
-        *   **无监督学习 (Unsupervised Learning):**  从无标签数据中学习数据结构和模式，用于聚类、降维、关联规则挖掘等任务。
+#### 强化学习 (Reinforcement Learning)
+通过与环境交互学习最优策略，以获得最大奖励。
 
-        ::: callout-tip
-        ## 示例
-        用户分群 (聚类)、商品推荐 (关联规则)。
-        :::
+- **示例：** 游戏 AI、自动驾驶
+:::
 
-        *   **强化学习 (Reinforcement Learning):**  通过与环境交互学习最优策略，以获得最大奖励。 (简要介绍，本课程侧重监督学习和无监督学习)
+::: {.callout-note}
+## 机器学习与相关学科
 
-        ::: callout-tip
-        ## 示例
-        游戏 AI、自动驾驶。
-        :::
+#### 机器学习 vs. 传统统计分析
+- **侧重点不同：** 统计分析 (解释性、推断) vs. 机器学习 (预测性、性能)
+- **方法论差异：** 统计分析 (模型假设、参数估计) vs. 机器学习 (算法迭代、模型优化)
 
-    *   机器学习与相关学科
-        *   **机器学习 vs. 传统统计分析:**
-            *   侧重点不同：统计分析 (解释性、推断) vs. 机器学习 (预测性、性能)。
-            *   方法论差异：统计分析 (模型假设、参数估计) vs. 机器学习 (算法迭代、模型优化)。
-        *   **机器学习 vs. 数据挖掘:**
-            *   目标相似：从数据中发现知识和模式。
-            *   侧重面不同：数据挖掘 (更侧重数据预处理、模式发现) vs. 机器学习 (更侧重模型构建、预测和决策)。
-    *   机器学习和生成式AI 的商业应用案例
-        *   **精准营销:**  用户画像、个性化推荐、广告投放优化。
-        *   **风险管理:**  信用评分、欺诈检测、风险预警。
-        *   **智能客服:**  聊天机器人、智能问答、工单自动化。
-        *   **内容创作:**  文案生成、图像生成、音乐创作、代码生成 (生成式AI)。
-        *   **智能产品与服务:**  智能家居、自动驾驶、智能医疗。
+#### 机器学习 vs. 数据挖掘
+- **目标相似：** 从数据中发现知识和模式
+- **侧重面不同：** 数据挖掘 (更侧重数据预处理、模式发现) vs. 机器学习 (更侧重模型构建、预测和决策)
+:::
 
-2.  **Python 机器学习环境搭建**
-    *   **安装 Python 解释器:**
-        *   **从 Python 官网下载并安装 Python 解释器:**  [https://www.python.org/downloads/](https://www.python.org/downloads/) (建议安装 3.9 及以上版本)
-        *   **安装过程中，务必勾选 "Add Python to PATH"**，以便在命令行中直接使用 `python` 和 `pip` 命令。
+::: {.callout-tip}
+## 机器学习和生成式AI 的商业应用案例
 
-        ::: callout-warning
-        ## 重要
-        安装 Python 时，请务必勾选 "Add Python to PATH" 选项。
-        :::
+1. **精准营销：** 用户画像、个性化推荐、广告投放优化
+2. **风险管理：** 信用评分、欺诈检测、风险预警
+3. **智能客服：** 聊天机器人、智能问答、工单自动化
+4. **内容创作：** 文案生成、图像生成、音乐创作、代码生成 (生成式AI)
+5. **智能产品与服务：** 智能家居、自动驾驶、智能医疗
+:::
 
-        *   **验证 Python 安装:**  打开命令行 (Windows: `cmd` 或 PowerShell, macOS/Linux: Terminal)，输入 `python --version` 和 `pip --version`，查看 Python 和 pip 版本信息。
-    *   **安装 VS Code 编辑器:**
-        *   **从 VS Code 官网下载并安装 VS Code:** [https://code.visualstudio.com/download](https://code.visualstudio.com/download) (根据操作系统选择合适的版本)
-    *   **在 VS Code 中安装 Python 插件:**
-        *   打开 VS Code，点击左侧侧边栏的 "Extensions" 图标 (或快捷键 `Ctrl+Shift+X` / `Cmd+Shift+X`)。
-        *   在搜索框中输入 "Python"，找到 **"Python" 插件 (由 Microsoft 提供)**，点击 "Install" 进行安装。
-        *   **Python 插件功能:**  代码智能提示、代码格式化、代码调试、Jupyter Notebook 支持、虚拟环境管理等。
-    *   **在 VS Code 中选择 Python 解释器:**
-        *   安装 Python 插件后，VS Code 会自动检测系统中的 Python 解释器。
-        *   **手动选择 Python 解释器:**  点击 VS Code 窗口右下角的 Python 版本号，或使用快捷键 `Ctrl+Shift+P` / `Cmd+Shift+P`，输入 "Python: Select Interpreter"，选择已安装的 Python 解释器。
-        *   **管理多个 Python 版本:**  如果安装了多个 Python 版本，可以在 "Select Interpreter" 菜单中选择不同的版本。
-    *   **使用 `venv` 创建和管理虚拟环境:**
+### 2. Python 机器学习环境搭建
 
-        ::: callout-note
-        ## 什么是虚拟环境
-        虚拟环境是一个隔离的 Python 环境，可以为不同的项目安装不同的 Python 包，避免包版本冲突。
-        :::
+::: {.callout-important}
+## Python 解释器安装
+1. **从 Python 官网下载并安装 Python 解释器：** [https://www.python.org/downloads/](https://www.python.org/downloads/) (建议安装 3.9 及以上版本)
+2. **安装过程中，务必勾选 "Add Python to PATH"**
+3. **验证安装：** 打开命令行，输入 `python --version` 和 `pip --version`
+:::
 
-        *   **使用 `venv` 创建虚拟环境:**  在项目根目录下，打开命令行，输入 `python -m venv .venv` (`.venv` 为虚拟环境文件夹名称，可以自定义)。
-        *   **激活虚拟环境:**
-            *   **Windows (cmd):**  `.venv\Scripts\activate.bat`
-            *   **Windows (PowerShell):**  `.venv\Scripts\Activate.ps1`
-            *   **macOS/Linux:**  `source .venv/bin/activate`
-            *   激活后，命令行提示符前会显示虚拟环境名称 `(.venv)`。
-        *   **在 VS Code 中使用虚拟环境:**  VS Code 会自动检测项目中的虚拟环境，并在右下角显示。  如果没有自动检测到，可以手动选择虚拟环境解释器 (参考 "选择 Python 解释器" 步骤)。
-        *   **在虚拟环境中安装 Python 包:**  激活虚拟环境后，使用 `pip install 包名` 命令安装的包，只会安装到当前虚拟环境中，不会影响全局 Python 环境。
-    *   **安装 Python 常用库 (在虚拟环境中):**
-        *   激活虚拟环境后，使用 `pip install scikit-learn pandas numpy matplotlib seaborn` 命令安装常用库。
-    *   **体验 AI 辅助编程工具:**
-        *   **GitHub Copilot, 通义灵码, Cline 等代码辅助插件:**  代码自动补全、代码片段生成、代码错误检查、自然语言代码解释等功能演示。
-        *   **Cursor 代码编辑器:**  内置 AI 功能的代码编辑器体验。(https://cursor.sh/)
-        *   **配置 pip 国内镜像源 (可选，但推荐):**
+::: {.callout-note}
+## VS Code 编辑器安装与配置
+1. **安装 VS Code：** [https://code.visualstudio.com/download](https://code.visualstudio.com/download)
+2. **安装 Python 插件：**
+   - 打开 VS Code，点击左侧 "Extensions" 图标
+   - 搜索并安装 "Python" 插件 (由 Microsoft 提供)
+   - **功能：** 代码智能提示、格式化、调试、Jupyter Notebook 支持等
+3. **选择 Python 解释器：**
+   - 点击窗口右下角的 Python 版本号
+   - 或使用 `Ctrl+Shift+P` / `Cmd+Shift+P` 选择解释器
+:::
 
-        ::: callout-note
-        ## 为什么要配置国内镜像源
-        pip 默认使用国外的 PyPI 仓库下载 Python 包，国内下载速度可能较慢。配置国内镜像源可以显著提升下载速度，尤其是在网络环境不佳的情况下。
-        :::
+::: {.callout-warning}
+## 虚拟环境管理
+**什么是虚拟环境：** 隔离的 Python 环境，可以为不同项目安装不同的 Python 包，避免包版本冲突。
 
-        *   **常用国内镜像源:**
-            *   **清华大学:** `https://pypi.tuna.tsinghua.edu.cn/simple`
-            *   **阿里云:** `https://mirrors.aliyun.com/pypi/simple/`
-            *   **豆瓣:** `https://pypi.doubanio.com/simple/`
-            *   **中国科学技术大学:** `https://pypi.mirrors.ustc.edu.cn/simple/`
-            *   **华中科技大学:** `https://pypi.hustunique.com/`
-            *   **Windows 配置方法:**
-                *   在 **用户目录** (例如 `C:\Users\YourUserName`) 下创建文件夹 `pip`。
-                *   在 `pip` 文件夹下创建文件 `pip.ini`。
-                *   用文本编辑器打开 `pip.ini`，写入以下内容 (以清华大学镜像源为例):
+1. **创建虚拟环境：** `python -m venv .venv`
+2. **激活虚拟环境：**
+   - Windows (cmd): `.venv\Scripts\activate.bat`
+   - Windows (PowerShell): `.venv\Scripts\Activate.ps1`
+   - macOS/Linux: `source .venv/bin/activate`
+3. **在 VS Code 中使用：** VS Code 会自动检测项目中的虚拟环境
+:::
 
-                ```ini:pip.ini
-                [global]
-                index-url = https://pypi.tuna.tsinghua.edu.cn/simple
-                [install]
-                trusted-host = pypi.tuna.tsinghua.edu.cn
-                ```
-            *   **macOS/Linux 配置方法:**
-                *   在 **用户目录** (例如 `/Users/YourUserName` 或 `~`) 下创建文件夹 `.pip` (注意文件夹名前面的点)。
-                *   在 `.pip` 文件夹下创建文件 `pip.conf`。
-                *   用文本编辑器打开 `pip.conf`，写入以下内容 (以清华大学镜像源为例):
+::: {.callout-tip}
+## Python 常用库安装
+在虚拟环境中安装以下库：
+```bash
+pip install scikit-learn pandas numpy matplotlib seaborn
+```
 
-                ```ini:pip.conf
-                [global]
-                index-url = https://pypi.tuna.tsinghua.edu.cn/simple
-                [install]
-                trusted-host = pypi.tuna.tsinghua.edu.cn
-                ```
-            *   **验证镜像源是否生效:**  配置完成后，尝试使用 `pip install 包名` 命令安装 Python 包，观察下载速度是否提升。  也可以使用 `pip config get global.index-url` 命令查看当前 pip 配置的镜像源。
+**配置 pip 国内镜像源 (推荐)：**
 
-### 实践环节
+1. 创建配置文件：
 
-1.  **Python 解释器安装:**  学生根据教程，从 Python 官网下载并安装 Python 解释器，并验证安装成功。
-2.  **VS Code 编辑器安装:**  安装 VS Code 编辑器。
-3.  **VS Code Python 插件安装和配置:**  在 VS Code 中安装 Python 插件，并选择 Python 解释器。
-4.  **使用 `venv` 创建和激活虚拟环境:**  在指定目录下创建虚拟环境，并尝试激活和退出虚拟环境。
-5.  **在虚拟环境中安装常用 Python 库:**  激活虚拟环境后，使用 `pip install` 命令安装 `scikit-learn`, `pandas`, `numpy`, `matplotlib`, `seaborn` 等常用库。
-6.  **体验 AI 辅助编程工具:**  安装 GitHub Copilot 或 通义灵码 插件 (或体验 Cursor 编辑器)，尝试使用 AI 工具辅助编写简单的 Python 代码，并在虚拟环境中运行。
+   - Windows: `%USERPROFILE%\pip\pip.ini`
+   - macOS/Linux: `~/.pip/pip.conf`
+2. 添加配置内容：
+```ini
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+[install]
+trusted-host = pypi.tuna.tsinghua.edu.cn
+```
+:::
 
-### 课后作业
-
-1.  **完成 Python 和 VS Code 环境搭建，并成功创建和激活虚拟环境，安装常用 Python 库，确保环境配置成功。**
-2.  **查阅资料，了解 Python 虚拟环境的作用和优势。**
-3.  **思考题：**  为什么在 Python 项目开发中推荐使用虚拟环境？ 不使用虚拟环境可能带来哪些问题？
-
-###  相关资源
-
-*   **Python 官网下载:**  [https://www.python.org/downloads/](https://www.python.org/downloads/)
-*   **VS Code 官网下载:**  [https://code.visualstudio.com/download](https://code.visualstudio.com/download)
-*   **VS Code Python 插件:** [https://marketplace.visualstudio.com/items?itemName=ms-python.python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-*   **Python `venv` 虚拟环境官方文档:** [https://docs.python.org/3/library/venv.html](https://docs.python.org/3/library/venv.html)
-*   **Python 机器学习常用库文档:**
-    *   `scikit-learn`: [scikit-learn.org](https://scikit-learn.org/stable/)
-    *   `pandas`: [pandas.pydata.org](https://pandas.pydata.org/)
-    *   `numpy`: [numpy.org](https://numpy.org/)
-    *   `matplotlib`: [matplotlib.org](https://matplotlib.org/)
-    *   `seaborn`: [seaborn.pydata.org](https://seaborn.pydata.org/)
-*   **AI 辅助编程工具:**
-    *   GitHub Copilot: [github.com/features/copilot](https://github.com/features/copilot)
-    *   通义灵码: [tongyi.aliyun.com/lingma](https://tongyi.aliyun.com/lingma)
-    *   Cursor: [cursor.sh](https://cursor.sh/)
-
----
+::: {.callout-note}
+## AI 辅助编程工具体验
+- **GitHub Copilot:** [github.com/features/copilot](https://github.com/features/copilot)
+- **通义灵码:** [tongyi.aliyun.com/lingma](https://tongyi.aliyun.com/lingma)
+- **Cursor:** [cursor.sh](https://cursor.sh/)
+:::
 
 ## 第二次课：Python 基础语法与数据操作
 
-### 课程目标
+::: {.callout-tip}
+## 课程目标
+- 回顾 Python 基础语法
+- 掌握 `Numpy` 库的基本操作
+- 掌握 `Pandas` 库的基本操作
+- 能够使用 AI 辅助编程工具完成编程练习
+:::
 
-*   回顾 Python 基础语法，包括变量、数据类型、运算符、控制流、函数和模块。
-*   掌握 `Numpy` 库的基本操作，包括数组创建、数组运算和常用函数。
-*   掌握 `Pandas` 库的基本操作，包括数据结构 (Series, DataFrame)、数据读取、数据选择和数据清洗 (重复值处理)。
-*   能够使用 AI 辅助编程工具完成 Python 基础语法和数据操作的编程练习。
+### 1. Python 基础语法回顾
 
-### 内容概要
+::: {.callout-important}
+## 基础语法要点
 
-1.  **Python 基础语法回顾**
-    *   **变量与数据类型:**
-        *   变量命名规则、动态类型。
-        *   常用数据类型：整型 (int)、浮点型 (float)、字符串 (str)、布尔型 (bool)、列表 (list)、元组 (tuple)、字典 (dict)、集合 (set)。
-    *   **运算符:**
-        *   算术运算符、比较运算符、逻辑运算符、赋值运算符、成员运算符、身份运算符。
-    *   **控制流:**
-        *   条件语句：`if`, `elif`, `else`。
-        *   循环语句：`for`, `while`，`break`, `continue`。
-    *   **函数:**
-        *   函数定义、函数参数、函数返回值、匿名函数 (lambda)。
-    *   **模块与包:**
-        *   模块导入：`import`, `from ... import ...`。
-        *   常用内置模块：`math`, `random`, `os`, `sys`, `datetime`。
+#### 变量与数据类型
+- 变量命名规则、动态类型
+- 常用数据类型：`int`, `float`, `str`, `bool`, `list`, `tuple`, `dict`, `set`
 
-2.  **`Numpy` 基础**
-    *   **`Numpy` 数组 (ndarray):**
-        *   数组创建：`np.array()`, `np.zeros()`, `np.ones()`, `np.arange()`, `np.linspace()`, `np.random.rand()` 等。
-        *   数组属性：`shape`, `dtype`, `ndim`, `size`。
-        *   数组索引和切片。
-        *   数组维度变换：`reshape()`, `flatten()`, `transpose()`。
-    *   **数组运算:**
-        *   元素级运算：加减乘除、幂运算、比较运算。
-        *   矩阵运算：矩阵乘法 (`np.dot()`, `@` 运算符)。
-        *   广播 (broadcasting) 机制。
-    *   **常用函数:**
-        *   数学函数：`np.sin()`, `np.cos()`, `np.exp()`, `np.log()`, `np.sqrt()` 等。
-        *   统计函数：`np.mean()`, `np.median()`, `np.std()`, `np.max()`, `np.min()`, `np.sum()` 等。
-        *   排序和查找：`np.sort()`, `np.argsort()`, `np.unique()`, `np.where()` 等。
+#### 运算符
+- 算术运算符
+- 比较运算符
+- 逻辑运算符
+- 赋值运算符
+- 成员运算符
+- 身份运算符
 
-3.  **`Pandas` 基础**
-    *   **`Pandas` 数据结构:**
-        *   **Series:**  带标签的一维数组，类似于带索引的列表。
-            *   `Series` 创建、索引、切片、常用属性和方法。
-        *   **DataFrame:**  带标签的二维数据表，类似于 Excel 表格或 SQL 表。
-            *   `DataFrame` 创建、列选择、行选择、索引、切片、常用属性和方法。
-    *   **数据读取:**
-        *   `pd.read_csv()`:  读取 CSV 文件。
-        *   `pd.read_excel()`:  读取 Excel 文件。
-        *   `pd.read_json()`:  读取 JSON 文件。
-        *   常用参数：`filepath_or_buffer`, `sep`, `header`, `index_col`, `encoding` 等。
-    *   **数据选择:**
-        *   列选择：`df['列名']`, `df[['列名1', '列名2']]`。
-        *   行选择：`df.loc[]` (标签索引), `df.iloc[]` (位置索引), 条件索引。
-        *   `loc`, `iloc`, `[]` 索引方式的区别和应用场景。
-    *   **数据清洗 (初步):**
-        *   **重复值处理:**  `df.duplicated()`, `df.drop_duplicates()`。
-        *   **缺失值处理:**  (简要介绍，下周详细讲解) `df.isnull()`, `df.fillna()`, `df.dropna()`。
+#### 控制流
+- 条件语句：`if`, `elif`, `else`
+- 循环语句：`for`, `while`, `break`, `continue`
 
-### 实践环节
+#### 函数
+- 函数定义
+- 函数参数
+- 函数返回值
+- 匿名函数 (lambda)
 
-1.  **Python 基础语法编程练习:**  完成 Python 基础语法的编程练习，例如：
-    *   使用循环和条件语句解决简单问题 (例如：判断闰年、计算阶乘)。
-    *   编写函数实现特定功能 (例如：计算列表平均值、判断字符串是否回文)。
-2.  **`Numpy` 数组操作练习:**  完成 `Numpy` 数组创建、运算和常用函数的练习，例如：
-    *   创建不同类型的 `Numpy` 数组，并进行属性查看和维度变换。
-    *   进行数组的元素级运算和矩阵运算。
-    *   使用 `Numpy` 常用函数进行统计分析和数据处理。
-3.  **`Pandas` 数据操作练习:**  完成 `Pandas` 数据结构创建、数据读取、数据选择和数据清洗的练习，例如：
-    *   创建 `Series` 和 `DataFrame`，并进行基本操作。
-    *   读取 CSV 文件，并进行数据查看和选择。
-    *   使用 `Pandas` 进行重复值查找和删除。
-4.  **使用 AI 工具辅助完成 Python 代码:**  在编程练习过程中，积极使用 AI 辅助编程工具，提高代码编写效率和准确性。
+#### 模块与包
+- 模块导入：`import`, `from ... import ...`
+- 常用内置模块：`math`, `random`, `os`, `sys`, `datetime`
+:::
 
-### 课后作业
+### 2. Numpy 基础
 
-1.  **完成 Python 基础语法和数据操作的编程练习，并将代码上传到 GitHub 仓库。**
-2.  **预习下周课程内容：数据预处理与特征工程基础。**
-3.  **思考题：**  `Series` 和 `DataFrame` 的区别和应用场景？  `loc` 和 `iloc` 索引方式有何不同？
+::: {.callout-note}
+## Numpy 数组操作
+#### 数组创建
+- `np.array()`, `np.zeros()`, `np.ones()`
+- `np.arange()`, `np.linspace()`
+- `np.random.rand()`
 
-### 相关资源
+#### 数组属性
+- `shape`, `dtype`, `ndim`, `size`
+- 数组索引和切片
+- 维度变换：`reshape()`, `flatten()`, `transpose()`
+:::
 
-*   **Python 官方文档:**  [docs.python.org](https://docs.python.org/3/)
-*   **`Numpy` 官方文档:**  [numpy.org/doc/stable/](https://numpy.org/doc/stable/)
-*   **`Pandas` 官方文档:**  [pandas.pydata.org/docs/](https://pandas.pydata.org/docs/)
-*   **W3School Python 教程:**  [www.w3schools.com/python/](https://www.w3schools.com/python/)
-*   **廖雪峰 Python 教程:**  [www.liaoxuefeng.com/wiki/1016959663602400](https://www.liaoxuefeng.com/wiki/1016959663602400)
+::: {.callout-important}
+## 数组运算
+- **元素级运算：** 加减乘除、幂运算、比较运算
+- **矩阵运算：** 矩阵乘法 (`np.dot()`, `@` 运算符)
+- **广播机制**
 
----
+#### 常用函数
+- **数学函数：** `np.sin()`, `np.cos()`, `np.exp()`, `np.log()`, `np.sqrt()`
+- **统计函数：** `np.mean()`, `np.median()`, `np.std()`, `np.max()`, `np.min()`, `np.sum()`
+- **排序和查找：** `np.sort()`, `np.argsort()`, `np.unique()`, `np.where()`
+:::
+
+### 3. Pandas 基础
+
+::: {.callout-important}
+## Pandas 数据结构
+#### Series
+- 带标签的一维数组
+- 创建、索引、切片、属性和方法
+
+#### DataFrame
+- 带标签的二维数据表
+- 创建、列选择、行选择、索引、切片
+- 常用属性和方法
+:::
+
+::: {.callout-note}
+## 数据操作
+#### 数据读取
+- `pd.read_csv()`: 读取 CSV 文件
+- `pd.read_excel()`: 读取 Excel 文件
+- `pd.read_json()`: 读取 JSON 文件
+- 常用参数：`filepath_or_buffer`, `sep`, `header`, `index_col`, `encoding`
+
+#### 数据选择
+- 列选择：`df['列名']`, `df[['列名1', '列名2']]`
+- 行选择：`df.loc[]`, `df.iloc[]`, 条件索引
+- 索引方式的区别和应用场景
+
+#### 数据清洗
+- 重复值处理：`df.duplicated()`, `df.drop_duplicates()`
+- 缺失值处理：`df.isnull()`, `df.fillna()`, `df.dropna()`
+:::
+
+::: {.callout-tip}
+## 实践环节
+1. **Python 基础语法练习**
+2. **Numpy 数组操作练习**
+3. **Pandas 数据操作练习**
+4. **使用 AI 工具辅助完成代码**
+:::
+
+::: {.callout-important}
+## 课后作业
+1. 完成 Python 基础语法和数据操作的编程练习
+2. 将代码上传到 GitHub 仓库
+3. 预习下周课程内容：数据预处理与特征工程基础
+:::
+
+::: {.callout-note}
+## 相关资源
+- [Python 官方文档](https://docs.python.org/3/)
+- [Numpy 官方文档](https://numpy.org/doc/stable/)
+- [Pandas 官方文档](https://pandas.pydata.org/docs/)
+- [W3School Python 教程](https://www.w3schools.com/python/)
+- [廖雪峰 Python 教程](https://www.liaoxuefeng.com/wiki/1016959663602400)
+:::
 
