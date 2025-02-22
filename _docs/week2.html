@@ -168,6 +168,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <a href="./week3.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：分类算法基础 (一) - 逻辑回归与支持向量机</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：分类算法基础 (二) - 决策树与集成学习 (随机森林)</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -302,6 +307,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>df.isnull().sum()</code></li>
 <li><code>missingno</code> 库 (可视化)</li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/week2/missing_values_matrix.png" class="img-fluid figure-img"></p>
+<figcaption>缺失值分布矩阵图</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/week2/missing_values_heatmap.png" class="img-fluid figure-img"></p>
+<figcaption>缺失值相关性热力图</figcaption>
+</figure>
+</div>
 </section>
 <section id="缺失值处理策略" class="level5">
 <h5 class="anchored" data-anchor-id="缺失值处理策略">2.1.2 缺失值处理策略</h5>
@@ -378,6 +395,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>IQR (四分位距)</strong></li>
 <li>其他方法 (聚类, LOF 等)</li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/week2/boxplot_outliers.png" class="img-fluid figure-img"></p>
+<figcaption>箱线图异常值检测示例</figcaption>
+</figure>
+</div>
 </section>
 <section id="异常值处理策略" class="level5">
 <h5 class="anchored" data-anchor-id="异常值处理策略">2.2.2 异常值处理策略</h5>
@@ -416,6 +439,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>sklearn.preprocessing.StandardScaler</code></li>
 </ul></li>
 </ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/week2/scaling_comparison.png" class="img-fluid figure-img"></p>
+<figcaption>特征缩放效果对比</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -523,6 +552,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>sklearn.preprocessing.PolynomialFeatures</code></li>
 </ul></li>
 </ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/week2/polynomial_features.png" class="img-fluid figure-img"></p>
+<figcaption>多项式特征转换示例</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -572,6 +607,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li><code>numpy.log</code>, <code>numpy.log1p</code> (推荐使用 log1p，避免 log(0) 错误)</li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/week2/log_transform.png" class="img-fluid figure-img"></p>
+<figcaption>对数变换效果对比</figcaption>
+</figure>
+</div>
 </div>
 </div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>

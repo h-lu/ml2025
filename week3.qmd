@@ -41,7 +41,12 @@
 ## 逻辑回归的原理
 - **线性模型 + Sigmoid 函数：** 逻辑回归本质上是一个线性模型，使用 Sigmoid 函数将输出映射到 (0, 1) 区间
 - **Sigmoid 函数：** $\sigma(z) = \frac{1}{1 + e^{-z}}$
+
+![Sigmoid函数示意图](img/week3/sigmoid.png)
+
 - **决策边界：** 通过设定阈值 (通常为 0.5) 将概率值转换为类别标签
+
+![逻辑回归决策边界示例](img/week3/logistic_boundary.png)
 :::
 
 ::: {.callout-important}
@@ -108,27 +113,16 @@ print("\n分类报告:\n", classification_report(y_test, y_pred))
 - **最大化间隔 (Margin Maximization)：**  SVM 不仅要分隔数据，还要让分隔线距离最近的数据点越远越好。这个"距离"就是**间隔 (Margin)**。
 - **支持向量 (Support Vectors)：**  在分隔线边缘，对分隔线位置起决定性作用的"关键"数据点。SVM 的名字就来源于它们。
 
+![SVM最大间隔和支持向量示意图](img/week3/svm_margin.png)
+
 简单来说，SVM 就像是在两种不同类型的物品之间划出一条尽可能宽的隔离带。隔离带越宽，模型就越稳健。
 :::
-$$
-\begin{aligned}
-& \min_{w, b, \xi} \frac{1}{2} \|w\|^2 + C \sum_{i=1}^{n} \xi_i \\
-& \text{s.t. } y_i (w^T x_i + b) \geq 1 - \xi_i, \quad \xi_i \geq 0, \quad i = 1, \ldots, n
-\end{aligned}
-$$
-
-其中，$w$ 是权重向量，$b$ 是偏置项，$\xi_i$ 是松弛变量，$C$ 是惩罚参数。
-
-决策函数：
-$$
-f(x) = \text{sign}(w^T x + b)
-$$
-
-**注意：** 上述公式是**线性支持向量机 (Linear SVM)** 的公式。它适用于**线性可分**的数据。对于**非线性可分**的数据，我们需要使用**核函数**。
 
 ::: {.callout-important}
 ## 核函数 (Kernel Functions) -  "核技巧" 的精髓
 - **为什么需要核函数？**  当数据不是线性可分的时候，线性 SVM 就无法很好地工作。**核函数** 是一种强大的工具，它可以将数据**隐式地**映射到**更高维的空间**，使得原本线性不可分的数据在新空间中变得**线性可分**。这个过程被称为 **"核技巧 (Kernel Trick)"**。
+
+![不同核函数的效果对比](img/week3/kernel_comparison.png)
 
 - **"核技巧" 的核心思想：**  与其显式地计算高维空间中的坐标，不如直接计算**高维空间中两个向量的点积**。而**核函数**就是用来高效计算这个点积的。
 
@@ -213,6 +207,8 @@ print("\n分类报告:\n", classification_report(y_test, y_pred))
 ## AUC-ROC
 - **ROC 曲线：** 以假正例率为横轴，真正例率为纵轴的曲线
 - **AUC 值：** ROC 曲线下的面积，值越大表示模型性能越好
+
+![ROC曲线示例](img/week3/roc_curve.png)
 :::
 
 ### 5. 模型选择与调优

@@ -53,6 +53,10 @@
 - `df.isnull().sum()`
 - `missingno` 库 (可视化)
 
+![缺失值分布矩阵图](img/week2/missing_values_matrix.png)
+
+![缺失值相关性热力图](img/week2/missing_values_heatmap.png)
+
 ##### 2.1.2 缺失值处理策略
 - **删除法:** `df.dropna()` (**慎用**)
 - **填充法:** `df.fillna(value)`
@@ -105,6 +109,8 @@ print("\n众数填充后:\n", df)
 - **IQR (四分位距)**
 - 其他方法 (聚类, LOF 等)
 
+![箱线图异常值检测示例](img/week2/boxplot_outliers.png)
+
 ##### 2.2.2 异常值处理策略
 - 删除法 (**慎用**)
 - 替换法
@@ -126,6 +132,8 @@ print("\n众数填充后:\n", df)
    - 将特征缩放到均值为 0，标准差为 1 的分布
    - 公式：`x_scaled = (x - mean) / std`
    - `sklearn.preprocessing.StandardScaler`
+
+![特征缩放效果对比](img/week2/scaling_comparison.png)
 :::
 
 ```python
@@ -199,6 +207,8 @@ print("\nMinMaxScaler 归一化后:\n", df_scaling_minmax)
 1. **多项式特征:**
    - 通过多项式扩展，增加特征的非线性
    - `sklearn.preprocessing.PolynomialFeatures`
+
+![多项式特征转换示例](img/week2/polynomial_features.png)
 :::
 
 ```python
@@ -232,6 +242,8 @@ print("\nPolynomialFeatures 2 次多项式特征:\n", df_poly_encoded)
 **对数变换:** 对特征取对数，压缩数据范围，平滑数据分布，处理长尾分布。
 
 - `numpy.log`, `numpy.log1p` (推荐使用 log1p，避免 log(0) 错误)
+
+![对数变换效果对比](img/week2/log_transform.png)
 :::
 
 ```python
