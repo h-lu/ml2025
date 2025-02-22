@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>第一周：机器学习导论与Python环境搭建 – 机器学习 (Python)</title>
+<title>第二周：数据预处理与特征工程基础 – 机器学习 (Python)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./week2.html" rel="next">
-<link href="./syllabus.html" rel="prev">
+<link href="./week1.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -118,7 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1.html"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week2.html"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -155,12 +120,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week1.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
+  <a href="./week1.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week2.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></a>
+  <a href="./week2.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></a>
   </div>
 </li>
     </ul>
@@ -173,7 +138,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#第一次课机器学习导论与python环境搭建" id="toc-第一次课机器学习导论与python环境搭建" class="nav-link active" data-scroll-target="#第一次课机器学习导论与python环境搭建">第一次课：机器学习导论与Python环境搭建</a>
+  <li><a href="#第二次课数据预处理与特征工程基础" id="toc-第二次课数据预处理与特征工程基础" class="nav-link active" data-scroll-target="#第二次课数据预处理与特征工程基础">第二次课：数据预处理与特征工程基础</a>
   <ul class="collapse">
   <li><a href="#课程目标" id="toc-课程目标" class="nav-link" data-scroll-target="#课程目标">课程目标</a></li>
   <li><a href="#内容概要" id="toc-内容概要" class="nav-link" data-scroll-target="#内容概要">内容概要</a></li>
@@ -181,13 +146,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#课后作业" id="toc-课后作业" class="nav-link" data-scroll-target="#课后作业">课后作业</a></li>
   <li><a href="#相关资源" id="toc-相关资源" class="nav-link" data-scroll-target="#相关资源">相关资源</a></li>
   </ul></li>
-  <li><a href="#第二次课python-基础语法与数据操作" id="toc-第二次课python-基础语法与数据操作" class="nav-link" data-scroll-target="#第二次课python-基础语法与数据操作">第二次课：Python 基础语法与数据操作</a>
+  <li><a href="#第三次课特征选择与降维-下周内容预告" id="toc-第三次课特征选择与降维-下周内容预告" class="nav-link" data-scroll-target="#第三次课特征选择与降维-下周内容预告">第三次课：特征选择与降维 (下周内容预告)</a>
   <ul class="collapse">
-  <li><a href="#课程目标-1" id="toc-课程目标-1" class="nav-link" data-scroll-target="#课程目标-1">课程目标</a></li>
-  <li><a href="#内容概要-1" id="toc-内容概要-1" class="nav-link" data-scroll-target="#内容概要-1">内容概要</a></li>
-  <li><a href="#实践环节-1" id="toc-实践环节-1" class="nav-link" data-scroll-target="#实践环节-1">实践环节</a></li>
-  <li><a href="#课后作业-1" id="toc-课后作业-1" class="nav-link" data-scroll-target="#课后作业-1">课后作业</a></li>
-  <li><a href="#相关资源-1" id="toc-相关资源-1" class="nav-link" data-scroll-target="#相关资源-1">相关资源</a></li>
+  <li><a href="#课程目标-下周" id="toc-课程目标-下周" class="nav-link" data-scroll-target="#课程目标-下周">课程目标 (下周)</a></li>
+  <li><a href="#内容概要-下周" id="toc-内容概要-下周" class="nav-link" data-scroll-target="#内容概要-下周">内容概要 (下周)</a></li>
+  <li><a href="#课后作业-下周" id="toc-课后作业-下周" class="nav-link" data-scroll-target="#课后作业-下周">课后作业 (下周)</a></li>
+  <li><a href="#相关资源-下周" id="toc-相关资源-下周" class="nav-link" data-scroll-target="#相关资源-下周">相关资源 (下周)</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -197,7 +161,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></h1>
+<h1 class="title"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></h1>
 </div>
 
 
@@ -214,24 +178,63 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="第一次课机器学习导论与python环境搭建" class="level2">
-<h2 class="anchored" data-anchor-id="第一次课机器学习导论与python环境搭建">第一次课：机器学习导论与Python环境搭建</h2>
+<section id="第二次课数据预处理与特征工程基础" class="level2">
+<h2 class="anchored" data-anchor-id="第二次课数据预处理与特征工程基础">第二次课：数据预处理与特征工程基础</h2>
 <section id="课程目标" class="level3">
 <h3 class="anchored" data-anchor-id="课程目标">课程目标</h3>
 <ul>
-<li>了解机器学习的核心概念和类型 (监督学习、无监督学习、强化学习)。</li>
-<li>理解机器学习与传统统计分析、数据挖掘的区别与联系。</li>
-<li>认识机器学习和生成式AI 在商业领域的应用前景。</li>
-<li><strong>掌握 Python 和 VS Code 的安装配置，包括 Python 解释器、VS Code 编辑器、Python 插件、虚拟环境 <code>venv</code> 的使用。</strong></li>
-<li>初步体验 AI 辅助编程工具，如 GitHub Copilot, 通义灵码, Cline。</li>
+<li>掌握使用 <code>Pandas</code> 进行数据加载和探索的方法，包括数据读取、查看、统计分析和可视化。</li>
+<li>掌握常见的数据清洗方法，包括缺失值处理 (删除、填充) 和异常值处理 (检测与处理)。</li>
+<li>理解特征工程的基本概念和方法，包括数值特征处理 (特征缩放、特征转换) 和类别特征处理 (独热编码、标签编码)。</li>
+<li>掌握使用 <code>Scikit-learn</code> 进行数据预处理和特征工程的常用方法。</li>
+<li>能够使用 AI 辅助编程工具完成数据预处理和特征工程的编程练习。</li>
+<li>了解小组项目一：电商用户行为数据探索与预处理 的目标、数据集和任务要求。</li>
 </ul>
 </section>
 <section id="内容概要" class="level3">
 <h3 class="anchored" data-anchor-id="内容概要">内容概要</h3>
 <ol type="1">
-<li><strong>机器学习导论</strong>
+<li><strong>数据加载与探索</strong>
 <ul>
-<li>什么是机器学习？</li>
+<li><strong>使用 <code>Pandas</code> 读取数据:</strong>
+<ul>
+<li><code>pd.read_csv()</code>, <code>pd.read_excel()</code> 等常用数据读取函数。</li>
+<li>常用参数：<code>filepath_or_buffer</code>, <code>sep</code>, <code>header</code>, <code>index_col</code>, <code>encoding</code> 等。</li>
+</ul></li>
+<li><strong>数据查看:</strong>
+<ul>
+<li><code>df.head()</code>, <code>df.tail()</code>, <code>df.sample()</code>: 查看数据的前几行、后几行或随机抽样行。</li>
+<li><code>df.info()</code>: 查看数据类型、缺失值情况、内存占用等信息。</li>
+<li><code>df.describe()</code>: 查看数值特征的统计描述 (均值、标准差、最小值、最大值、分位数等)。</li>
+<li><code>df.shape</code>, <code>df.columns</code>, <code>df.index</code>, <code>df.dtypes</code>: 查看数据维度、列名、索引和数据类型。</li>
+</ul></li>
+<li><strong>数据基本统计分析:</strong>
+<ul>
+<li>数值特征统计：<code>df['列名'].mean()</code>, <code>df['列名'].median()</code>, <code>df['列名'].std()</code>, <code>df['列名'].max()</code>, <code>df['列名'].min()</code>, <code>df['列名'].value_counts()</code> 等。</li>
+<li>类别特征统计：<code>df['列名'].value_counts()</code>, <code>df['列名'].unique()</code>, <code>df['列名'].nunique()</code> 等。</li>
+<li>相关性分析：<code>df.corr()</code> (计算特征之间的相关系数)。</li>
+</ul></li>
+<li><strong>数据可视化 (初步):</strong>
+<ul>
+<li>直方图：<code>df['列名'].hist()</code> (查看数值特征分布)。</li>
+<li>箱线图：<code>df.boxplot(column=['列名'])</code> (查看数值特征的箱线图，检测异常值)。</li>
+<li>散点图：<code>df.plot.scatter(x='列名1', y='列名2')</code> (查看两个数值特征之间的关系)。</li>
+<li>柱状图：<code>df['列名'].value_counts().plot.bar()</code> (查看类别特征的分布)。</li>
+<li><strong>使用 <code>matplotlib</code> 和 <code>seaborn</code> 进行更高级的数据可视化 (下周详细讲解)。</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>数据清洗</strong>
+<ul>
+<li><strong>缺失值处理:</strong>
+<ul>
+<li><strong>检测缺失值:</strong> <code>df.isnull()</code>, <code>df.sum()</code>, <code>df.isnull().sum()</code>, <code>missingno</code> 库 (可视化缺失值)。</li>
+<li><strong>缺失值处理策略:</strong>
+<ul>
+<li><strong>删除法:</strong> <code>df.dropna()</code> (删除包含缺失值的行或列，慎用，可能丢失信息)。</li>
+<li><strong>填充法:</strong> <code>df.fillna(value)</code>, <code>df['列名'].fillna(value)</code> (使用固定值、均值、中位数、众数等填充缺失值)。</li>
+<li><strong>插值法:</strong> <code>df.interpolate()</code> (使用插值方法估计缺失值，例如线性插值、多项式插值等)。</li>
+<li><strong>高级方法:</strong> 使用模型预测缺失值 (例如 KNN 填充、回归填充等，本课程不深入讲解)。</li>
+</ul></li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -239,104 +242,116 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-定义
+选择合适的缺失值处理策略
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>无需显式编程，让计算机从数据中学习规律和知识。</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-与传统编程的区别
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>传统编程 (显式规则) vs.&nbsp;机器学习 (从数据中学习规则)。</p>
-</div>
-</div>
-<ul>
-<li>机器学习的核心概念
-<ul>
-<li><strong>监督学习 (Supervised Learning):</strong> 从带有标签的数据中学习，用于分类和回归任务。</li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-示例
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>垃圾邮件识别 (分类)、房价预测 (回归)。</p>
-</div>
-</div>
-<ul>
-<li><strong>无监督学习 (Unsupervised Learning):</strong> 从无标签数据中学习数据结构和模式，用于聚类、降维、关联规则挖掘等任务。</li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-示例
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>用户分群 (聚类)、商品推荐 (关联规则)。</p>
-</div>
-</div>
-<ul>
-<li><strong>强化学习 (Reinforcement Learning):</strong> 通过与环境交互学习最优策略，以获得最大奖励。 (简要介绍，本课程侧重监督学习和无监督学习)</li>
-</ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-示例
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>游戏 AI、自动驾驶。</p>
+<p>需要根据具体情况和业务理解。</p>
 </div>
 </div></li>
-<li>机器学习与相关学科
+<li><strong>异常值处理:</strong>
 <ul>
-<li><strong>机器学习 vs.&nbsp;传统统计分析:</strong>
+<li><strong>异常值检测方法:</strong>
 <ul>
-<li>侧重点不同：统计分析 (解释性、推断) vs.&nbsp;机器学习 (预测性、性能)。</li>
-<li>方法论差异：统计分析 (模型假设、参数估计) vs.&nbsp;机器学习 (算法迭代、模型优化)。</li>
+<li><strong>箱线图 (Boxplot):</strong> 箱线图以外的点通常被认为是异常值。</li>
+<li><strong>Z-score:</strong> 计算 Z-score，绝对值大于阈值 (例如 3) 的被认为是异常值。</li>
+<li><strong>IQR (四分位距):</strong> 超出 Q1 - 1.5IQR 或 Q3 + 1.5IQR 范围的值被认为是异常值。</li>
+<li><strong>其他方法:</strong> 聚类、LOF (局部离群因子) 等算法 (本课程不深入讲解)。</li>
 </ul></li>
-<li><strong>机器学习 vs.&nbsp;数据挖掘:</strong>
+<li><strong>异常值处理策略:</strong>
 <ul>
-<li>目标相似：从数据中发现知识和模式。</li>
-<li>侧重面不同：数据挖掘 (更侧重数据预处理、模式发现) vs.&nbsp;机器学习 (更侧重模型构建、预测和决策)。</li>
+<li><strong>删除法:</strong> 直接删除异常值 (慎用，可能丢失信息)。</li>
+<li><strong>替换法:</strong> 使用均值、中位数、边界值等替换异常值。</li>
+<li><strong>视为缺失值:</strong> 将异常值替换为缺失值，再进行缺失值处理。</li>
+<li><strong>不处理:</strong> 有些情况下，异常值可能包含有价值的信息，可以考虑不处理。</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+异常值处理
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>同样需要根据具体情况和业务理解。</p>
+</div>
+</div></li>
+</ul></li>
+<li><strong>特征工程基础</strong>
+<ul>
+<li><strong>数值特征处理:</strong>
+<ul>
+<li><strong>特征缩放 (Feature Scaling):</strong> 将数值特征缩放到一定范围，避免特征量纲不一致和数值过大/过小带来的问题。
+<ul>
+<li><strong>标准化 (Standardization):</strong> 将特征缩放到均值为 0，标准差为 1 的分布 (也称 Z-score 归一化)。
+<ul>
+<li>公式：<code>x_scaled = (x - mean) / std</code></li>
+<li><code>sklearn.preprocessing.StandardScaler</code></li>
+</ul></li>
+<li><strong>归一化 (Normalization):</strong> 将特征缩放到 0 和 1 之间 (也称 Min-Max 缩放)。
+<ul>
+<li>公式：<code>x_scaled = (x - min) / (max - min)</code></li>
+<li><code>sklearn.preprocessing.MinMaxScaler</code></li>
+</ul></li>
+<li><strong>其他缩放方法:</strong> <code>RobustScaler</code> (基于四分位距缩放，对异常值更鲁棒), <code>MaxAbsScaler</code> (绝对值最大值缩放) 等。</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+选择合适的缩放方法
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>需要根据数据分布和模型特点。</p>
+</div>
+</div>
+<ul>
+<li><strong>特征转换 (Feature Transformation):</strong> 对数值特征进行函数变换，使其更符合模型假设或业务需求。
+<ul>
+<li><strong>多项式特征:</strong> 将特征进行多项式扩展，增加特征的非线性性。
+<ul>
+<li>例如：将特征 <code>x</code> 转换为 <code>x</code>, <code>x^2</code>, <code>x^3</code> 等。</li>
+<li><code>sklearn.preprocessing.PolynomialFeatures</code></li>
+</ul></li>
+<li><strong>对数变换:</strong> 对特征取对数，减小数值范围，平滑数据分布，处理长尾分布。
+<ul>
+<li>例如：<code>log(x + 1)</code> (加 1 是为了避免对 0 取对数)。</li>
+<li><code>numpy.log1p</code>, <code>sklearn.preprocessing.PowerTransformer</code></li>
+</ul></li>
+<li><strong>指数变换:</strong> 对特征取指数。</li>
+<li><strong>Box-Cox 变换, Yeo-Johnson 变换:</strong> 更通用的幂变换，可以处理不同分布的数据。
+<ul>
+<li><code>sklearn.preprocessing.PowerTransformer</code></li>
 </ul></li>
 </ul></li>
-<li>机器学习和生成式AI 的商业应用案例
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+选择合适的特征转换方法
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>根据业务理解和数据探索选择。</p>
+</div>
+</div></li>
+<li><strong>类别特征处理:</strong>
 <ul>
-<li><strong>精准营销:</strong> 用户画像、个性化推荐、广告投放优化。</li>
-<li><strong>风险管理:</strong> 信用评分、欺诈检测、风险预警。</li>
-<li><strong>智能客服:</strong> 聊天机器人、智能问答、工单自动化。</li>
-<li><strong>内容创作:</strong> 文案生成、图像生成、音乐创作、代码生成 (生成式AI)。</li>
-<li><strong>智能产品与服务:</strong> 智能家居、自动驾驶、智能医疗。</li>
+<li><strong>独热编码 (One-Hot Encoding):</strong> 将类别特征转换为多个二元特征，每个类别对应一列，存在该类别则为 1，否则为 0。
+<ul>
+<li>适用于类别之间没有顺序关系的情况 (例如：颜色、城市)。</li>
+<li><code>pandas.get_dummies</code>, <code>sklearn.preprocessing.OneHotEncoder</code></li>
 </ul></li>
-</ul></li>
-<li><strong>Python 机器学习环境搭建</strong>
-<ul>
-<li><p><strong>安装 Python 解释器:</strong></p>
-<ul>
-<li><strong>从 Python 官网下载并安装 Python 解释器:</strong> <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a> (建议安装 3.9 及以上版本)</li>
-<li><strong>安装过程中，务必勾选 “Add Python to PATH”</strong>，以便在命令行中直接使用 <code>python</code> 和 <code>pip</code> 命令。</li>
 </ul>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -344,67 +359,40 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-重要
+注意
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>安装 Python 时，请务必勾选 “Add Python to PATH” 选项。</p>
+<p>处理高基数类别特征 (类别数量过多) 可能导致维度灾难。</p>
 </div>
 </div>
 <ul>
-<li><strong>验证 Python 安装:</strong> 打开命令行 (Windows: <code>cmd</code> 或 PowerShell, macOS/Linux: Terminal)，输入 <code>python --version</code> 和 <code>pip --version</code>，查看 Python 和 pip 版本信息。</li>
-</ul></li>
-<li><p><strong>安装 VS Code 编辑器:</strong></p>
+<li><strong>标签编码 (Label Encoding):</strong> 将类别特征转换为数值标签，每个类别对应一个整数。
 <ul>
-<li><strong>从 VS Code 官网下载并安装 VS Code:</strong> <a href="https://code.visualstudio.com/download">https://code.visualstudio.com/download</a> (根据操作系统选择合适的版本)</li>
+<li>适用于类别之间有顺序关系的情况 (例如：学历、等级)。</li>
+<li><code>sklearn.preprocessing.LabelEncoder</code></li>
 </ul></li>
-<li><p><strong>在 VS Code 中安装 Python 插件:</strong></p>
-<ul>
-<li>打开 VS Code，点击左侧侧边栏的 “Extensions” 图标 (或快捷键 <code>Ctrl+Shift+X</code> / <code>Cmd+Shift+X</code>)。</li>
-<li>在搜索框中输入 “Python”，找到 <strong>“Python” 插件 (由 Microsoft 提供)</strong>，点击 “Install” 进行安装。</li>
-<li><strong>Python 插件功能:</strong> 代码智能提示、代码格式化、代码调试、Jupyter Notebook 支持、虚拟环境管理等。</li>
-</ul></li>
-<li><p><strong>在 VS Code 中选择 Python 解释器:</strong></p>
-<ul>
-<li>安装 Python 插件后，VS Code 会自动检测系统中的 Python 解释器。</li>
-<li><strong>手动选择 Python 解释器:</strong> 点击 VS Code 窗口右下角的 Python 版本号，或使用快捷键 <code>Ctrl+Shift+P</code> / <code>Cmd+Shift+P</code>，输入 “Python: Select Interpreter”，选择已安装的 Python 解释器。</li>
-<li><strong>管理多个 Python 版本:</strong> 如果安装了多个 Python 版本，可以在 “Select Interpreter” 菜单中选择不同的版本。</li>
-</ul></li>
-<li><p><strong>使用 <code>venv</code> 创建和管理虚拟环境:</strong></p>
-<div class="callout callout-style-default callout-note callout-titled">
+</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-什么是虚拟环境
+注意
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>虚拟环境是一个隔离的 Python 环境，可以为不同的项目安装不同的 Python 包，避免包版本冲突。</p>
+<p>标签编码可能会引入类别之间的顺序关系，如果类别没有实际顺序意义，可能不适用。</p>
 </div>
 </div>
 <ul>
-<li><strong>使用 <code>venv</code> 创建虚拟环境:</strong> 在项目根目录下，打开命令行，输入 <code>python -m venv .venv</code> (<code>.venv</code> 为虚拟环境文件夹名称，可以自定义)。</li>
-<li><strong>激活虚拟环境:</strong>
+<li><strong>顺序编码 (Ordinal Encoding):</strong> 类似于标签编码，但可以自定义类别顺序。
 <ul>
-<li><strong>Windows (cmd):</strong> <code>.venv\Scripts\activate.bat</code></li>
-<li><strong>Windows (PowerShell):</strong> <code>.venv\Scripts\Activate.ps1</code></li>
-<li><strong>macOS/Linux:</strong> <code>source .venv/bin/activate</code></li>
-<li>激活后，命令行提示符前会显示虚拟环境名称 <code>(.venv)</code>。</li>
+<li>适用于类别之间有明确顺序关系的情况。</li>
+<li><code>sklearn.preprocessing.OrdinalEncoder</code></li>
 </ul></li>
-<li><strong>在 VS Code 中使用虚拟环境:</strong> VS Code 会自动检测项目中的虚拟环境，并在右下角显示。 如果没有自动检测到，可以手动选择虚拟环境解释器 (参考 “选择 Python 解释器” 步骤)。</li>
-<li><strong>在虚拟环境中安装 Python 包:</strong> 激活虚拟环境后，使用 <code>pip install 包名</code> 命令安装的包，只会安装到当前虚拟环境中，不会影响全局 Python 环境。</li>
-</ul></li>
-<li><p><strong>安装 Python 常用库 (在虚拟环境中):</strong></p>
-<ul>
-<li>激活虚拟环境后，使用 <code>pip install scikit-learn pandas numpy matplotlib seaborn</code> 命令安装常用库。</li>
-</ul></li>
-<li><p><strong>体验 AI 辅助编程工具:</strong></p>
-<ul>
-<li><strong>GitHub Copilot, 通义灵码, Cline 等代码辅助插件:</strong> 代码自动补全、代码片段生成、代码错误检查、自然语言代码解释等功能演示。</li>
-<li><strong>Cursor 代码编辑器:</strong> 内置 AI 功能的代码编辑器体验。(https://cursor.sh/)</li>
-<li><strong>配置 pip 国内镜像源 (可选，但推荐):</strong></li>
+<li><strong>二进制编码 (Binary Encoding), 效应编码 (Effect Encoding), 目标编码 (Target Encoding) 等其他类别特征编码方法 (本课程不深入讲解)。</strong></li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -412,226 +400,172 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-为什么要配置国内镜像源
+选择合适的类别特征编码方法
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>pip 默认使用国外的 PyPI 仓库下载 Python 包，国内下载速度可能较慢。配置国内镜像源可以显著提升下载速度，尤其是在网络环境不佳的情况下。</p>
+<p>需要根据数据特点和模型需求。</p>
+</div>
+</div></li>
+</ul></li>
+<li><strong><code>Scikit-learn</code> 数据预处理和特征工程常用模块</strong>
+<ul>
+<li><p><code>sklearn.preprocessing</code>: 提供了各种数据预处理和特征工程的函数和类，例如：</p>
+<ul>
+<li><code>StandardScaler</code>, <code>MinMaxScaler</code>, <code>RobustScaler</code>, <code>MaxAbsScaler</code> (特征缩放)。</li>
+<li><code>PolynomialFeatures</code>, <code>PowerTransformer</code> (特征转换)。</li>
+<li><code>OneHotEncoder</code>, <code>LabelEncoder</code>, <code>OrdinalEncoder</code> (类别特征编码)。</li>
+<li><code>SimpleImputer</code> (缺失值填充)。</li>
+</ul></li>
+<li><p><code>sklearn.impute</code>: 提供了缺失值填充的类，例如 <code>SimpleImputer</code>, <code>KNNImputer</code> (KNN 填充), <code>IterativeImputer</code> (迭代填充)。</p></li>
+<li><p><code>sklearn.feature_selection</code>: 提供了特征选择的类 (下周讲解)。</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+熟练使用 Scikit-learn
 </div>
 </div>
+<div class="callout-body-container callout-body">
+<p>可以高效地进行数据预处理和特征工程。</p>
+</div>
+</div></li>
+</ul></li>
+<li><strong>小组项目一：电商用户行为数据探索与预处理 (案例介绍与数据准备)</strong>
 <ul>
-<li><strong>常用国内镜像源:</strong>
+<li><strong>项目背景:</strong> 电商平台积累了大量的用户行为数据，例如用户的点击、浏览、购买、加购、收藏等行为。 通过分析这些数据，可以了解用户兴趣偏好、购买行为模式，为个性化推荐、精准营销、用户增长等提供数据支持。</li>
+<li><strong>数据集:</strong> <strong>鼓励学生小组自主选择数据集</strong>，建议选择电商或零售行业的用户行为数据集。 数据集应包含用户行为数据，数据量适中，特征维度不低于10个，且具有一定的分类难度。 <strong>鼓励各小组选择不同的数据集，以提高项目实践的多样性。</strong> <strong>(本课程提供 <a href="https://tianchi.aliyun.com/dataset/dataDetail?dataId=649">阿里巴巴天池 - 淘宝用户行为数据</a> 作为示例数据集)</strong>。
 <ul>
-<li><strong>清华大学:</strong> <code>https://pypi.tuna.tsinghua.edu.cn/simple</code></li>
-<li><strong>阿里云:</strong> <code>https://mirrors.aliyun.com/pypi/simple/</code></li>
-<li><strong>豆瓣:</strong> <code>https://pypi.doubanio.com/simple/</code></li>
-<li><strong>中国科学技术大学:</strong> <code>https://pypi.mirrors.ustc.edu.cn/simple/</code></li>
-<li><strong>华中科技大学:</strong> <code>https://pypi.hustunique.com/</code></li>
-<li><strong>Windows 配置方法:</strong>
+<li><strong>(示例数据集) 阿里巴巴天池 - 淘宝用户行为数据:</strong> 数据集包含 2000 万条淘宝用户的行为记录，字段包括：用户ID、商品ID、商品类目ID、行为类型 (点击、浏览、加购、购买)、时间戳。</li>
+<li><strong>数据已进行简化处理，只保留了部分用户和商品数据，并转换为 CSV 格式，方便教学使用。</strong></li>
+</ul></li>
+<li><strong>项目目标:</strong> 对电商用户行为数据进行探索性数据分析 (EDA) 和预处理，为后续的机器学习建模 (例如用户行为预测、商品推荐) 做好数据准备。</li>
+<li><strong>项目任务 (小组完成):</strong>
 <ul>
-<li>在 <strong>用户目录</strong> (例如 <code>C:\Users\YourUserName</code>) 下创建文件夹 <code>pip</code>。</li>
-<li>在 <code>pip</code> 文件夹下创建文件 <code>pip.ini</code>。</li>
-<li>用文本编辑器打开 <code>pip.ini</code>，写入以下内容 (以清华大学镜像源为例):</li>
-</ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ini:pip.ini code-with-copy"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[global]</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">index-url </span><span class="ot">=</span><span class="st"> https://pypi.tuna.tsinghua.edu.cn/simple</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">[install]</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">trusted-host </span><span class="ot">=</span><span class="st"> pypi.tuna.tsinghua.edu.cn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><strong>macOS/Linux 配置方法:</strong>
+<li><strong>数据探索:</strong>
 <ul>
-<li>在 <strong>用户目录</strong> (例如 <code>/Users/YourUserName</code> 或 <code>~</code>) 下创建文件夹 <code>.pip</code> (注意文件夹名前面的点)。</li>
-<li>在 <code>.pip</code> 文件夹下创建文件 <code>pip.conf</code>。</li>
-<li>用文本编辑器打开 <code>pip.conf</code>，写入以下内容 (以清华大学镜像源为例):</li>
-</ul>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ini:pip.conf code-with-copy"><code class="sourceCode toml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[global]</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">index-url</span> <span class="op">=</span> <span class="dt">https</span><span class="er">://</span><span class="dt">pypi.tuna.tsinghua.edu.cn</span><span class="er">/</span><span class="dt">simple</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">[install]</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dt">trusted-host</span> <span class="op">=</span> <span class="dt">pypi.tuna.tsinghua.edu.cn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><strong>验证镜像源是否生效:</strong> 配置完成后，尝试使用 <code>pip install 包名</code> 命令安装 Python 包，观察下载速度是否提升。 也可以使用 <code>pip config get global.index-url</code> 命令查看当前 pip 配置的镜像源。</li>
+<li>加载数据集，查看数据基本信息 (数据类型、缺失值等)。</li>
+<li>分析用户行为类型分布、时间分布、用户和商品数量等。</li>
+<li>可视化用户行为数据，例如用户行为时间序列图、商品销量排行榜等。</li>
+</ul></li>
+<li><strong>数据清洗:</strong>
+<ul>
+<li>处理缺失值 (如果存在)。</li>
+<li>检测和处理异常值 (例如时间戳异常)。</li>
+<li><strong>根据数据探索结果，进行必要的数据清洗操作。</strong></li>
+</ul></li>
+<li><strong>特征工程:</strong>
+<ul>
+<li><strong>基于用户行为数据，构建用户特征和商品特征。</strong> (例如：用户点击次数、购买次数、浏览商品类目数；商品被点击次数、被购买次数等)。</li>
+<li><strong>可以尝试构建一些交叉特征或衍生特征。</strong></li>
+<li><strong>对特征进行必要的预处理 (例如特征缩放、类别编码)。</strong></li>
+</ul></li>
+<li><strong>提交内容:</strong>
+<ul>
+<li><strong>预处理后的数据集 (CSV 格式)。</strong></li>
+<li><strong>Python 代码 (Jupyter Notebook 或 Python 脚本)，包含数据探索、清洗和特征工程的完整代码，代码需要有清晰的注释。</strong></li>
+<li><strong>小组分工说明 (可选)。</strong></li>
 </ul></li>
 </ul></li>
+<li><strong>评分标准:</strong> 数据预处理的完整性、代码的规范性、数据探索的深入程度、特征工程的合理性。</li>
+<li><strong>下周第二次课进行小组项目展示和代码讲解。</strong></li>
 </ul></li>
 </ol>
 </section>
 <section id="实践环节" class="level3">
 <h3 class="anchored" data-anchor-id="实践环节">实践环节</h3>
 <ol type="1">
-<li><strong>Python 解释器安装:</strong> 学生根据教程，从 Python 官网下载并安装 Python 解释器，并验证安装成功。</li>
-<li><strong>VS Code 编辑器安装:</strong> 安装 VS Code 编辑器。</li>
-<li><strong>VS Code Python 插件安装和配置:</strong> 在 VS Code 中安装 Python 插件，并选择 Python 解释器。</li>
-<li><strong>使用 <code>venv</code> 创建和激活虚拟环境:</strong> 在指定目录下创建虚拟环境，并尝试激活和退出虚拟环境。</li>
-<li><strong>在虚拟环境中安装常用 Python 库:</strong> 激活虚拟环境后，使用 <code>pip install</code> 命令安装 <code>scikit-learn</code>, <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>seaborn</code> 等常用库。</li>
-<li><strong>体验 AI 辅助编程工具:</strong> 安装 GitHub Copilot 或 通义灵码 插件 (或体验 Cursor 编辑器)，尝试使用 AI 工具辅助编写简单的 Python 代码，并在虚拟环境中运行。</li>
+<li><strong>数据加载与探索练习:</strong> 使用 <code>Pandas</code> 读取 CSV 数据集 (提供示例数据集)，进行数据查看、统计分析和可视化练习。</li>
+<li><strong>数据清洗练习:</strong> 对示例数据集进行缺失值和异常值处理练习，尝试不同的处理策略，并比较效果。</li>
+<li><strong>特征工程基础练习:</strong> 对示例数据集进行数值特征缩放、特征转换和类别特征编码练习，使用 <code>Scikit-learn</code> 提供的工具。</li>
+<li><strong>小组项目一：数据探索与预处理实践:</strong> 小组合作，开始进行电商用户行为数据集的数据探索、数据清洗和特征工程，完成数据预处理代码初稿。</li>
+<li><strong>使用 AI 工具辅助完成数据预处理和特征工程代码，提高代码编写效率。</strong></li>
 </ol>
 </section>
 <section id="课后作业" class="level3">
 <h3 class="anchored" data-anchor-id="课后作业">课后作业</h3>
 <ol type="1">
-<li><strong>完成 Python 和 VS Code 环境搭建，并成功创建和激活虚拟环境，安装常用 Python 库，确保环境配置成功。</strong></li>
-<li><strong>查阅资料，了解 Python 虚拟环境的作用和优势。</strong></li>
-<li><strong>思考题：</strong> 为什么在 Python 项目开发中推荐使用虚拟环境？ 不使用虚拟环境可能带来哪些问题？</li>
+<li><strong>完成数据加载、数据查看、数据基本统计分析和可视化的编程练习，并将代码上传到 GitHub 仓库。</strong></li>
+<li><strong>完成数据清洗 (缺失值处理、异常值处理) 和特征工程 (数值特征处理、类别特征处理) 的编程练习，并将代码上传到 GitHub 仓库。</strong></li>
+<li><strong>小组合作完成小组项目一：电商用户行为数据探索与预处理 的数据预处理代码，并提交预处理后的数据集和代码到指定平台 (例如 GitHub 仓库)。</strong></li>
+<li><strong>预习下周课程内容：特征选择与降维。</strong></li>
+<li><strong>思考题：</strong> 在数据预处理和特征工程中，如何选择合适的方法和策略？ 数据预处理和特征工程对机器学习模型性能的影响？</li>
 </ol>
 </section>
 <section id="相关资源" class="level3">
 <h3 class="anchored" data-anchor-id="相关资源">相关资源</h3>
 <ul>
-<li><strong>Python 官网下载:</strong> <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></li>
-<li><strong>VS Code 官网下载:</strong> <a href="https://code.visualstudio.com/download">https://code.visualstudio.com/download</a></li>
-<li><strong>VS Code Python 插件:</strong> <a href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">https://marketplace.visualstudio.com/items?itemName=ms-python.python</a></li>
-<li><strong>Python <code>venv</code> 虚拟环境官方文档:</strong> <a href="https://docs.python.org/3/library/venv.html">https://docs.python.org/3/library/venv.html</a></li>
-<li><strong>Python 机器学习常用库文档:</strong>
-<ul>
-<li><code>scikit-learn</code>: <a href="https://scikit-learn.org/stable/">scikit-learn.org</a></li>
-<li><code>pandas</code>: <a href="https://pandas.pydata.org/">pandas.pydata.org</a></li>
-<li><code>numpy</code>: <a href="https://numpy.org/">numpy.org</a></li>
-<li><code>matplotlib</code>: <a href="https://matplotlib.org/">matplotlib.org</a></li>
-<li><code>seaborn</code>: <a href="https://seaborn.pydata.org/">seaborn.pydata.org</a></li>
-</ul></li>
-<li><strong>AI 辅助编程工具:</strong>
-<ul>
-<li>GitHub Copilot: <a href="https://github.com/features/copilot">github.com/features/copilot</a></li>
-<li>通义灵码: <a href="https://tongyi.aliyun.com/lingma">tongyi.aliyun.com/lingma</a></li>
-<li>Cursor: <a href="https://cursor.sh/">cursor.sh</a></li>
-</ul></li>
+<li><strong><code>Pandas</code> 官方文档:</strong> <a href="https://pandas.pydata.org/docs/">pandas.pydata.org/docs/</a></li>
+<li><strong><code>Scikit-learn</code> 官方文档:</strong> <a href="https://scikit-learn.org/stable/">scikit-learn.org/stable/</a></li>
+<li><strong><code>Scikit-learn</code> Preprocessing 模块文档:</strong> <a href="https://scikit-learn.org/stable/modules/preprocessing.html">scikit-learn.org/stable/modules/preprocessing.html</a></li>
+<li><strong><code>Scikit-learn</code> Impute 模块文档:</strong> <a href="https://scikit-learn.org/stable/modules/impute.html">scikit-learn.org/stable/modules/impute.html</a></li>
+<li><strong>《Python Data Science Handbook》:</strong> <a href="https://jakevdp.github.io/PythonDataScienceHandbook/">jakevdp.github.io/PythonDataScienceHandbook/</a> (Chapter 3, Chapter 4, Chapter 5)</li>
+<li><strong>《Hands-On Machine Learning with Scikit-Learn, Keras &amp; TensorFlow》:</strong> <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/">www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/</a> (Chapter 2, Chapter 3)</li>
+<li><strong>阿里巴巴天池 - 淘宝用户行为数据:</strong> <a href="https://tianchi.aliyun.com/dataset/dataDetail?dataId=649">https://tianchi.aliyun.com/dataset/dataDetail?dataId=649</a></li>
 </ul>
 <hr>
 </section>
 </section>
-<section id="第二次课python-基础语法与数据操作" class="level2">
-<h2 class="anchored" data-anchor-id="第二次课python-基础语法与数据操作">第二次课：Python 基础语法与数据操作</h2>
-<section id="课程目标-1" class="level3">
-<h3 class="anchored" data-anchor-id="课程目标-1">课程目标</h3>
+<section id="第三次课特征选择与降维-下周内容预告" class="level2">
+<h2 class="anchored" data-anchor-id="第三次课特征选择与降维-下周内容预告">第三次课：特征选择与降维 (下周内容预告)</h2>
+<section id="课程目标-下周" class="level3">
+<h3 class="anchored" data-anchor-id="课程目标-下周">课程目标 (下周)</h3>
 <ul>
-<li>回顾 Python 基础语法，包括变量、数据类型、运算符、控制流、函数和模块。</li>
-<li>掌握 <code>Numpy</code> 库的基本操作，包括数组创建、数组运算和常用函数。</li>
-<li>掌握 <code>Pandas</code> 库的基本操作，包括数据结构 (Series, DataFrame)、数据读取、数据选择和数据清洗 (重复值处理)。</li>
-<li>能够使用 AI 辅助编程工具完成 Python 基础语法和数据操作的编程练习。</li>
+<li>理解特征选择和降维的目的和意义。</li>
+<li>掌握常用的特征选择方法，包括过滤式、包裹式和嵌入式方法。</li>
+<li>掌握常用的降维方法，包括 PCA 和 t-SNE。</li>
+<li>能够使用 <code>Scikit-learn</code> 进行特征选择和降维操作。</li>
 </ul>
 </section>
-<section id="内容概要-1" class="level3">
-<h3 class="anchored" data-anchor-id="内容概要-1">内容概要</h3>
+<section id="内容概要-下周" class="level3">
+<h3 class="anchored" data-anchor-id="内容概要-下周">内容概要 (下周)</h3>
 <ol type="1">
-<li><strong>Python 基础语法回顾</strong>
+<li><strong>特征选择</strong>
 <ul>
-<li><strong>变量与数据类型:</strong>
+<li>特征选择的目的和意义：降维、去除冗余特征、提高模型性能、可解释性。</li>
+<li>特征选择方法：
 <ul>
-<li>变量命名规则、动态类型。</li>
-<li>常用数据类型：整型 (int)、浮点型 (float)、字符串 (str)、布尔型 (bool)、列表 (list)、元组 (tuple)、字典 (dict)、集合 (set)。</li>
+<li><strong>过滤式 (Filter methods):</strong> 基于特征与目标变量之间的统计指标进行选择 (例如：方差选择、相关系数、卡方检验、互信息)。</li>
+<li><strong>包裹式 (Wrapper methods):</strong> 将特征子集的选择看作搜索问题，使用模型性能作为评价指标进行选择 (例如：递归特征消除 RFE)。</li>
+<li><strong>嵌入式 (Embedded methods):</strong> 将特征选择融入到模型训练过程中 (例如：L1 正则化、树模型特征重要性)。</li>
 </ul></li>
-<li><strong>运算符:</strong>
-<ul>
-<li>算术运算符、比较运算符、逻辑运算符、赋值运算符、成员运算符、身份运算符。</li>
+<li><code>Scikit-learn</code> 特征选择模块：<code>sklearn.feature_selection</code>。</li>
 </ul></li>
-<li><strong>控制流:</strong>
+<li><strong>降维</strong>
 <ul>
-<li>条件语句：<code>if</code>, <code>elif</code>, <code>else</code>。</li>
-<li>循环语句：<code>for</code>, <code>while</code>，<code>break</code>, <code>continue</code>。</li>
-</ul></li>
-<li><strong>函数:</strong>
+<li>降维的目的和意义：降维、可视化、去除噪声、提高计算效率。</li>
+<li>常用降维方法：
 <ul>
-<li>函数定义、函数参数、函数返回值、匿名函数 (lambda)。</li>
-</ul></li>
-<li><strong>模块与包:</strong>
-<ul>
-<li>模块导入：<code>import</code>, <code>from ... import ...</code>。</li>
-<li>常用内置模块：<code>math</code>, <code>random</code>, <code>os</code>, <code>sys</code>, <code>datetime</code>。</li>
+<li><strong>主成分分析 (PCA):</strong> 线性降维方法，通过正交变换将数据投影到低维空间，使得投影后的数据方差最大化。</li>
+<li><strong>t-SNE:</strong> 非线性降维方法，用于高维数据可视化，将高维数据映射到低维空间，保持数据点的局部邻域结构。</li>
+<li><code>Scikit-learn</code> 降维模块：<code>sklearn.decomposition</code> (PCA), <code>sklearn.manifold</code> (t-SNE)。</li>
 </ul></li>
 </ul></li>
-<li><strong><code>Numpy</code> 基础</strong>
+<li><strong>实践环节 (下周)</strong>
 <ul>
-<li><strong><code>Numpy</code> 数组 (ndarray):</strong>
-<ul>
-<li>数组创建：<code>np.array()</code>, <code>np.zeros()</code>, <code>np.ones()</code>, <code>np.arange()</code>, <code>np.linspace()</code>, <code>np.random.rand()</code> 等。</li>
-<li>数组属性：<code>shape</code>, <code>dtype</code>, <code>ndim</code>, <code>size</code>。</li>
-<li>数组索引和切片。</li>
-<li>数组维度变换：<code>reshape()</code>, <code>flatten()</code>, <code>transpose()</code>。</li>
-</ul></li>
-<li><strong>数组运算:</strong>
-<ul>
-<li>元素级运算：加减乘除、幂运算、比较运算。</li>
-<li>矩阵运算：矩阵乘法 (<code>np.dot()</code>, <code>@</code> 运算符)。</li>
-<li>广播 (broadcasting) 机制。</li>
-</ul></li>
-<li><strong>常用函数:</strong>
-<ul>
-<li>数学函数：<code>np.sin()</code>, <code>np.cos()</code>, <code>np.exp()</code>, <code>np.log()</code>, <code>np.sqrt()</code> 等。</li>
-<li>统计函数：<code>np.mean()</code>, <code>np.median()</code>, <code>np.std()</code>, <code>np.max()</code>, <code>np.min()</code>, <code>np.sum()</code> 等。</li>
-<li>排序和查找：<code>np.sort()</code>, <code>np.argsort()</code>, <code>np.unique()</code>, <code>np.where()</code> 等。</li>
-</ul></li>
-</ul></li>
-<li><strong><code>Pandas</code> 基础</strong>
-<ul>
-<li><strong><code>Pandas</code> 数据结构:</strong>
-<ul>
-<li><strong>Series:</strong> 带标签的一维数组，类似于带索引的列表。
-<ul>
-<li><code>Series</code> 创建、索引、切片、常用属性和方法。</li>
-</ul></li>
-<li><strong>DataFrame:</strong> 带标签的二维数据表，类似于 Excel 表格或 SQL 表。
-<ul>
-<li><code>DataFrame</code> 创建、列选择、行选择、索引、切片、常用属性和方法。</li>
-</ul></li>
-</ul></li>
-<li><strong>数据读取:</strong>
-<ul>
-<li><code>pd.read_csv()</code>: 读取 CSV 文件。</li>
-<li><code>pd.read_excel()</code>: 读取 Excel 文件。</li>
-<li><code>pd.read_json()</code>: 读取 JSON 文件。</li>
-<li>常用参数：<code>filepath_or_buffer</code>, <code>sep</code>, <code>header</code>, <code>index_col</code>, <code>encoding</code> 等。</li>
-</ul></li>
-<li><strong>数据选择:</strong>
-<ul>
-<li>列选择：<code>df['列名']</code>, <code>df[['列名1', '列名2']]</code>。</li>
-<li>行选择：<code>df.loc[]</code> (标签索引), <code>df.iloc[]</code> (位置索引), 条件索引。</li>
-<li><code>loc</code>, <code>iloc</code>, <code>[]</code> 索引方式的区别和应用场景。</li>
-</ul></li>
-<li><strong>数据清洗 (初步):</strong>
-<ul>
-<li><strong>重复值处理:</strong> <code>df.duplicated()</code>, <code>df.drop_duplicates()</code>。</li>
-<li><strong>缺失值处理:</strong> (简要介绍，下周详细讲解) <code>df.isnull()</code>, <code>df.fillna()</code>, <code>df.dropna()</code>。</li>
-</ul></li>
+<li>使用 <code>Scikit-learn</code> 进行特征选择和降维的编程练习。</li>
+<li>结合实际数据集，应用特征选择和降维方法，并评估模型性能。</li>
 </ul></li>
 </ol>
 </section>
-<section id="实践环节-1" class="level3">
-<h3 class="anchored" data-anchor-id="实践环节-1">实践环节</h3>
-<ol type="1">
-<li><strong>Python 基础语法编程练习:</strong> 完成 Python 基础语法的编程练习，例如：
+<section id="课后作业-下周" class="level3">
+<h3 class="anchored" data-anchor-id="课后作业-下周">课后作业 (下周)</h3>
 <ul>
-<li>使用循环和条件语句解决简单问题 (例如：判断闰年、计算阶乘)。</li>
-<li>编写函数实现特定功能 (例如：计算列表平均值、判断字符串是否回文)。</li>
-</ul></li>
-<li><strong><code>Numpy</code> 数组操作练习:</strong> 完成 <code>Numpy</code> 数组创建、运算和常用函数的练习，例如：
-<ul>
-<li>创建不同类型的 <code>Numpy</code> 数组，并进行属性查看和维度变换。</li>
-<li>进行数组的元素级运算和矩阵运算。</li>
-<li>使用 <code>Numpy</code> 常用函数进行统计分析和数据处理。</li>
-</ul></li>
-<li><strong><code>Pandas</code> 数据操作练习:</strong> 完成 <code>Pandas</code> 数据结构创建、数据读取、数据选择和数据清洗的练习，例如：
-<ul>
-<li>创建 <code>Series</code> 和 <code>DataFrame</code>，并进行基本操作。</li>
-<li>读取 CSV 文件，并进行数据查看和选择。</li>
-<li>使用 <code>Pandas</code> 进行重复值查找和删除。</li>
-</ul></li>
-<li><strong>使用 AI 工具辅助完成 Python 代码:</strong> 在编程练习过程中，积极使用 AI 辅助编程工具，提高代码编写效率和准确性。</li>
-</ol>
+<li>完成特征选择和降维的编程练习，并将代码上传到 GitHub 仓库。</li>
+<li>查阅资料，深入了解特征选择和降维的原理和应用场景。</li>
+<li>思考题：特征选择和降维的区别和联系？ 如何根据实际问题选择合适的特征选择和降维方法？</li>
+</ul>
 </section>
-<section id="课后作业-1" class="level3">
-<h3 class="anchored" data-anchor-id="课后作业-1">课后作业</h3>
-<ol type="1">
-<li><strong>完成 Python 基础语法和数据操作的编程练习，并将代码上传到 GitHub 仓库。</strong></li>
-<li><strong>预习下周课程内容：数据预处理与特征工程基础。</strong></li>
-<li><strong>思考题：</strong> <code>Series</code> 和 <code>DataFrame</code> 的区别和应用场景？ <code>loc</code> 和 <code>iloc</code> 索引方式有何不同？</li>
-</ol>
-</section>
-<section id="相关资源-1" class="level3">
-<h3 class="anchored" data-anchor-id="相关资源-1">相关资源</h3>
+<section id="相关资源-下周" class="level3">
+<h3 class="anchored" data-anchor-id="相关资源-下周">相关资源 (下周)</h3>
 <ul>
-<li><strong>Python 官方文档:</strong> <a href="https://docs.python.org/3/">docs.python.org</a></li>
-<li><strong><code>Numpy</code> 官方文档:</strong> <a href="https://numpy.org/doc/stable/">numpy.org/doc/stable/</a></li>
-<li><strong><code>Pandas</code> 官方文档:</strong> <a href="https://pandas.pydata.org/docs/">pandas.pydata.org/docs/</a></li>
-<li><strong>W3School Python 教程:</strong> <a href="https://www.w3schools.com/python/">www.w3schools.com/python/</a></li>
-<li><strong>廖雪峰 Python 教程:</strong> <a href="https://www.liaoxuefeng.com/wiki/1016959663602400">www.liaoxuefeng.com/wiki/1016959663602400</a></li>
+<li><strong><code>Scikit-learn</code> Feature Selection 模块文档:</strong> <a href="https://scikit-learn.org/stable/modules/feature_selection.html">scikit-learn.org/stable/modules/feature_selection.html</a></li>
+<li><strong><code>Scikit-learn</code> Decomposition 模块文档 (PCA):</strong> <a href="https://scikit-learn.org/stable/modules/decomposition.html">scikit-learn.org/stable/modules/decomposition.html</a></li>
+<li><strong><code>Scikit-learn</code> Manifold 模块文档 (t-SNE):</strong> <a href="https://scikit-learn.org/stable/modules/manifold.html">scikit-learn.org/stable/modules/manifold.html</a></li>
+<li><strong>《Python Data Science Handbook》:</strong> <a href="https://jakevdp.github.io/PythonDataScienceHandbook/">jakevdp.github.io/PythonDataScienceHandbook/</a> (Chapter 5)</li>
+<li><strong>《Hands-On Machine Learning with Scikit-Learn, Keras &amp; TensorFlow》:</strong> <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/">www.oreilly.com/library/view/hands-on-machine-learning/9781098125973/</a> (Chapter 7, Chapter 8)</li>
 </ul>
 <hr>
 
@@ -1062,14 +996,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./syllabus.html" class="pagination-link" aria-label="课程大纲">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">课程大纲</span></span>
+      <a href="./week1.html" class="pagination-link" aria-label="第一周：机器学习导论与Python环境搭建">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./week2.html" class="pagination-link" aria-label="第二周：数据预处理与特征工程基础">
-        <span class="nav-page-text"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
