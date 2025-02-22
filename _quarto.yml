@@ -1,6 +1,6 @@
 project:
   type: book
-  output-dir: _docs
+  output-dir: _book
 
 book:
   title: "机器学习 (Python)"
