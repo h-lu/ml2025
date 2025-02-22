@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>课程大纲 – 机器学习 (Python)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week1.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xkm/sYwpb+ilR5gUw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+
+<link rel="stylesheet" href="styles/custom.css">
+<link rel="stylesheet" href="styles/mermaid.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./syllabus.html"><span class="chapter-title">课程大纲</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习 (Python)</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习 (Python)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./syllabus.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">课程大纲</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#课程概述" id="toc-课程概述" class="nav-link active" data-scroll-target="#课程概述">课程概述</a>
+  <ul class="collapse">
+  <li><a href="#课程目标" id="toc-课程目标" class="nav-link" data-scroll-target="#课程目标">课程目标</a></li>
+  <li><a href="#课程结构" id="toc-课程结构" class="nav-link" data-scroll-target="#课程结构">课程结构</a></li>
+  <li><a href="#每周课程安排" id="toc-每周课程安排" class="nav-link" data-scroll-target="#每周课程安排">每周课程安排</a>
+  <ul class="collapse">
+  <li><a href="#第一阶段-1-2周-机器学习与python入门" id="toc-第一阶段-1-2周-机器学习与python入门" class="nav-link" data-scroll-target="#第一阶段-1-2周-机器学习与python入门">第一阶段 (1-2周): 机器学习与Python入门</a></li>
+  <li><a href="#第二阶段-3-8周-机器学习核心算法实践" id="toc-第二阶段-3-8周-机器学习核心算法实践" class="nav-link" data-scroll-target="#第二阶段-3-8周-机器学习核心算法实践">第二阶段 (3-8周): 机器学习核心算法实践</a></li>
+  <li><a href="#第三阶段-9-13周-生成式ai探索与应用" id="toc-第三阶段-9-13周-生成式ai探索与应用" class="nav-link" data-scroll-target="#第三阶段-9-13周-生成式ai探索与应用">第三阶段 (9-13周): 生成式AI探索与应用</a></li>
+  <li><a href="#第四阶段-14-16周-小组综合项目实战与商业应用拓展" id="toc-第四阶段-14-16周-小组综合项目实战与商业应用拓展" class="nav-link" data-scroll-target="#第四阶段-14-16周-小组综合项目实战与商业应用拓展">第四阶段 (14-16周): 小组综合项目实战与商业应用拓展</a></li>
+  </ul></li>
+  <li><a href="#项目设置-贯穿课程" id="toc-项目设置-贯穿课程" class="nav-link" data-scroll-target="#项目设置-贯穿课程">项目设置 (贯穿课程)</a>
+  <ul class="collapse">
+  <li><a href="#小组项目-共4个-综合项目" id="toc-小组项目-共4个-综合项目" class="nav-link" data-scroll-target="#小组项目-共4个-综合项目">小组项目 (共4个 + 综合项目)</a></li>
+  </ul></li>
+  <li><a href="#ai-辅助编程工具" id="toc-ai-辅助编程工具" class="nav-link" data-scroll-target="#ai-辅助编程工具">AI 辅助编程工具</a></li>
+  <li><a href="#考核方式" id="toc-考核方式" class="nav-link" data-scroll-target="#考核方式">考核方式</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">课程大纲</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="课程概述" class="level1">
+<h1>课程概述</h1>
+<p>本课程为经管学生设计，旨在弱化复杂的数学理论，侧重机器学习和生成式AI的实战应用，并深度结合 AI 辅助编程工具。课程共计 16 周，每周两次课，每次 1.5 小时。课程以项目为中心，贯穿始终，帮助学生掌握核心技能并培养创新思维。</p>
+<section id="课程目标" class="level2">
+<h2 class="anchored" data-anchor-id="课程目标">课程目标</h2>
+<p>完成本课程后，学生将能够：</p>
+<ul>
+<li><strong>熟练运用 AI 辅助编程工具:</strong> 例如 GitHub Copilot, Cursor, 通义灵码等，提升代码编写效率和质量。</li>
+<li><strong>理解核心概念:</strong> 解释机器学习和生成式AI的核心概念，并区分不同算法的适用场景。</li>
+<li><strong>掌握编程工具:</strong> 熟练使用 VS Code, Cursor 等代码编辑器，以及 GitHub Copilot, 通义灵码, Cline 等 AI 辅助编程工具，以及 <code>scikit-learn</code>, <code>TensorFlow</code>, <code>PyTorch</code>, <code>Langchain</code> 等 Python 库进行机器学习和生成式AI编程。</li>
+<li><strong>应用经典算法:</strong> 运用分类、回归、聚类等经典机器学习算法，以及 Prompt 工程、Stable Diffusion 等生成式AI技术，解决实际商业问题 (例如：客户分类、销量预测、图像生成、Agent 开发)。</li>
+<li><strong>团队协作:</strong> 有效地进行团队合作，完成四个具有实际商业应用价值的小组项目，并撰写项目报告和进行项目展示。</li>
+</ul>
+</section>
+<section id="课程结构" class="level2">
+<h2 class="anchored" data-anchor-id="课程结构">课程结构</h2>
+<p>课程分为四个阶段，循序渐进地引导学生从理论到实践，最终完成小组项目，并拓展到更广泛的商业应用场景和伦理考量。</p>
+<ul>
+<li><strong>每个阶段都将深度结合 AI 辅助编程工具，提升学习效率和编程体验。</strong></li>
+<li><strong>阶段一 (1-2周): 机器学习与Python入门</strong>
+<ul>
+<li>目标：建立机器学习基础概念，熟悉Python编程环境和AI辅助工具。</li>
+</ul></li>
+<li><strong>阶段二 (3-8周): 机器学习核心算法实践</strong>
+<ul>
+<li>目标：掌握分类、回归、聚类等核心机器学习算法，并能应用于实际问题。</li>
+</ul></li>
+<li><strong>阶段三 (9-13周): 生成式AI探索与应用</strong>
+<ul>
+<li>目标：了解大语言模型、多模态AI等生成式AI技术，掌握Prompt工程和Agent开发等技能。</li>
+</ul></li>
+<li><strong>阶段四 (14-16周): 小组综合项目实战与商业应用拓展</strong>
+<ul>
+<li>目标：团队合作，综合应用机器学习和生成式AI技术解决实际商业问题，并拓展到更广泛的商业应用场景和伦理考量。</li>
+</ul></li>
+</ul>
+</section>
+<section id="每周课程安排" class="level2">
+<h2 class="anchored" data-anchor-id="每周课程安排">每周课程安排</h2>
+<p>以下是详细的每周课程内容和项目安排，每次课程 1.5 小时。</p>
+<section id="第一阶段-1-2周-机器学习与python入门" class="level3">
+<h3 class="anchored" data-anchor-id="第一阶段-1-2周-机器学习与python入门">第一阶段 (1-2周): 机器学习与Python入门</h3>
+<section id="第1周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第1周-共2次课">第1周 (共2次课)</h4>
+<div id="week1-1">
+<ul>
+<li><p><strong>第一次课: 机器学习导论与Python环境搭建</strong></p>
+<ul>
+<li>内容：
+<ul>
+<li>讲解机器学习的核心概念：监督学习、无监督学习、强化学习 (简要介绍)。</li>
+<li>对比机器学习与传统统计分析、数据挖掘。</li>
+<li>展示机器学习和生成式AI在商业领域的应用案例 (例如：精准营销、风险管理、智能客服、内容创作)。</li>
+<li>Python 机器学习环境搭建：<strong>VS Code, Python, Jupyter 插件 (Extension), <code>scikit-learn</code>, <code>pandas</code>, <code>numpy</code> 等常用库安装</strong>。</li>
+<li>介绍并体验 AI 辅助编程工具 (例如：GitHub Copilot, 通义灵码, Cline)。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>熟悉 VS Code, Jupyter Notebook 插件和基本的 Python 数据操作。</li>
+<li>使用 AI 工具辅助编写简单的 Python 代码，体验代码自动补全和生成功能。</li>
+</ul></li>
+</ul></li>
+<li><p><strong>第二次课: Python 基础语法与数据操作</strong></p>
+<ul>
+<li>内容：
+<ul>
+<li>Python 基础语法回顾：变量、数据类型、运算符、控制流 (循环、条件语句)、函数、模块。</li>
+<li><code>Numpy</code> 基础：数组创建、数组运算、常用函数。</li>
+<li><code>Pandas</code> 基础：数据结构 (Series, DataFrame)、数据读取、数据选择、数据清洗 (重复值处理)。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>完成 Python 基础语法和数据操作的编程练习。</li>
+<li>使用 AI 工具辅助完成 Python 代码。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第2周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第2周-共2次课">第2周 (共2次课)</h4>
+<div id="week2-1">
+<ul>
+<li><strong>第一次课: 数据预处理与特征工程基础</strong>
+<ul>
+<li>内容：
+<ul>
+<li>数据加载与探索：使用 <code>pandas</code> 读取和查看数据，进行数据基本统计分析和可视化。</li>
+<li>数据清洗：缺失值处理策略 (删除、填充)、异常值检测与处理 (箱线图、Z-score)。</li>
+<li>特征工程基础：
+<ul>
+<li>数值特征处理：特征缩放 (标准化、归一化)、特征转换 (多项式特征)。</li>
+<li>类别特征处理：独热编码、标签编码。</li>
+</ul></li>
+<li>使用 <code>scikit-learn</code> 进行数据预处理和特征工程的常用方法。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 <code>pandas</code> 和 <code>numpy</code> 进行实际的数据预处理操作练习。</li>
+<li>使用 AI 工具辅助完成数据预处理代码。</li>
+</ul></li>
+<li><strong>小组项目一：电商用户行为数据探索与预处理 (案例介绍与数据准备)</strong>
+<ul>
+<li>介绍电商用户行为数据集，明确项目目标：对用户行为数据进行探索性分析和预处理，为后续的机器学习建模做准备。</li>
+<li>布置小组项目一任务：数据探索、清洗和特征工程，下周课前提交预处理后的数据集和代码。</li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目一：电商用户行为数据探索与预处理 (数据分析与代码实践)</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目一：电商用户行为数据探索与预处理</strong></li>
+<li><strong>教师巡回指导，解答学生在数据分析和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，进行电商用户行为数据探索、数据清洗和特征工程。</li>
+<li>完成小组项目一代码初稿。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="第二阶段-3-8周-机器学习核心算法实践" class="level3">
+<h3 class="anchored" data-anchor-id="第二阶段-3-8周-机器学习核心算法实践">第二阶段 (3-8周): 机器学习核心算法实践</h3>
+<section id="第3周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第3周-共2次课">第3周 (共2次课)</h4>
+<div id="week3-1">
+<ul>
+<li><strong>第一次课: 分类算法 (一) - 逻辑回归与支持向量机 (SVM)</strong>
+<ul>
+<li>内容：
+<ul>
+<li>分类问题概述：应用场景 (客户分类、风险预测、垃圾邮件识别等)。</li>
+<li>逻辑回归：原理、公式推导 (简要介绍)、<code>scikit-learn</code> 实现、模型评估指标 (准确率、精确率、召回率、F1-score、AUC-ROC)。</li>
+<li>支持向量机 (SVM)：原理 (最大间隔、核函数 - 线性核、RBF核)、<code>scikit-learn</code> 实现、SVM 的优缺点。</li>
+<li>模型选择与调优：交叉验证、网格搜索 (<code>GridSearchCV</code>) (简要介绍)。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 <code>scikit-learn</code> 构建和评估逻辑回归和 SVM 分类模型，应用于电商用户行为数据集 (小组项目一)。</li>
+<li>使用 AI 工具辅助完成模型训练和评估代码。</li>
+</ul></li>
+<li><strong>小组项目一：电商用户行为数据分类模型构建 (逻辑回归或SVM)</strong>
+<ul>
+<li>指导学生使用逻辑回归或 SVM 算法，基于预处理后的电商用户行为数据，构建用户分类模型 (例如：用户购买意愿预测、用户价值分层)。</li>
+<li>明确小组项目一提交内容：模型代码、实验结果报告 (包括模型评估指标)。</li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目一：电商用户行为数据分类模型构建 (模型训练与代码实践)</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目一：电商用户行为数据分类模型构建 (逻辑回归或SVM)</strong></li>
+<li><strong>教师巡回指导，解答学生在模型训练和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，构建和训练逻辑回归或 SVM 分类模型。</li>
+<li>完成小组项目一代码和实验报告初稿。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第4周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第4周-共2次课">第4周 (共2次课)</h4>
+<div id="week4-1">
+<ul>
+<li><strong>第一次课: 分类算法 (二) - 决策树与集成学习 (随机森林)</strong>
+<ul>
+<li>内容：
+<ul>
+<li>决策树：原理、信息增益/基尼系数、<code>scikit-learn</code> 实现、决策树的优缺点、可视化 (graphviz)。</li>
+<li>集成学习：Bagging (随机森林)：原理、<code>scikit-learn</code> 实现、随机森林的优缺点、特征重要性。</li>
+<li>模型评估与选择：模型评估指标回顾、交叉验证、网格搜索 (<code>GridSearchCV</code>) 详细讲解与实践。</li>
+<li>分类模型评估指标的选择和应用场景。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 <code>scikit-learn</code> 构建和评估决策树和随机森林分类模型，并进行模型调优。</li>
+<li>比较不同分类模型在电商用户行为数据集上的性能。</li>
+<li>使用 AI 工具辅助完成模型训练、评估和调优代码。</li>
+</ul></li>
+<li><strong>小组项目一：电商用户行为数据分类模型优化 (随机森林)</strong>
+<ul>
+<li>指导学生使用随机森林算法，优化电商用户行为数据分类模型，并进行模型性能评估和比较。</li>
+<li><strong>小组项目一：电商用户行为数据探索与预处理 提交 (第5周课前)</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目一：电商用户行为数据分类优化 (模型优化与报告撰写)</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目一：电商用户行为数据分类优化 (随机森林)</strong></li>
+<li><strong>教师巡回指导，解答学生在模型优化和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，优化随机森林分类模型。</li>
+<li>撰写小组项目一实验报告，包括数据预处理、模型构建、模型评估、结果分析和结论。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第5周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第5周-共2次课">第5周 (共2次课)</h4>
+<div id="week5-1">
+<ul>
+<li><strong>第一次课: 回归算法 (一) - 线性回归与多项式回归</strong>
+<ul>
+<li>内容：
+<ul>
+<li>回归问题概述：应用场景 (房价预测、销量预测、股票价格预测等)。</li>
+<li>线性回归：原理、公式推导 (简要介绍)、<code>scikit-learn</code> 实现、模型评估指标 (均方误差 MSE、均方根误差 RMSE、平均绝对误差 MAE、R-squared)。</li>
+<li>多项式回归：原理、<code>scikit-learn</code> 实现、多项式回归与线性回归的关系。</li>
+<li>正则化：L1 正则化 (LASSO)、L2 正则化 (Ridge) (简要介绍)。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 <code>scikit-learn</code> 构建和评估线性回归和多项式回归模型，应用于房价预测数据集 (小组项目二)。</li>
+<li>使用 AI 工具辅助完成模型训练和评估代码。</li>
+</ul></li>
+<li><strong>小组项目二：房价预测模型构建 (线性回归或多项式回归)</strong>
+<ul>
+<li>指导学生使用线性回归或多项式回归算法，基于房价数据集，构建房价预测模型。</li>
+<li>明确小组项目二提交内容：模型代码、实验结果报告 (包括模型评估指标)。</li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目二：房价预测模型构建 (模型训练与代码实践)</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目二：房价预测模型构建 (线性回归或多项式回归)</strong></li>
+<li><strong>教师巡回指导，解答学生在模型训练和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，构建和训练线性回归或多项式回归模型。</li>
+<li>完成小组项目二代码和实验报告初稿。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第6周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第6周-共2次课">第6周 (共2次课)</h4>
+<div id="week6-1">
+<ul>
+<li><strong>第一次课: 回归算法 (二) - 集成学习 (XGBoost)</strong>
+<ul>
+<li>内容：
+<ul>
+<li>集成学习：Boosting (XGBoost)：原理 (梯度提升、树模型)、<code>xgboost</code> 库实现、XGBoost 的优缺点、模型参数调优。</li>
+<li>正则化：L1 正则化 (LASSO)、L2 正则化 (Ridge) 详细讲解与实践，应用于线性回归和多项式回归模型。</li>
+<li>回归模型评估指标的选择和应用场景。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 <code>xgboost</code> 库构建和评估 XGBoost 回归模型，并进行模型调优。</li>
+<li>比较 XGBoost 与线性回归、多项式回归在房价预测数据集上的性能。</li>
+<li>使用 AI 工具辅助完成模型训练、评估和调优代码。</li>
+</ul></li>
+<li><strong>小组项目二：房价预测模型优化 (XGBoost)</strong>
+<ul>
+<li>指导学生使用 XGBoost 算法，优化房价预测模型，并进行模型性能评估和比较。</li>
+<li><strong>小组项目二：房价预测模型构建 (线性/多项式回归) 提交 (第7周课前)</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目二：房价预测模型优化 (模型优化与报告撰写)</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目二：房价预测模型优化 (XGBoost)</strong></li>
+<li><strong>教师巡回指导，解答学生在模型优化和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，优化 XGBoost 回归模型。</li>
+<li>撰写小组项目二实验报告，包括模型构建、模型评估、模型调优、结果分析和结论。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第7周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第7周-共2次课">第7周 (共2次课)</h4>
+<div id="week7-1">
+<ul>
+<li><strong>第一次课: 聚类算法 (一) - K-Means</strong>
+<ul>
+<li>内容：
+<ul>
+<li>聚类问题概述：应用场景 (用户分群、商品推荐、异常检测等)。</li>
+<li>K-Means 聚类：原理、算法步骤、<code>scikit-learn</code> 实现、K 值选择 (轮廓系数、肘部法则)、K-Means 的优缺点。</li>
+<li>聚类模型评估指标：轮廓系数、 Davies-Bouldin 指数 (简要介绍)。</li>
+<li>聚类结果可视化：散点图、聚类中心可视化。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 <code>scikit-learn</code> 构建和评估 K-Means 聚类模型，应用于用户分群数据集 (小组项目三)。</li>
+<li>使用 AI 工具辅助完成模型训练、评估和可视化代码。</li>
+</ul></li>
+<li><strong>小组项目三：用户分群模型构建 (K-Means)</strong>
+<ul>
+<li>指导学生使用 K-Means 聚类算法，基于用户分群数据集，构建用户分群模型。</li>
+<li>明确小组项目三提交内容：模型代码、实验结果报告 (包括聚类结果可视化和分析)。</li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目三：用户分群模型构建 (模型训练与代码实践)</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目三：用户分群模型构建 (K-Means)</strong></li>
+<li><strong>教师巡回指导，解答学生在模型训练和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，构建和训练 K-Means 聚类模型。</li>
+<li>完成小组项目三代码和实验报告初稿。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第8周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第8周-共2次课">第8周 (共2次课)</h4>
+<div id="week8-1">
+<ul>
+<li><strong>第一次课: 聚类算法 (二) - DBSCAN</strong>
+<ul>
+<li>内容：
+<ul>
+<li>DBSCAN 聚类：原理 (密度聚类)、算法步骤、<code>scikit-learn</code> 实现、DBSCAN 的优缺点、参数选择。</li>
+<li>聚类算法选择：K-Means vs.&nbsp;DBSCAN，不同聚类算法的应用场景。</li>
+<li>聚类结果评估：轮廓系数、 Davies-Bouldin 指数 详细讲解与实践，聚类结果的业务意义解读。</li>
+<li>聚类结果可视化：高级可视化技巧，例如使用 <code>seaborn</code> 或 <code>plotly</code> 绘制更美观、更具信息量的聚类结果图。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 <code>scikit-learn</code> 构建和评估 DBSCAN 聚类模型，并进行模型调优和参数选择。</li>
+<li>比较 K-Means 和 DBSCAN 在用户分群数据集上的性能和聚类效果。</li>
+<li>使用 AI 工具辅助完成模型训练、评估、可视化和调优代码。</li>
+</ul></li>
+<li><strong>小组项目三：用户分群模型优化 (DBSCAN 或 K-Means 优化)</strong>
+<ul>
+<li>指导学生使用 DBSCAN 算法或优化 K-Means 算法 (例如：尝试不同的 K 值或初始化方法)，优化用户分群模型，并进行模型性能评估和聚类结果分析。</li>
+<li><strong>小组项目三：用户分群模型构建 (K-Means) 提交 (第9周课前)</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目三：用户分群模型优化 (模型优化与报告撰写)</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目三：用户分群模型优化 (DBSCAN 或 K-Means 优化)</strong></li>
+<li><strong>教师巡回指导，解答学生在模型优化和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，优化 DBSCAN 或 K-Means 聚类模型。</li>
+<li>撰写小组项目三实验报告，包括模型构建、模型评估、聚类结果可视化、结果分析和结论。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="第三阶段-9-13周-生成式ai探索与应用" class="level3">
+<h3 class="anchored" data-anchor-id="第三阶段-9-13周-生成式ai探索与应用">第三阶段 (9-13周): 生成式AI探索与应用</h3>
+<section id="第9周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第9周-共2次课">第9周 (共2次课)</h4>
+<div id="week9-1">
+<ul>
+<li><strong>第一次课: 生成式AI 导论 - 大语言模型 (LLM) 与 Prompt 工程</strong>
+<ul>
+<li>内容：
+<ul>
+<li>生成式AI 概述：发展历程、应用场景 (内容创作、对话系统、代码生成等)、与判别式 AI 的区别。</li>
+<li>大语言模型 (LLM)：Transformer 架构 (简要介绍)、预训练、微调、代表性 LLM (GPT, BERT, Llama 等)。</li>
+<li>Prompt 工程：Prompt 的概念、Prompt 设计原则 (清晰、具体、简洁)、常用 Prompt 技巧 (Few-shot, Chain-of-Thought, Instruction Tuning)。</li>
+<li>Langchain 框架：Langchain 简介、核心组件 (Models, Prompts, Chains, Agents)、Langchain 的应用场景。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>体验在线 LLM 产品 (例如：ChatGPT, 文心一言, Bard)，尝试不同的 Prompt，体验 LLM 的文本生成能力。</li>
+<li>使用 AI 工具辅助进行 Prompt 设计和优化。</li>
+</ul></li>
+<li><strong>小组项目四：智能文案生成 Agent 开发 (项目启动与 Prompt 设计)</strong>
+<ul>
+<li>介绍小组项目四：智能文案生成 Agent 开发，明确项目目标：利用 LLM 和 Langchain 框架，开发一个能够根据用户需求自动生成高质量文案的 Agent。</li>
+<li>布置小组项目四任务：Prompt 设计、Agent 框架搭建、核心功能开发和扩展功能探索。</li>
+<li><strong>小组项目三：用户分群模型优化 (DBSCAN/K-Means) 及报告 提交 (第10周课前)</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目四：智能文案生成 Agent Prompt 优化与 Langchain 框架初探</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目四：智能文案生成 Agent Prompt 优化</strong></li>
+<li><strong>教师巡回指导，解答学生在 Prompt 设计和优化中遇到的问题。</strong></li>
+<li>Langchain 框架初探：安装 Langchain, Langchain 核心组件 (Models, Prompts) 实践，构建简单的 LLM 应用。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，进行智能文案生成 Agent 的 Prompt 设计和优化。</li>
+<li>完成小组项目四 Prompt 设计方案初稿。</li>
+<li>初步体验 Langchain 框架，完成简单的 LLM 应用代码。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第10周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第10周-共2次课">第10周 (共2次课)</h4>
+<div id="week10-1">
+<ul>
+<li><strong>第一次课: Langchain 核心组件与 Agent 框架搭建</strong>
+<ul>
+<li>内容：
+<ul>
+<li>Langchain 核心组件：Chains (SequentialChain, SimpleSequentialChain, TransformChain), Memory (ConversationBufferMemory, ConversationChain)。</li>
+<li>Agent 框架搭建：Agent 的概念、Agent 类型 (Zero-shot Agent, Conversational Agent)、<code>Langchain</code> Agent 实现、Agent 工具 (Tools) 的使用。</li>
+<li>智能文案生成 Agent 框架设计：确定 Agent 类型、选择 Tools, 设计 Agent 的工作流程。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 Langchain 框架，构建智能文案生成 Agent 的基本框架，包括 Agent, Tools 和 Memory 组件。</li>
+<li>使用 AI 工具辅助完成 Agent 框架代码。</li>
+</ul></li>
+<li><strong>小组项目四：智能文案生成 Agent Agent 框架搭建</strong>
+<ul>
+<li>指导学生使用 Langchain 框架，搭建智能文案生成 Agent 的基本框架，为后续功能开发奠定基础。</li>
+<li><strong>小组项目四：智能文案生成 Agent Prompt 设计方案 提交 (第11周课前)</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目四：智能文案生成 Agent Agent 框架代码实践</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目四：智能文案生成 Agent Agent 框架代码实现</strong></li>
+<li><strong>教师巡回指导，解答学生在 Agent 框架搭建和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，完成智能文案生成 Agent 的框架代码。</li>
+<li>完成小组项目四 Agent 框架代码初稿。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第11周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第11周-共2次课">第11周 (共2次课)</h4>
+<div id="week11-1">
+<ul>
+<li><strong>第一次课: 智能文案生成 Agent 核心功能开发 (文案生成)</strong>
+<ul>
+<li>内容：
+<ul>
+<li>智能文案生成 Agent 核心功能开发：
+<ul>
+<li><strong>文案生成流程设计：</strong> 用户需求分析、Prompt 构建、LLM 调用、文案生成结果处理。</li>
+<li><strong>Langchain Chains 应用：</strong> 使用 Chains 组合 Prompt 和 LLM, 实现文案生成流程。</li>
+<li><strong>文案生成质量评估：</strong> 常用评估指标 (流畅度、相关性、信息量)、人工评估方法。</li>
+</ul></li>
+<li>LLM 调用与 API Key 管理：如何调用 LLM API (例如：OpenAI API)、API Key 的申请和安全管理。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>使用 Langchain Chains 和 LLM API，实现智能文案生成 Agent 的核心功能：根据用户输入的关键词或主题，自动生成文案。</li>
+<li>使用 AI 工具辅助完成文案生成功能代码。</li>
+</ul></li>
+<li><strong>小组项目四：智能文案生成 Agent 核心功能 (文案生成) 开发</strong>
+<ul>
+<li>指导学生实现智能文案生成 Agent 的核心功能，使其能够根据用户需求生成基本的文案内容。</li>
+<li><strong>小组项目四：智能文案生成 Agent Agent 框架代码 提交 (第12周课前)</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目四：智能文案生成 Agent 核心功能代码实践</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目四：智能文案生成 Agent 核心功能 (文案生成) 代码实现</strong></li>
+<li><strong>教师巡回指导，解答学生在文案生成功能开发和代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，完成智能文案生成 Agent 的核心功能代码。</li>
+<li>完成小组项目四 Agent 核心功能代码初稿。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第12周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第12周-共2次课">第12周 (共2次课)</h4>
+<div id="week12-1">
+<ul>
+<li><strong>第一次课: 智能文案生成 Agent 功能扩展 (一) - 文案风格控制与优化</strong>
+<ul>
+<li>内容：
+<ul>
+<li>智能文案生成 Agent 功能扩展：
+<ul>
+<li><strong>文案风格控制：</strong> Prompt 技巧 (风格关键词、指令)、参数调整 (temperature, top_p)、实现文案风格多样化 (例如：正式、幽默、创意)。</li>
+<li><strong>文案优化：</strong> Prompt 优化技巧、迭代优化流程、提升文案质量 (例如：信息准确性、逻辑性、吸引力)。</li>
+<li><strong>Langchain Memory 应用：</strong> 在 Agent 中引入 Memory 组件，实现对话记忆功能，提升文案生成的连贯性和上下文相关性。</li>
+</ul></li>
+<li>LLM 参数调优：temperature, top_p 等常用参数的含义和作用，参数调优策略。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>扩展智能文案生成 Agent 的功能，实现文案风格控制和优化。</li>
+<li>尝试不同的 Prompt 技巧和参数调整，提升文案生成质量和多样性。</li>
+<li>使用 AI 工具辅助完成功能扩展代码。</li>
+</ul></li>
+<li><strong>小组项目四：智能文案生成 Agent 功能扩展 (文案风格控制与优化)</strong>
+<ul>
+<li>指导学生扩展智能文案生成 Agent 的功能，使其能够控制文案风格和进行文案优化，提升 Agent 的实用性和用户体验。</li>
+<li><strong>小组项目四：智能文案生成 Agent 核心功能代码 提交 (第13周课前)</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目四：智能文案生成 Agent 功能扩展代码实践</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目四：智能文案生成 Agent 功能扩展 (文案风格控制与优化) 代码实现</strong></li>
+<li><strong>教师巡回指导，解答学生在功能扩展代码实现中遇到的问题。</strong></li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，完成智能文案生成 Agent 的功能扩展代码。</li>
+<li>完成小组项目四 Agent 功能扩展代码初稿。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第13周-共2次课" class="level4">
+<h4 class="anchored" data-anchor-id="第13周-共2次课">第13周 (共2次课)</h4>
+<div id="week13-1">
+<ul>
+<li><strong>第一次课: 智能文案生成 Agent 功能扩展 (二) - 文生图 (可选) 与多模态 AI 初探</strong>
+<ul>
+<li>内容：
+<ul>
+<li>智能文案生成 Agent 功能扩展 (可选)：
+<ul>
+<li><strong>文生图功能集成：</strong> Stable Diffusion WebUI 介绍、API 调用、Langchain 工具集成、实现文生图功能。</li>
+<li><strong>多模态 AI 初探：</strong> 多模态 AI 概念、应用场景 (图文生成、跨模态检索)、多模态 LLM 简介 (例如：LLaVA, VisualGPT)。</li>
+<li><strong>Agent 功能扩展思路：</strong> 更多 Agent 功能扩展方向 (例如：文案编辑、多语言支持、内容发布)。</li>
+</ul></li>
+<li>Stable Diffusion WebUI 实践：安装和配置 Stable Diffusion WebUI, 体验文生图功能，了解常用模型和参数。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>为智能文案生成 Agent 添加文生图功能 (可选)，实现图文结合的内容创作。</li>
+<li>体验 Stable Diffusion WebUI 的文生图功能，尝试不同的模型和 Prompt。</li>
+<li>使用 AI 工具辅助完成文生图功能集成代码。</li>
+</ul></li>
+<li><strong>小组项目四：智能文案生成 Agent 功能扩展 (文生图 - 可选) 与 Agent 报告撰写</strong>
+<ul>
+<li>鼓励学生为智能文案生成 Agent 添加文生图功能，探索多模态 AI 应用，并开始撰写小组项目四实验报告。</li>
+<li><strong>小组项目四：智能文案生成 Agent 功能扩展代码 提交 (第14周课前)</strong></li>
+</ul></li>
+</ul></li>
+<li><strong>第二次课: 小组项目四：智能文案生成 Agent 功能扩展代码实践与报告撰写指导</strong>
+<ul>
+<li>内容：
+<ul>
+<li><strong>学生分组进行小组项目四：智能文案生成 Agent 文生图功能探索 (可选) 代码实现</strong></li>
+<li><strong>教师巡回指导，解答学生在文生图功能集成和代码实现中遇到的问题。</strong></li>
+<li><strong>小组项目四报告撰写指导：</strong> 报告结构、内容要点、撰写技巧。</li>
+</ul></li>
+<li>实践：
+<ul>
+<li>学生以小组为单位，使用 Python 和 AI 工具，完成智能文案生成 Agent 的文生图功能集成代码 (可选)。</li>
+<li>开始撰写小组项目四实验报告。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="第四阶段-14-16周-小组综合项目实战与商业应用拓展" class="level3">
+<h3 class="anchored" data-anchor-id="第四阶段-14-16周-小组综合项目实战与商业应用拓展">第四阶段 (14-16周): 小组综合项目实战与商业应用拓展</h3>
+<section id="第14-15周-共4次课-小组综合项目开发与指导" class="level4">
+<h4 class="anchored" data-anchor-id="第14-15周-共4次课-小组综合项目开发与指导">第14-15周 (共4次课): 小组综合项目开发与指导</h4>
+<div id="week14-15">
+<ul>
+<li>内容：
+<ul>
+<li>学生以小组为单位，进行小组综合项目的设计、开发和实验。</li>
+</ul></li>
+<li>指导：
+<ul>
+<li>教师在课堂上提供项目指导和技术支持，解答学生在项目开发过程中遇到的问题。</li>
+</ul></li>
+<li>协作：
+<ul>
+<li>鼓励学生充分利用 AI 辅助编程工具，提高开发效率，加强团队协作。</li>
+</ul></li>
+<li>检查：
+<ul>
+<li>第 15 周进行小组综合项目中期检查，了解项目进展，及时发现和解决问题。</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="第16周-共1次课-小组综合项目展示与课程总结" class="level4">
+<h4 class="anchored" data-anchor-id="第16周-共1次课-小组综合项目展示与课程总结">第16周 (共1次课): 小组综合项目展示与课程总结</h4>
+<div id="week16-1">
+<ul>
+<li><strong>第一次课: 小组综合项目展示与答辩</strong>
+<ul>
+<li>展示：
+<ul>
+<li>各小组进行项目成果展示，讲解项目背景、问题定义、技术方案、实验结果、商业价值和创新点。</li>
+</ul></li>
+<li>答辩：
+<ul>
+<li>接受教师和同学的提问和点评。</li>
+</ul></li>
+<li><strong>小组综合项目：开放式商业问题 提交 (本周课前)</strong></li>
+</ul></li>
+<li><strong>第二次课: 课程总结与未来展望</strong>
+<ul>
+<li>总结：
+<ul>
+<li>回顾课程内容，总结机器学习和生成式AI的核心概念、算法、技术和应用。</li>
+</ul></li>
+<li>展望：
+<ul>
+<li>展望机器学习和生成式AI 在商业领域的未来发展前景，鼓励学生继续深入学习和探索。</li>
+<li>再次强调生成式AI 技术的商业伦理和社会责任。</li>
+</ul></li>
+<li>评估：
+<ul>
+<li>进行课程评估和反馈，收集学生对课程的意见和建议，为课程改进提供参考。</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+<section id="项目设置-贯穿课程" class="level2">
+<h2 class="anchored" data-anchor-id="项目设置-贯穿课程">项目设置 (贯穿课程)</h2>
+<section id="小组项目-共4个-综合项目" class="level3">
+<h3 class="anchored" data-anchor-id="小组项目-共4个-综合项目">小组项目 (共4个 + 综合项目)</h3>
+<ul>
+<li><p><strong>小组项目一 (电商用户行为数据分析与分类)</strong></p>
+<ul>
+<li>学习目标：掌握数据预处理、特征工程、分类算法 (逻辑回归, SVM, 决策树, 随机森林) 的应用，理解分类模型评估指标。</li>
+<li>周期：2 周 (数据预处理 + 模型构建与优化)</li>
+<li>提交时间：
+<ul>
+<li>数据预处理结果：第 2 周课前</li>
+<li>分类模型 (逻辑回归/SVM)：第 3 周课前</li>
+<li>分类模型 (随机森林) 及报告：第 5 周课前</li>
+</ul></li>
+<li><strong>数据集:</strong> 学生小组自主选择数据集，建议选择电商或零售行业的用户行为数据集。数据集应包含用户行为数据，数据量适中，特征维度不低于10个，且具有一定的分类难度。 鼓励各小组选择不同的数据集，以提高项目实践的多样性。</li>
+</ul></li>
+<li><p><strong>小组项目二 (房价预测模型构建与优化)</strong></p>
+<ul>
+<li>学习目标：掌握回归算法 (线性回归, 多项式回归, XGBoost) 的应用，理解正则化和模型调优方法，掌握回归模型评估指标。</li>
+<li>周期：2 周 (模型构建 + 模型优化与调优)</li>
+<li>提交时间：
+<ul>
+<li>回归模型 (线性回归/多项式回归)：第 5 周课前</li>
+<li>回归模型 (XGBoost) 及报告：第 7 周课前</li>
+</ul></li>
+<li><strong>数据集:</strong> 学生小组自主选择数据集，建议选择包含城市或地区房价信息的公开数据集。数据集应包含房价相关特征，数据量不低于500条，特征维度不低于8个，且特征之间应具有一定的相关性。 鼓励各小组选择不同的数据集，以提高项目实践的多样性。</li>
+</ul></li>
+<li><p><strong>小组项目三 (用户分群模型构建与分析)</strong></p>
+<ul>
+<li>学习目标：掌握聚类算法 (K-Means, DBSCAN) 的应用，理解聚类算法选择和聚类结果评估方法，掌握聚类结果可视化和分析技巧。</li>
+<li>周期：2 周 (模型构建 + 模型优化与结果分析)</li>
+<li>提交时间：
+<ul>
+<li>聚类模型 (K-Means)：第 7 周课前</li>
+<li>聚类模型 (DBSCAN 或 K-Means 优化) 及报告：第 9 周课前</li>
+</ul></li>
+<li><strong>数据集:</strong> 学生小组自主选择数据集，建议选择包含用户画像或用户行为特征的数据集。数据集应适用于用户分群任务，数据量不低于300条，特征维度不低于5个，且数据集中应包含可用于区分用户群体的特征。 鼓励各小组选择不同的数据集，以提高项目实践的多样性。</li>
+</ul></li>
+<li><p><strong>小组项目四 (智能文案生成 Agent 开发)</strong></p>
+<ul>
+<li>学习目标：掌握 Prompt 工程、<code>Langchain</code> 框架和 Agent 开发技术，理解 LLM 的应用和局限性，初步接触多模态 AI (可选)。</li>
+<li>周期：4 周 (Prompt 设计 + Agent 框架 + 功能完善 + 扩展探索)</li>
+<li>提交时间：
+<ul>
+<li>Prompt 设计方案和 Agent 代码框架：第 10 周课前</li>
+<li>Agent 核心功能 (文案生成)：第 12 周课前</li>
+<li>Agent 功能扩展 (可选) 及报告：第 14 周课前</li>
+</ul></li>
+<li><strong>数据集:</strong> 本项目不涉及传统数据集，学生需自行准备或生成 Agent 应用所需的示例数据或知识库 (例如：产品信息、营销知识等)。鼓励各小组根据 Agent 应用场景，构建不同的知识库或示例数据，以体现 Agent 的个性化和创新性。</li>
+</ul></li>
+<li><p><strong>小组综合项目 (开放式商业问题)</strong></p>
+<ul>
+<li>学习目标：综合应用课程所学机器学习和生成式AI知识，解决开放式商业问题，提升创新思维、团队协作和项目管理能力。</li>
+<li>周期：3 周 (项目选题与方案设计 + 项目开发与实验 + 项目展示与报告)</li>
+<li>提交时间：
+<ul>
+<li>小组综合项目报告和展示材料：第 16 周课前</li>
+</ul></li>
+<li><strong>数据集:</strong> 学生小组根据所选的开放式商业问题自主选择或构建数据集，数据集应与项目主题紧密相关，数据量和难度应与项目目标相匹配。 鼓励各小组选择不同的数据集，以提高项目实践的多样性。</li>
+</ul>
+<p><em>小组人数：建议每组 2-3 人。</em></p></li>
+<li><p><strong>项目形式:</strong> 小组合作完成，包括项目方案设计、数据准备 (或环境搭建)、算法/模型实现、实验验证、结果分析、项目展示和项目报告。 每次小组项目提交后，选取 3 个优秀小组在课堂上进行项目讲解和展示，分享经验和成果。</p></li>
+</ul>
+</section>
+</section>
+<section id="ai-辅助编程工具" class="level2">
+<h2 class="anchored" data-anchor-id="ai-辅助编程工具">AI 辅助编程工具</h2>
+<ul>
+<li><strong>代码编辑器:</strong> VS Code, Cursor
+<ul>
+<li>特点：轻量级、高效、插件丰富，支持 Jupyter Notebook，适合 Python 开发和机器学习。</li>
+</ul></li>
+<li><strong>代码辅助插件:</strong> GitHub Copilot, 通义灵码, Cline 等
+<ul>
+<li>功能：代码自动补全、代码片段生成、代码错误检查、自然语言代码解释等，提高编程效率，降低编程难度，辅助 Prompt 设计和 Agent 开发。</li>
+</ul></li>
+<li><strong>机器学习/深度学习库:</strong> <code>scikit-learn</code>, <code>TensorFlow</code>, <code>PyTorch</code>
+<ul>
+<li>功能：提供丰富的机器学习和深度学习算法、模型和工具，方便学生进行模型构建、训练和评估。</li>
+</ul></li>
+<li><strong>生成式AI 框架:</strong> <code>Langchain</code>
+<ul>
+<li>功能：简化 LLM 应用和 Agent 开发流程，提供丰富的组件和工具，方便学生快速构建生成式AI应用。</li>
+</ul></li>
+<li><strong>文生图工具:</strong> Stable Diffusion WebUI
+<ul>
+<li>功能：强大的文生图工具，支持多种模型和参数调整，方便学生进行图像生成和创意设计。</li>
+</ul></li>
+</ul>
+</section>
+<section id="考核方式" class="level2">
+<h2 class="anchored" data-anchor-id="考核方式">考核方式</h2>
+<ul>
+<li><strong>小组项目一 ~ 四 (40%):</strong> 根据项目完成质量、代码质量、实验结果、创新性和项目报告进行综合评分，每个项目 10%。</li>
+<li><strong>小组综合项目 (20%):</strong> 根据项目选题意义、创新性、实用性、完成度、展示效果和项目报告进行评分 (小组内成员评分可以考虑组内互评和贡献度)。</li>
+<li><strong>课堂参与 (10%):</strong> 根据课堂讨论、提问、出勤、作业完成情况等进行评分，鼓励学生积极参与课堂互动。</li>
+<li><strong>期末考试 (30%):</strong> 期末考试采用闭卷形式，重点考察学生对机器学习和生成式AI 基础理论、核心概念和算法的掌握程度。</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="机器学习 (Python)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">机器学习 (Python)</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./week1.html" class="pagination-link" aria-label="第一周：机器学习导论与Python环境搭建">
+        <span class="nav-page-text"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

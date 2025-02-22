@@ -1,0 +1,27 @@
+project:
+  type: book
+
+book:
+  title: "机器学习 (Python)"
+  author: "陆海呢"  # 请替换为您的名字
+  date: today
+  chapters:
+    - index.qmd  # 首页文件 (可选，如果需要)
+    - syllabus.qmd # 课程大纲作为第一章
+    - week1.qmd  # 第一周内容作为第二章
+    # - week2.qmd  # 如果有第二周内容，可以继续添加
+    # - ...
+
+format:
+  html:
+    theme: cosmo
+    css:
+      - styles/custom.css
+      - styles/mermaid.css
+    toc: true
+    number-sections: false
+    code-fold: true
+    callout-appearance: "none"
+    include-in-header:
+      - text: |
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xkm/sYwpb+ilR5gUw==" crossorigin="anonymous" referrerpolicy="no-referrer">
