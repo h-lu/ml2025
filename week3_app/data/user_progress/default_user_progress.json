@@ -1,0 +1,20 @@
+{
+  "theory": {
+    "logistic_regression": 0.0,
+    "svm": 0.0
+  },
+  "exercises": {
+    "basic_1": 0.0,
+    "basic_2": 0.0,
+    "advanced_1": 0
+  },
+  "quizzes": {
+    "逻辑回归基础": {
+      "score": 0,
+      "total": 5,
+      "percentage": 0.0,
+      "timestamp": "2025-03-02 11:21:44"
+    }
+  },
+  "last_updated": "2025-03-02 11:21:44"
+}

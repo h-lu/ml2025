@@ -1,6 +1,7 @@
 project:
   type: book
   output-dir: _book
+  repo: https://github.com/h-lu/ml_app
 
 book:
   title: "机器学习 (Python)"

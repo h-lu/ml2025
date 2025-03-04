@@ -1,0 +1,77 @@
+
+    <svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+        <!-- 背景 -->
+        <rect width="700" height="400" fill="#f5f5f5" rx="15" ry="15"/>
+        
+        <!-- 标题 -->
+        <text x="350.0" y="40" font-size="20" text-anchor="middle" font-weight="bold">分类算法学习路径</text>
+        
+        <!-- 阶段1：基础理论 -->
+        <rect x="50" y="80" width="150" height="70" rx="10" ry="10" 
+              fill="#bbdefb" stroke="#1976D2" stroke-width="2"/>
+        <text x="125" y="110" font-size="16" text-anchor="middle" font-weight="bold">基础理论</text>
+        <text x="125" y="135" font-size="12" text-anchor="middle">理解算法原理</text>
+        
+        <!-- 阶段2：可视化理解 -->
+        <rect x="250" y="80" width="150" height="70" rx="10" ry="10" 
+              fill="#c8e6c9" stroke="#388E3C" stroke-width="2"/>
+        <text x="325" y="110" font-size="16" text-anchor="middle" font-weight="bold">可视化理解</text>
+        <text x="325" y="135" font-size="12" text-anchor="middle">直观感受算法表现</text>
+        
+        <!-- 阶段3：基础练习 -->
+        <rect x="450" y="80" width="150" height="70" rx="10" ry="10" 
+              fill="#ffecb3" stroke="#FFA000" stroke-width="2"/>
+        <text x="525" y="110" font-size="16" text-anchor="middle" font-weight="bold">基础练习</text>
+        <text x="525" y="135" font-size="12" text-anchor="middle">上手实践算法</text>
+        
+        <!-- 阶段4：理解偏差-方差 -->
+        <rect x="50" y="200" width="150" height="70" rx="10" ry="10" 
+              fill="#e1bee7" stroke="#7B1FA2" stroke-width="2"/>
+        <text x="125" y="230" font-size="16" text-anchor="middle" font-weight="bold">偏差-方差</text>
+        <text x="125" y="255" font-size="12" text-anchor="middle">理解模型复杂度</text>
+        
+        <!-- 阶段5：过拟合处理 -->
+        <rect x="250" y="200" width="150" height="70" rx="10" ry="10" 
+              fill="#d1c4e9" stroke="#512DA8" stroke-width="2"/>
+        <text x="325" y="230" font-size="16" text-anchor="middle" font-weight="bold">过拟合处理</text>
+        <text x="325" y="255" font-size="12" text-anchor="middle">学习正则化方法</text>
+        
+        <!-- 阶段6：综合实践 -->
+        <rect x="450" y="200" width="150" height="70" rx="10" ry="10" 
+              fill="#ffccbc" stroke="#E64A19" stroke-width="2"/>
+        <text x="525" y="230" font-size="16" text-anchor="middle" font-weight="bold">综合实践</text>
+        <text x="525" y="255" font-size="12" text-anchor="middle">真实场景应用</text>
+        
+        <!-- 连接箭头 -->
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+            </marker>
+        </defs>
+        
+        <!-- 水平箭头 -->
+        <line x1="200" y1="115" x2="250" y2="115" 
+              stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+        <line x1="400" y1="115" x2="450" y2="115" 
+              stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+              
+        <!-- 垂直+水平箭头 -->
+        <path d="M 125 150 L 125 200" 
+              stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+        <path d="M 525 150 L 525 170 L 400 170 L 400 200"
+              stroke="#333" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+              
+        <!-- 水平箭头第二行 -->
+        <line x1="200" y1="235" x2="250" y2="235" 
+              stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+        <line x1="400" y1="235" x2="450" y2="235" 
+              stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+              
+        <!-- 最后的结论 -->
+        <rect x="175.0" y="320" width="350" height="50" rx="10" ry="10" 
+              fill="#b3e5fc" stroke="#0288D1" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="350.0" y="350" font-size="16" text-anchor="middle" font-weight="bold">
+            掌握分类算法的理论与实践应用能力
+        </text>
+    </svg>
+    
