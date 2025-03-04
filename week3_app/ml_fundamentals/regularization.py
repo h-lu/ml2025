@@ -10,7 +10,7 @@ import os
 import tempfile
 from sklearn.linear_model import Ridge, Lasso, ElasticNet
 from sklearn.preprocessing import StandardScaler
-from utils.svg_generator import create_interactive_regularization_svg
+from utils.svg_generator import create_interactive_regularization_svg, render_svg
 
 def show_regularization_demo():
     """显示正则化技术的交互式演示"""
@@ -81,11 +81,17 @@ def show_regularization_demo():
         
         # 创建SVG内容并保存到文件
         svg_content = create_interactive_regularization_svg(reg_strength, reg_type_param)
-        with open(regularization_img_path, "w") as f:
+        with open(regularization_img_path, "w", encoding="utf-8") as f:
             f.write(svg_content)
         
-        # 使用st.image显示图片
-        st.image(regularization_img_path)
+        # 直接读取SVG内容并使用render_svg函数显示
+        try:
+            with open(regularization_img_path, "r", encoding="utf-8") as f:
+                svg_content = f.read()
+            render_svg(svg_content)
+        except Exception as e:
+            st.error(f"显示SVG图片时出错: {str(e)}")
+            st.warning("生成图片文件失败，请检查路径和权限")
     
     # 系数变化演示
     st.markdown("### 系数变化演示")

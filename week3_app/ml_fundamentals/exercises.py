@@ -15,7 +15,7 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
-from utils.svg_generator import create_learning_curve_svg
+from utils.svg_generator import create_learning_curve_svg, render_svg
 
 def show_ml_exercises():
     """显示机器学习基础的交互式练习"""
@@ -464,11 +464,17 @@ def show_learning_curve_exercise():
         
         # 创建SVG内容并保存到文件
         svg_content = create_learning_curve_svg()
-        with open(lc_img_path, "w") as f:
+        with open(lc_img_path, "w", encoding="utf-8") as f:
             f.write(svg_content)
     
-    # 使用st.image显示图片
-    st.image(lc_img_path)
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(lc_img_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
     
     st.markdown("""
     **练习目标：**
@@ -666,4 +672,169 @@ def show_learning_curve_exercise():
         1. 学习曲线的收敛性如何帮助判断是否需要更多训练数据？
         2. 如何通过学习曲线确定模型的最佳复杂度？
         3. 对于当前的数据集，什么样的正则化设置最合适，为什么？
+        """)
+
+def show_cv_exercise():
+    """显示交叉验证练习"""
+    
+    st.markdown("## 交叉验证练习")
+    
+    st.markdown("""
+    在本练习中，您将使用交叉验证来评估模型性能并选择最佳超参数。
+    
+    ### 任务目标
+    
+    1. 生成分类数据集并划分训练和测试集
+    2. 使用交叉验证评估不同C值的逻辑回归模型
+    3. 观察交叉验证分数与泛化性能的关系
+    4. 找出最佳的C值参数
+    """)
+    
+    # 练习参数设置
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        n_samples = st.slider("样本数量", min_value=100, max_value=1000, value=300, step=50)
+        n_features = st.slider("特征数量", min_value=5, max_value=50, value=20, step=5)
+        n_folds = st.slider("交叉验证折数", min_value=2, max_value=10, value=5, step=1)
+        
+        penalty_type = st.radio(
+            "正则化类型",
+            ["l1", "l2"]
+        )
+    
+    with col2:
+        st.markdown("""
+        ### 参数说明
+        
+        - **样本数量**: 用于训练和评估的总样本数
+        - **特征数量**: 数据集中的特征数量
+        - **交叉验证折数**: k折交叉验证中的k值
+        - **正则化类型**: 逻辑回归中使用的正则化类型
+          - L1: 产生稀疏解，可用于特征选择
+          - L2: 产生较小的参数值，通常更稳定
+        
+        点击下方按钮生成数据并运行实验:
+        """)
+        
+        run_experiment = st.button("运行实验", key="cv_experiment")
+    
+    if run_experiment:
+        # 生成数据
+        np.random.seed(42)
+        X, y = make_classification(
+            n_samples=n_samples,
+            n_features=n_features,
+            n_informative=int(n_features * 0.5),
+            n_redundant=int(n_features * 0.2),
+            n_classes=2,
+            random_state=42
+        )
+        
+        # 划分训练集和测试集
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+        # 创建C值参数范围
+        c_values = np.logspace(-4, 4, 9)  # 从0.0001到10000的9个值
+        
+        # 交叉验证结果
+        cv_scores = []
+        train_scores = []
+        test_scores = []
+        
+        for c in c_values:
+            model = LogisticRegression(C=c, penalty=penalty_type, solver='liblinear', random_state=42, max_iter=1000)
+            
+            # 交叉验证分数
+            cv_score = cross_val_score(model, X_train, y_train, cv=n_folds, scoring='accuracy')
+            cv_scores.append(np.mean(cv_score))
+            
+            # 训练模型
+            model.fit(X_train, y_train)
+            
+            # 训练和测试分数
+            train_scores.append(accuracy_score(y_train, model.predict(X_train)))
+            test_scores.append(accuracy_score(y_test, model.predict(X_test)))
+        
+        # 找出最佳C值
+        best_c_index = np.argmax(cv_scores)
+        best_c = c_values[best_c_index]
+        
+        # 使用最佳C值训练模型
+        best_model = LogisticRegression(C=best_c, penalty=penalty_type, solver='liblinear', random_state=42, max_iter=1000)
+        best_model.fit(X_train, y_train)
+        
+        # 评估最佳模型
+        final_train_score = accuracy_score(y_train, best_model.predict(X_train))
+        final_test_score = accuracy_score(y_test, best_model.predict(X_test))
+        
+        # 绘制结果
+        st.markdown("### 交叉验证结果")
+        
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        ax.plot(np.log10(c_values), cv_scores, 'o-', color='green', label=f'{n_folds}折交叉验证分数')
+        ax.plot(np.log10(c_values), train_scores, 's--', color='blue', label='训练集准确率')
+        ax.plot(np.log10(c_values), test_scores, 'd-.', color='red', label='测试集准确率')
+        ax.axvline(np.log10(best_c), color='black', linestyle='--', 
+                  label=f'最佳C值 = {best_c:.4f}')
+        
+        ax.set_xlabel('正则化参数 log10(C)')
+        ax.set_ylabel('准确率')
+        ax.set_title('不同C值的模型性能')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        
+        st.pyplot(fig)
+        
+        # 显示最佳模型结果
+        st.markdown("### 最佳模型性能")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("最佳C值", f"{best_c:.4f}")
+        with col2:
+            st.metric("训练集准确率", f"{final_train_score:.4f}")
+        with col3:
+            st.metric("测试集准确率", f"{final_test_score:.4f}")
+        
+        # 计算交叉验证与测试集的差异
+        cv_test_diff = abs(cv_scores[best_c_index] - test_scores[best_c_index])
+        
+        # 分析结果
+        st.markdown("### 结果分析")
+        
+        # 显示交叉验证与测试集的相关性
+        st.info(f"""
+        **交叉验证与测试集性能差异**: {cv_test_diff:.4f}
+        
+        交叉验证分数与实际测试集性能{'接近' if cv_test_diff < 0.03 else '有一定差距'}，
+        说明交叉验证{'可以' if cv_test_diff < 0.03 else '在一定程度上可以'}很好地估计模型的泛化能力。
+        """)
+        
+        # 判断最佳C值位置
+        if best_c <= c_values[2]:  # 如果最佳C值较小
+            st.success("""
+            **高正则化强度**: 最佳模型使用了较小的C值，表明较强的正则化有助于提高模型性能。
+            这可能是因为数据集有较多的噪声或冗余特征，强正则化可以减少过拟合风险。
+            """)
+        elif best_c >= c_values[6]:  # 如果最佳C值较大
+            st.success("""
+            **低正则化强度**: 最佳模型使用了较大的C值，表明较弱的正则化有助于提高模型性能。
+            这可能是因为数据集中的模式较为复杂，模型需要更大的灵活性来捕捉这些模式。
+            """)
+        else:  # 如果最佳C值在中间
+            st.success("""
+            **平衡的正则化强度**: 最佳模型使用了中等大小的C值，表明适度的正则化可以平衡模型的复杂性和泛化能力。
+            这通常是一个良好的平衡点，既不会过拟合也不会欠拟合。
+            """)
+        
+        # 思考题
+        st.markdown("""
+        ### 思考问题
+        
+        1. 为什么交叉验证分数可能与测试集性能有差异？
+        2. 增加交叉验证的折数会如何影响模型选择的稳定性？
+        3. 在实际应用中，如何选择合适的交叉验证策略？
+        4. 交叉验证在小样本数据集和大样本数据集中的应用有何不同？
         """) 

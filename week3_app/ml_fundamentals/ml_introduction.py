@@ -5,6 +5,7 @@
 import streamlit as st
 import os
 from utils.fonts import get_svg_style
+from utils.svg_generator import create_ml_basics_concept_svg, create_ml_workflow_svg, render_svg
 
 def show_ml_introduction():
     """显示机器学习基础介绍内容"""
@@ -19,12 +20,27 @@ def show_ml_introduction():
     # 显示机器学习基本概念图
     st.markdown("### 机器学习的基本概念")
     
-    # 使用st.image()显示SVG图片
+    # 使用SVG路径
     svg_path = os.path.join("img", "ml_basics_concept.svg")
-    if os.path.exists(svg_path):
-        st.image(svg_path)
-    else:
-        st.warning("图片文件不存在，请确保已创建SVG文件")
+    
+    # 检查图片是否存在，不存在则创建
+    if not os.path.exists(svg_path):
+        # 确保img目录存在
+        os.makedirs(os.path.dirname(svg_path), exist_ok=True)
+        
+        # 创建SVG内容并保存到文件
+        svg_content = create_ml_basics_concept_svg()
+        with open(svg_path, "w", encoding="utf-8") as f:
+            f.write(svg_content)
+    
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(svg_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
     
     st.markdown("""
     ### 机器学习的主要类型
@@ -44,27 +60,38 @@ def show_ml_introduction():
     # 显示机器学习工作流程图
     st.markdown("### 机器学习的一般工作流程")
     
-    # 使用st.image()显示SVG图片
+    # 使用SVG路径
     svg_path = os.path.join("img", "ml_workflow.svg")
-    if os.path.exists(svg_path):
-        st.image(svg_path)
-    else:
-        st.warning("图片文件不存在，请确保已创建SVG文件")
+    
+    # 检查图片是否存在，不存在则创建
+    if not os.path.exists(svg_path):
+        # 确保img目录存在
+        os.makedirs(os.path.dirname(svg_path), exist_ok=True)
+        
+        # 创建SVG内容并保存到文件
+        svg_content = create_ml_workflow_svg()
+        with open(svg_path, "w", encoding="utf-8") as f:
+            f.write(svg_content)
+    
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(svg_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
     
     st.markdown("""
-    ### 机器学习的关键挑战
+    ### 机器学习面临的常见挑战
     
-    1. **数据质量**：机器学习模型的性能很大程度上取决于训练数据的质量和数量
+    1. **数据质量问题**: 缺失值、噪声、异常值
+    2. **特征选择与工程**: 提取有意义的特征
+    3. **过拟合与欠拟合**: 平衡模型复杂度
+    4. **计算资源限制**: 大规模数据集的处理
+    5. **模型可解释性**: 理解模型决策过程
     
-    2. **特征工程**：选择和创建合适的特征对模型性能至关重要
-    
-    3. **模型选择**：为特定问题选择合适的算法和模型架构
-    
-    4. **过拟合和欠拟合**：平衡模型的复杂性，以及在训练数据和新数据上的表现
-    
-    5. **计算资源**：某些模型（尤其是深度学习）需要大量计算资源
-    
-    6. **解释性**：理解和解释模型的预测，特别是在关键决策应用中
+    思考：在你的学习或工作中，你可能遇到过哪些数据分析或预测问题，可以用机器学习解决？
     """)
     
     # 提示学生思考

@@ -12,8 +12,18 @@ import uuid
 
 def fig_to_svg(fig: Figure) -> str:
     """将Matplotlib图形转换为SVG字符串"""
+    # 确保图形已经被绘制
+    fig.canvas.draw()
+    
+    # 设置DPI以确保文字清晰
+    fig.set_dpi(100)
+    
+    # 设置字体以确保文字正确显示
+    plt.rcParams['svg.fonttype'] = 'none'  # 使用原始字体，而不是转换为路径
+    
     buf = io.BytesIO()
-    fig.savefig(buf, format='svg', bbox_inches='tight')
+    fig.savefig(buf, format='svg', bbox_inches='tight', pad_inches=0.1, 
+               transparent=True)  # 设置透明背景
     buf.seek(0)
     svg_content = buf.getvalue().decode('utf-8')
     buf.close()
@@ -760,6 +770,297 @@ def create_matplotlib_learning_path():
                 ha='center', fontsize=10, style='italic')
     
     return fig
+
+def create_learning_path_chart():
+    """创建学习路径图表"""
+    # 设置图形大小和风格
+    plt.style.use('ggplot')
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # 隐藏坐标轴
+    ax.axis('off')
+    
+    # 设置绘图范围
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 6)
+    
+    # 定义节点位置
+    nodes = {
+        'start': (1, 3),
+        'logistic': (3, 4),
+        'svm': (3, 2),
+        'bias_variance': (5, 3),
+        'regularization': (7, 4),
+        'model_selection': (7, 2),
+        'end': (9, 3)
+    }
+    
+    # 添加节点
+    node_styles = {
+        'start': {'facecolor': 'lightblue', 'edgecolor': 'blue', 'boxstyle': 'round', 'alpha': 0.9},
+        'logistic': {'facecolor': 'lightgreen', 'edgecolor': 'green', 'boxstyle': 'round', 'alpha': 0.9},
+        'svm': {'facecolor': 'lightgreen', 'edgecolor': 'green', 'boxstyle': 'round', 'alpha': 0.9},
+        'bias_variance': {'facecolor': 'lightyellow', 'edgecolor': 'orange', 'boxstyle': 'round', 'alpha': 0.9},
+        'regularization': {'facecolor': 'lightsalmon', 'edgecolor': 'red', 'boxstyle': 'round', 'alpha': 0.9},
+        'model_selection': {'facecolor': 'lightsalmon', 'edgecolor': 'red', 'boxstyle': 'round', 'alpha': 0.9},
+        'end': {'facecolor': 'lightpurple', 'edgecolor': 'purple', 'boxstyle': 'round', 'alpha': 0.9}
+    }
+    
+    node_texts = {
+        'start': '基础概念',
+        'logistic': '逻辑回归',
+        'svm': '支持向量机',
+        'bias_variance': '偏差-方差权衡',
+        'regularization': '正则化方法',
+        'model_selection': '模型选择与评估',
+        'end': '高级主题'
+    }
+    
+    for node, pos in nodes.items():
+        ax.text(pos[0], pos[1], node_texts[node], ha='center', va='center', size=10,
+                bbox=node_styles[node])
+    
+    # 添加连接箭头
+    ax.annotate('', xy=nodes['logistic'], xytext=nodes['start'],
+                arrowprops=dict(arrowstyle='->', lw=2, color='gray'))
+    
+    ax.annotate('', xy=nodes['svm'], xytext=nodes['start'],
+                arrowprops=dict(arrowstyle='->', lw=2, color='gray'))
+    
+    ax.annotate('', xy=nodes['bias_variance'], xytext=nodes['logistic'],
+                arrowprops=dict(arrowstyle='->', lw=2, color='gray'))
+    
+    ax.annotate('', xy=nodes['bias_variance'], xytext=nodes['svm'],
+                arrowprops=dict(arrowstyle='->', lw=2, color='gray'))
+    
+    ax.annotate('', xy=nodes['regularization'], xytext=nodes['bias_variance'],
+                arrowprops=dict(arrowstyle='->', lw=2, color='gray'))
+    
+    ax.annotate('', xy=nodes['model_selection'], xytext=nodes['bias_variance'],
+                arrowprops=dict(arrowstyle='->', lw=2, color='gray'))
+    
+    ax.annotate('', xy=nodes['end'], xytext=nodes['regularization'],
+                arrowprops=dict(arrowstyle='->', lw=2, color='gray'))
+    
+    ax.annotate('', xy=nodes['end'], xytext=nodes['model_selection'],
+                arrowprops=dict(arrowstyle='->', lw=2, color='gray'))
+    
+    # 添加标题
+    plt.title('分类算法学习路径图', fontsize=14, fontweight='bold', y=1.02)
+    
+    # 添加说明文本
+    plt.figtext(0.5, 0.01, '提示：路径不必严格按顺序，可根据个人学习进度灵活调整', 
+                ha='center', fontsize=10, style='italic')
+    
+    return fig
+
+def create_ml_basics_concept_svg() -> str:
+    """创建机器学习基本概念SVG图"""
+    # 创建基于纯SVG的图像，不使用matplotlib
+    svg_content = f'''
+    <svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f0f8ff" />
+                <stop offset="100%" stop-color="#e6f2ff" />
+            </linearGradient>
+        </defs>
+        
+        <style>
+            .title {{
+                font-family: Arial, sans-serif;
+                font-size: 20px;
+                font-weight: bold;
+                text-anchor: middle;
+            }}
+            .subtitle {{
+                font-family: Arial, sans-serif;
+                font-size: 16px;
+                font-weight: bold;
+                text-anchor: middle;
+            }}
+            .text {{
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                text-anchor: middle;
+            }}
+            .box {{
+                stroke-width: 2px;
+                rx: 8px;
+                ry: 8px;
+            }}
+            .arrow {{
+                stroke-width: 2px;
+                marker-end: url(#arrowhead);
+            }}
+            .data {{
+                fill: #d1e7dd;
+                stroke: #198754;
+            }}
+            .algorithm {{
+                fill: #cfe2ff;
+                stroke: #0d6efd;
+            }}
+            .model {{
+                fill: #fff3cd;
+                stroke: #ffc107;
+            }}
+            .prediction {{
+                fill: #f8d7da;
+                stroke: #dc3545;
+            }}
+        </style>
+        
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+            </marker>
+        </defs>
+        
+        <rect width="100%" height="100%" fill="url(#bg-gradient)" />
+        
+        <!-- 标题 -->
+        <text x="400" y="40" class="title">机器学习基本概念</text>
+        
+        <!-- 数据框 -->
+        <rect x="100" y="100" width="180" height="100" class="box data" />
+        <text x="190" y="130" class="subtitle">数据</text>
+        <text x="190" y="160" class="text">输入的特征和标签</text>
+        <text x="190" y="180" class="text">(训练集和测试集)</text>
+        
+        <!-- 学习算法框 -->
+        <rect x="400" y="100" width="180" height="100" class="box algorithm" />
+        <text x="490" y="130" class="subtitle">学习算法</text>
+        <text x="490" y="160" class="text">从数据中学习模式</text>
+        <text x="490" y="180" class="text">(如线性回归、决策树)</text>
+        
+        <!-- 模型框 -->
+        <rect x="400" y="300" width="180" height="100" class="box model" />
+        <text x="490" y="330" class="subtitle">训练好的模型</text>
+        <text x="490" y="360" class="text">从数据中学到的模式</text>
+        <text x="490" y="380" class="text">(如权重、树结构)</text>
+        
+        <!-- 新数据框 -->
+        <rect x="100" y="300" width="180" height="100" class="box data" />
+        <text x="190" y="330" class="subtitle">新数据</text>
+        <text x="190" y="360" class="text">需要进行预测的</text>
+        <text x="190" y="380" class="text">未知样本</text>
+        
+        <!-- 预测框 -->
+        <rect x="650" y="300" width="100" height="100" class="box prediction" />
+        <text x="700" y="330" class="subtitle">预测</text>
+        <text x="700" y="360" class="text">模型对新数据</text>
+        <text x="700" y="380" class="text">的预测结果</text>
+        
+        <!-- 箭头 -->
+        <line x1="280" y1="150" x2="380" y2="150" class="arrow" stroke="#666" />
+        <line x1="490" y1="200" x2="490" y2="280" class="arrow" stroke="#666" />
+        <line x1="400" y1="350" x2="280" y2="350" class="arrow" stroke="#666" />
+        <line x1="580" y1="350" x2="650" y2="350" class="arrow" stroke="#666" />
+    </svg>
+    '''
+    return svg_content
+
+def create_ml_workflow_svg() -> str:
+    """创建机器学习工作流程SVG图"""
+    # 创建基于纯SVG的图像，不使用matplotlib
+    svg_content = f'''
+    <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f5f5f5" />
+                <stop offset="100%" stop-color="#e0e0e0" />
+            </linearGradient>
+        </defs>
+        
+        <style>
+            .title {{
+                font-family: Arial, sans-serif;
+                font-size: 22px;
+                font-weight: bold;
+                text-anchor: middle;
+            }}
+            .phase-title {{
+                font-family: Arial, sans-serif;
+                font-size: 16px;
+                font-weight: bold;
+                text-anchor: middle;
+            }}
+            .text {{
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                text-anchor: middle;
+            }}
+            .small-text {{
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                text-anchor: middle;
+            }}
+            .box {{
+                stroke-width: 2px;
+                rx: 10px;
+                ry: 10px;
+            }}
+            .arrow {{
+                stroke-width: 2px;
+                marker-end: url(#arrowhead);
+            }}
+        </style>
+        
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+            </marker>
+        </defs>
+        
+        <rect width="100%" height="100%" fill="url(#bg-gradient)" />
+        
+        <!-- 标题 -->
+        <text x="400" y="40" class="title">机器学习工作流程</text>
+        
+        <!-- 阶段1：问题定义 -->
+        <rect x="100" y="80" width="600" height="70" class="box" fill="#e3f2fd" stroke="#1565c0" />
+        <text x="400" y="110" class="phase-title">1. 问题定义</text>
+        <text x="400" y="135" class="text">确定业务问题，将其转化为机器学习任务，设定评估指标</text>
+        
+        <!-- 阶段2：数据准备 -->
+        <rect x="100" y="170" width="600" height="70" class="box" fill="#e8f5e9" stroke="#2e7d32" />
+        <text x="400" y="200" class="phase-title">2. 数据准备</text>
+        <text x="400" y="225" class="text">数据收集、清洗、探索性分析、特征工程、数据分割</text>
+        
+        <!-- 阶段3：模型选择与训练 -->
+        <rect x="100" y="260" width="600" height="70" class="box" fill="#fff3e0" stroke="#e65100" />
+        <text x="400" y="290" class="phase-title">3. 模型选择与训练</text>
+        <text x="400" y="315" class="text">选择算法、设置超参数、在训练集上训练模型</text>
+        
+        <!-- 阶段4：模型评估 -->
+        <rect x="100" y="350" width="600" height="70" class="box" fill="#e8eaf6" stroke="#3949ab" />
+        <text x="400" y="380" class="phase-title">4. 模型评估</text>
+        <text x="400" y="405" class="text">在验证集上评估性能，调整模型，进行交叉验证</text>
+        
+        <!-- 阶段5：模型部署与监控 -->
+        <rect x="100" y="440" width="600" height="70" class="box" fill="#fce4ec" stroke="#c2185b" />
+        <text x="400" y="470" class="phase-title">5. 模型部署与监控</text>
+        <text x="400" y="495" class="text">将模型集成到应用中，持续监控模型性能，收集反馈</text>
+        
+        <!-- 阶段6：模型改进 -->
+        <rect x="100" y="530" width="600" height="70" class="box" fill="#f3e5f5" stroke="#7b1fa2" />
+        <text x="400" y="560" class="phase-title">6. 模型改进</text>
+        <text x="400" y="585" class="text">根据反馈和新数据更新模型，持续优化算法和特征</text>
+        
+        <!-- 箭头 -->
+        <line x1="400" y1="150" x2="400" y2="170" class="arrow" stroke="#555" />
+        <line x1="400" y1="240" x2="400" y2="260" class="arrow" stroke="#555" />
+        <line x1="400" y1="330" x2="400" y2="350" class="arrow" stroke="#555" />
+        <line x1="400" y1="420" x2="400" y2="440" class="arrow" stroke="#555" />
+        <line x1="400" y1="510" x2="400" y2="530" class="arrow" stroke="#555" />
+        <!-- 从模型改进返回到数据准备的循环箭头 -->
+        <path d="M 100 565 Q 50 400 100 200" fill="none" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)" />
+    </svg>
+    '''
+    return svg_content
 
 def render_svg(svg_string):
     """在Streamlit中渲染SVG图形"""

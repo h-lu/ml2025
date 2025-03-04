@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from sklearn.linear_model import LinearRegression
-from utils.svg_generator import create_bias_variance_svg
+from utils.svg_generator import create_bias_variance_svg, render_svg
 
 def show_bias_variance_demo():
     """显示偏差-方差权衡的交互式演示"""
@@ -38,11 +38,17 @@ def show_bias_variance_demo():
         
         # 创建SVG内容并保存到文件
         svg_content = create_bias_variance_svg()
-        with open(bias_variance_img_path, "w") as f:
+        with open(bias_variance_img_path, "w", encoding="utf-8") as f:
             f.write(svg_content)
     
-    # 使用st.image显示图片
-    st.image(bias_variance_img_path)
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(bias_variance_img_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
     
     col1, col2 = st.columns([2, 1])
     

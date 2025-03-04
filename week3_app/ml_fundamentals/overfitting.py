@@ -11,7 +11,7 @@ import tempfile
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
-from utils.svg_generator import create_overfitting_svg, create_interactive_overfitting_svg
+from utils.svg_generator import create_overfitting_svg, create_interactive_overfitting_svg, render_svg
 
 def show_overfitting_demo():
     """显示过拟合与欠拟合的交互式演示"""
@@ -36,11 +36,17 @@ def show_overfitting_demo():
         
         # 创建SVG内容并保存到文件
         svg_content = create_overfitting_svg()
-        with open(overfitting_img_path, "w") as f:
+        with open(overfitting_img_path, "w", encoding="utf-8") as f:
             f.write(svg_content)
     
-    # 使用st.image显示图片
-    st.image(overfitting_img_path)
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(overfitting_img_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
     
     # 交互式演示
     st.markdown("### 交互式演示：多项式拟合")

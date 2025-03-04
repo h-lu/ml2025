@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.model_selection import learning_curve, validation_curve
 from sklearn.linear_model import LogisticRegression
 from sklearn.datasets import make_classification
-from utils.svg_generator import create_dataset_split_svg, create_cross_validation_svg, create_roc_curve_svg, create_learning_curve_svg
+from utils.svg_generator import create_dataset_split_svg, create_cross_validation_svg, create_roc_curve_svg, create_learning_curve_svg, render_svg
 import os
 
 def show_model_evaluation_demo():
@@ -63,11 +63,17 @@ def show_data_splitting():
         
         # 创建SVG内容并保存到文件
         svg_content = create_dataset_split_svg()
-        with open(split_img_path, "w") as f:
+        with open(split_img_path, "w", encoding="utf-8") as f:
             f.write(svg_content)
     
-    # 使用st.image显示图片
-    st.image(split_img_path)
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(split_img_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
 
 def show_cross_validation():
     """显示交叉验证的内容"""
@@ -97,11 +103,17 @@ def show_cross_validation():
         
         # 创建SVG内容并保存到文件
         svg_content = create_cross_validation_svg(k_folds)
-        with open(cv_img_path, "w") as f:
+        with open(cv_img_path, "w", encoding="utf-8") as f:
             f.write(svg_content)
     
-    # 使用st.image显示图片
-    st.image(cv_img_path)
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(cv_img_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
 
 def show_learning_curves():
     """显示学习曲线的内容"""
@@ -126,11 +138,17 @@ def show_learning_curves():
         
         # 创建SVG内容并保存到文件
         svg_content = create_learning_curve_svg()
-        with open(lc_img_path, "w") as f:
+        with open(lc_img_path, "w", encoding="utf-8") as f:
             f.write(svg_content)
     
-    # 使用st.image显示图片
-    st.image(lc_img_path)
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(lc_img_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
 
 def show_evaluation_metrics():
     """显示评估指标的内容"""
@@ -179,11 +197,17 @@ def show_evaluation_metrics():
         
         # 创建SVG内容并保存到文件
         svg_content = create_roc_curve_svg()
-        with open(roc_img_path, "w") as f:
+        with open(roc_img_path, "w", encoding="utf-8") as f:
             f.write(svg_content)
     
-    # 使用st.image显示图片
-    st.image(roc_img_path)
+    # 直接读取SVG内容并使用render_svg函数显示
+    try:
+        with open(roc_img_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+        render_svg(svg_content)
+    except Exception as e:
+        st.error(f"显示SVG图片时出错: {str(e)}")
+        st.warning("生成图片文件失败，请检查路径和权限")
 
 def show_hyperparameter_tuning():
     """显示超参数调整的内容"""
