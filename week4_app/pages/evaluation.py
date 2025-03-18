@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
@@ -28,6 +29,11 @@ def show():
     
     # 创建选项卡
     tabs = st.tabs(["评估指标回顾", "交叉验证", "网格搜索", "评估指标选择", "交互式演示"])
+    
+    # 获取当前文件所在的目录路径
+    current_file_dir = os.path.dirname(os.path.abspath(__file__))
+    # 获取week4_app目录路径（与run.py同级）
+    app_dir = os.path.dirname(current_file_dir)
     
     # 评估指标回顾选项卡
     with tabs[0]:
@@ -108,15 +114,18 @@ def show():
         - 假负例（False Negative, FN）：模型预测为负例，实际是正例
         """)
         
-        # 混淆矩阵可视化
+        # 混淆矩阵
+        st.markdown("### 4. 混淆矩阵")
+        
+        # 尝试加载混淆矩阵SVG
+        svg_path_cm = os.path.join(app_dir, "img", "extra", "confusion_matrix.svg")
         try:
-            # 尝试从绝对路径和相对路径加载图像
-            try:
-                st.image("img/extra/confusion_matrix.svg", caption="混淆矩阵示例", use_column_width=True)
-            except:
-                st.image("week4_app/img/extra/confusion_matrix.svg", caption="混淆矩阵示例", use_column_width=True)
+            if os.path.exists(svg_path_cm):
+                st.image(svg_path_cm, caption="混淆矩阵示例", use_column_width=True)
+            else:
+                st.error(f"找不到混淆矩阵图文件，路径：{svg_path_cm}")
         except Exception as e:
-            st.error(f"加载混淆矩阵示意图时出错: {e}")
+            st.error(f"加载混淆矩阵图时出错: {e}")
             # 显示文本描述作为备选
             st.markdown("""
             **混淆矩阵示例**:
@@ -152,14 +161,15 @@ def show():
         """)
         
         # 交叉验证示意图
+        # 尝试加载交叉验证SVG
+        svg_path_cv = os.path.join(app_dir, "img", "cross_validation_concept.svg")
         try:
-            # 尝试从不同的路径加载SVG文件
-            try:
-                st.image("img/cross_validation_concept.svg", caption="5折交叉验证示意图", use_column_width=True)
-            except:
-                st.image("week4_app/img/cross_validation_concept.svg", caption="5折交叉验证示意图", use_column_width=True)
+            if os.path.exists(svg_path_cv):
+                st.image(svg_path_cv, caption="5折交叉验证示意图", use_column_width=True)
+            else:
+                st.error(f"找不到交叉验证图文件，路径：{svg_path_cv}")
         except Exception as e:
-            st.error(f"加载交叉验证示意图时出错: {e}")
+            st.error(f"加载交叉验证图时出错: {e}")
             # 显示文本描述作为备选
             st.markdown("""
             5折交叉验证过程**:

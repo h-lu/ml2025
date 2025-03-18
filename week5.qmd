@@ -1,0 +1,218 @@
+# 第五周：项目汇报与回归算法基础
+
+## 第一次课：项目一小组汇报
+
+::: {.callout-tip}
+## 本周学习目标
+* 通过小组汇报，分享和学习电商用户行为数据分析与分类的项目经验
+* 掌握回归算法的基本原理和应用场景
+* 理解线性回归和多项式回归的区别与联系
+* 掌握回归模型的评估指标和方法
+* 学习正则化技术在回归中的应用
+* 能够使用scikit-learn实现和评估回归模型
+* 将学到的回归算法应用于实际的房价预测问题
+:::
+
+### 小组项目汇报
+
+::: {.callout-note}
+## 项目一：电商用户行为数据分析与分类
+* **项目目标**：对电商用户行为数据进行探索性分析和预处理，构建分类模型预测用户行为（如购买意愿、用户价值等）
+* **使用的算法**：逻辑回归、SVM、决策树、随机森林
+* **评估指标**：准确率、精确率、召回率、F1值、AUC-ROC等
+:::
+
+#### 汇报流程
+
+1. **小组汇报 (每组5-10分钟)**
+   * 项目背景与问题定义
+   * 数据集介绍与预处理方法
+   * 使用的分类算法与原因
+   * 实验结果与模型比较
+   * 结论与实际应用价值
+   
+2. **问答与讨论 (每组5分钟)**
+   * 教师点评与建议
+   * 同学提问与交流
+
+
+## 第二次课：回归算法基础 - 线性回归与多项式回归
+
+### 内容概要
+
+1. **回归问题概述**
+
+::: {.callout-note}
+## 什么是回归问题？
+* **定义**: 回归分析是一种预测分析，研究自变量（特征）与因变量（目标）之间的关系，目标是预测连续型数值。
+* **与分类的区别**: 分类预测的是离散类别，回归预测的是连续数值。
+* **应用场景**: 
+  * 房价预测
+  * 销量预测
+  * 股票价格预测
+  * 温度预测
+  * 能源消耗估计
+:::
+
+2. **线性回归**
+
+::: {.callout-important}
+## 线性回归原理
+* **基本模型**: $y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_n x_n + \epsilon$
+  * $y$ 是目标变量
+  * $x_1, x_2, ..., x_n$ 是特征变量
+  * $\beta_0, \beta_1, ..., \beta_n$ 是模型参数（系数）
+  * $\epsilon$ 是误差项
+
+* **参数估计**: 最小二乘法（最小化残差平方和）
+  * 残差平方和：$\sum_{i=1}^{m} (y_i - \hat{y}_i)^2$
+  * 封闭解：$\boldsymbol{\beta} = (X^TX)^{-1}X^Ty$
+
+* **假设条件**:
+  * 线性关系
+  * 误差项独立同分布
+  * 误差项服从均值为0的正态分布
+  * 无多重共线性
+:::
+
+3. **多项式回归**
+
+::: {.callout-note}
+## 多项式回归
+* **基本模型**: $y = \beta_0 + \beta_1 x + \beta_2 x^2 + ... + \beta_n x^n + \epsilon$
+* **本质**: 线性回归的扩展，通过引入高阶特征捕捉非线性关系
+* **特征转换**: 将原始特征转换为多项式特征，然后应用线性回归
+* **过拟合风险**: 高阶多项式容易过拟合，需要正则化
+:::
+
+4. **回归模型评估指标**
+
+::: {.callout-important}
+## 评估指标
+* **均方误差(MSE)**: $\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2$
+* **均方根误差(RMSE)**: $\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}$
+* **平均绝对误差(MAE)**: $\frac{1}{n}\sum_{i=1}^{n}|y_i-\hat{y}_i|$
+* **决定系数(R²)**: $1 - \frac{\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}{\sum_{i=1}^{n}(y_i-\bar{y})^2}$
+  * 取值范围：(-∞, 1]，1表示完美拟合
+  * 可解释为模型解释的目标变量方差比例
+:::
+
+5. **正则化方法**
+
+::: {.callout-note}
+## 正则化简介
+* **L1正则化(LASSO)**: 向目标函数添加L1范数惩罚项 $\lambda\sum_{j=1}^{n}|\beta_j|$
+  * 特点：可产生稀疏解，进行特征选择
+  
+* **L2正则化(Ridge)**: 向目标函数添加L2范数惩罚项 $\lambda\sum_{j=1}^{n}\beta_j^2$
+  * 特点：减小模型复杂度，但不产生稀疏解
+  
+* **弹性网(Elastic Net)**: 结合L1和L2正则化
+  * 特点：结合两者优点，适用于多重共线性情况
+:::
+
+### 实践: scikit-learn实现
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+
+# 生成示例数据
+np.random.seed(42)
+X = 2 * np.random.rand(100, 1)
+y = 4 + 3 * X + np.random.randn(100, 1)
+
+# 划分训练集和测试集
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 线性回归
+lin_reg = LinearRegression()
+lin_reg.fit(X_train, y_train)
+y_pred = lin_reg.predict(X_test)
+
+print("线性回归系数:", lin_reg.coef_)
+print("线性回归截距:", lin_reg.intercept_)
+print("MSE:", mean_squared_error(y_test, y_pred))
+print("R²:", r2_score(y_test, y_pred))
+
+# 多项式回归
+poly_reg = Pipeline([
+    ("poly_features", PolynomialFeatures(degree=2, include_bias=False)),
+    ("lin_reg", LinearRegression())
+])
+poly_reg.fit(X_train, y_train)
+y_poly_pred = poly_reg.predict(X_test)
+
+print("\n多项式回归MSE:", mean_squared_error(y_test, y_poly_pred))
+print("多项式回归R²:", r2_score(y_test, y_poly_pred))
+
+# Ridge回归（L2正则化）
+ridge_reg = Ridge(alpha=1.0)
+ridge_reg.fit(X_train, y_train)
+y_ridge_pred = ridge_reg.predict(X_test)
+
+print("\nRidge回归MSE:", mean_squared_error(y_test, y_ridge_pred))
+print("Ridge回归R²:", r2_score(y_test, y_ridge_pred))
+
+# Lasso回归（L1正则化）
+lasso_reg = Lasso(alpha=0.1)
+lasso_reg.fit(X_train, y_train)
+y_lasso_pred = lasso_reg.predict(X_test)
+
+print("\nLasso回归MSE:", mean_squared_error(y_test, y_lasso_pred))
+print("Lasso回归R²:", r2_score(y_test, y_lasso_pred))
+
+# 可视化结果
+plt.figure(figsize=(10, 6))
+plt.scatter(X_test, y_test, color='black', label='实际值')
+plt.plot(X_test, y_pred, color='blue', linewidth=3, label='线性回归')
+plt.plot(X_test, y_poly_pred, color='red', linewidth=3, label='多项式回归')
+plt.plot(X_test, y_ridge_pred, color='green', linewidth=3, label='Ridge回归')
+plt.plot(X_test, y_lasso_pred, color='orange', linewidth=3, label='Lasso回归')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.title('回归模型比较')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+### 小组项目二：房价预测模型构建
+
+::: {.callout-note}
+## 项目介绍
+* **目标**: 构建房价预测模型，根据房屋特征预测房价
+* **数据**: 各小组自主选择房价数据集，应包含房价相关特征，数据量不低于500条
+* **算法**: 线性回归或多项式回归
+* **提交内容**: 模型代码、实验结果报告（包括模型评估指标）
+:::
+
+::: {.callout-important}
+## 项目要求
+1. 数据探索与预处理
+   * 处理缺失值和异常值
+   * 进行特征工程（特征转换、特征选择等）
+   * 进行数据可视化，理解特征分布与相关性
+
+2. 模型构建
+   * 实现线性回归和/或多项式回归模型
+   * 考虑应用正则化方法（Ridge、Lasso）减少过拟合
+
+3. 模型评估
+   * 使用多种评估指标（MSE、RMSE、MAE、R²）
+   * 进行交叉验证，确保模型稳定性
+
+4. 结果分析
+   * 解释模型系数的含义
+   * 分析特征重要性
+   * 讨论模型局限性和可能的改进方向
+:::
+
+### 下次课预告
+
+下一次课我们将继续深入探讨回归算法，重点介绍集成学习（XGBoost）在回归问题中的应用，并进行小组项目二的代码实践。 

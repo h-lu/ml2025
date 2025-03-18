@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>第一周：机器学习导论与Python环境搭建 – 机器学习 (Python)</title>
+<title>第五周：项目汇报与回归算法基础 – 机器学习 (Python)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./week2.html" rel="next">
-<link href="./syllabus.html" rel="prev">
+<link href="./week6.html" rel="next">
+<link href="./week4.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -104,6 +104,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xkm/sYwpb+ilR5gUw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles/custom.css">
 <link rel="stylesheet" href="styles/mermaid.css">
@@ -118,7 +147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1.html"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week5.html"><span class="chapter-title">第五周：项目汇报与回归算法基础</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -155,7 +184,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week1.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
+  <a href="./week1.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -175,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week5.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：项目汇报与回归算法基础</span></a>
+  <a href="./week5.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第五周：项目汇报与回归算法基础</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -193,16 +222,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#第一次课机器学习导论与python环境搭建" id="toc-第一次课机器学习导论与python环境搭建" class="nav-link active" data-scroll-target="#第一次课机器学习导论与python环境搭建">第一次课：机器学习导论与Python环境搭建</a>
+  <li><a href="#第一次课项目一小组汇报" id="toc-第一次课项目一小组汇报" class="nav-link active" data-scroll-target="#第一次课项目一小组汇报">第一次课：项目一小组汇报</a>
   <ul class="collapse">
-  <li><a href="#机器学习导论" id="toc-机器学习导论" class="nav-link" data-scroll-target="#机器学习导论">1. 机器学习导论</a></li>
-  <li><a href="#python-机器学习环境搭建" id="toc-python-机器学习环境搭建" class="nav-link" data-scroll-target="#python-机器学习环境搭建">2. Python 机器学习环境搭建</a></li>
+  <li><a href="#小组项目汇报" id="toc-小组项目汇报" class="nav-link" data-scroll-target="#小组项目汇报">小组项目汇报</a></li>
   </ul></li>
-  <li><a href="#第二次课python-基础语法与数据操作" id="toc-第二次课python-基础语法与数据操作" class="nav-link" data-scroll-target="#第二次课python-基础语法与数据操作">第二次课：Python 基础语法与数据操作</a>
+  <li><a href="#第二次课回归算法基础---线性回归与多项式回归" id="toc-第二次课回归算法基础---线性回归与多项式回归" class="nav-link" data-scroll-target="#第二次课回归算法基础---线性回归与多项式回归">第二次课：回归算法基础 - 线性回归与多项式回归</a>
   <ul class="collapse">
-  <li><a href="#python-基础语法回顾" id="toc-python-基础语法回顾" class="nav-link" data-scroll-target="#python-基础语法回顾">1. Python 基础语法回顾</a></li>
-  <li><a href="#numpy-基础" id="toc-numpy-基础" class="nav-link" data-scroll-target="#numpy-基础">2. Numpy 基础</a></li>
-  <li><a href="#pandas-基础" id="toc-pandas-基础" class="nav-link" data-scroll-target="#pandas-基础">3. Pandas 基础</a></li>
+  <li><a href="#内容概要" id="toc-内容概要" class="nav-link" data-scroll-target="#内容概要">内容概要</a></li>
+  <li><a href="#实践-scikit-learn实现" id="toc-实践-scikit-learn实现" class="nav-link" data-scroll-target="#实践-scikit-learn实现">实践: scikit-learn实现</a></li>
+  <li><a href="#小组项目二房价预测模型构建" id="toc-小组项目二房价预测模型构建" class="nav-link" data-scroll-target="#小组项目二房价预测模型构建">小组项目二：房价预测模型构建</a></li>
+  <li><a href="#下次课预告" id="toc-下次课预告" class="nav-link" data-scroll-target="#下次课预告">下次课预告</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -212,7 +241,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></h1>
+<h1 class="title"><span class="chapter-title">第五周：项目汇报与回归算法基础</span></h1>
 </div>
 
 
@@ -229,6 +258,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="第一次课项目一小组汇报" class="level2">
+<h2 class="anchored" data-anchor-id="第一次课项目一小组汇报">第一次课：项目一小组汇报</h2>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -240,476 +271,327 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li>了解机器学习的核心概念和类型 (监督学习、无监督学习、强化学习)</li>
-<li>理解机器学习与传统统计分析、数据挖掘的区别与联系</li>
-<li>认识机器学习和生成式AI 在商业领域的应用前景</li>
-<li><strong>掌握 Python 和 VS Code 的安装配置，包括 Python 解释器、VS Code 编辑器、Python 插件、虚拟环境 <code>venv</code> 的使用</strong></li>
-<li>初步体验 AI 辅助编程工具，如 GitHub Copilot, 通义灵码, Cline</li>
+<li>通过小组汇报，分享和学习电商用户行为数据分析与分类的项目经验</li>
+<li>掌握回归算法的基本原理和应用场景</li>
+<li>理解线性回归和多项式回归的区别与联系</li>
+<li>掌握回归模型的评估指标和方法</li>
+<li>学习正则化技术在回归中的应用</li>
+<li>能够使用scikit-learn实现和评估回归模型</li>
+<li>将学到的回归算法应用于实际的房价预测问题</li>
 </ul>
 </div>
 </div>
-<section id="第一次课机器学习导论与python环境搭建" class="level2">
-<h2 class="anchored" data-anchor-id="第一次课机器学习导论与python环境搭建">第一次课：机器学习导论与Python环境搭建</h2>
-<section id="机器学习导论" class="level3">
-<h3 class="anchored" data-anchor-id="机器学习导论">1. 机器学习导论</h3>
+<section id="小组项目汇报" class="level3">
+<h3 class="anchored" data-anchor-id="小组项目汇报">小组项目汇报</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-什么是机器学习
+项目一：电商用户行为数据分析与分类
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>无需显式编程，让计算机从数据中学习规律和知识。</p>
-<p><strong>与传统编程的区别：</strong> 传统编程 (显式规则) vs.&nbsp;机器学习 (从数据中学习规则)。</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-机器学习的核心概念
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="监督学习-supervised-learning" class="level4">
-<h4 class="anchored" data-anchor-id="监督学习-supervised-learning">监督学习 (Supervised Learning)</h4>
-<p>从带有标签的数据中学习，用于分类和回归任务。</p>
 <ul>
-<li><strong>示例：</strong> 垃圾邮件识别 (分类)、房价预测 (回归)</li>
+<li><strong>项目目标</strong>：对电商用户行为数据进行探索性分析和预处理，构建分类模型预测用户行为（如购买意愿、用户价值等）</li>
+<li><strong>使用的算法</strong>：逻辑回归、SVM、决策树、随机森林</li>
+<li><strong>评估指标</strong>：准确率、精确率、召回率、F1值、AUC-ROC等</li>
 </ul>
-</section>
-<section id="无监督学习-unsupervised-learning" class="level4">
-<h4 class="anchored" data-anchor-id="无监督学习-unsupervised-learning">无监督学习 (Unsupervised Learning)</h4>
-<p>从无标签数据中学习数据结构和模式，用于聚类、降维、关联规则挖掘等任务。</p>
-<ul>
-<li><strong>示例：</strong> 用户分群 (聚类)、商品推荐 (关联规则)</li>
-</ul>
-</section>
-<section id="强化学习-reinforcement-learning" class="level4">
-<h4 class="anchored" data-anchor-id="强化学习-reinforcement-learning">强化学习 (Reinforcement Learning)</h4>
-<p>通过与环境交互学习最优策略，以获得最大奖励。</p>
-<ul>
-<li><strong>示例：</strong> 游戏 AI、自动驾驶</li>
-</ul>
-</section>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-机器学习与相关学科
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="机器学习-vs.-传统统计分析" class="level4">
-<h4 class="anchored" data-anchor-id="机器学习-vs.-传统统计分析">机器学习 vs.&nbsp;传统统计分析</h4>
-<ul>
-<li><strong>侧重点不同：</strong> 统计分析 (解释性、推断) vs.&nbsp;机器学习 (预测性、性能)</li>
-<li><strong>方法论差异：</strong> 统计分析 (模型假设、参数估计) vs.&nbsp;机器学习 (算法迭代、模型优化)</li>
-</ul>
-</section>
-<section id="机器学习-vs.-数据挖掘" class="level4">
-<h4 class="anchored" data-anchor-id="机器学习-vs.-数据挖掘">机器学习 vs.&nbsp;数据挖掘</h4>
-<ul>
-<li><strong>目标相似：</strong> 从数据中发现知识和模式</li>
-<li><strong>侧重面不同：</strong> 数据挖掘 (更侧重数据预处理、模式发现) vs.&nbsp;机器学习 (更侧重模型构建、预测和决策)</li>
-</ul>
-</section>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-机器学习和生成式AI 的商业应用案例
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<section id="汇报流程" class="level4">
+<h4 class="anchored" data-anchor-id="汇报流程">汇报流程</h4>
 <ol type="1">
-<li><strong>精准营销：</strong> 用户画像、个性化推荐、广告投放优化</li>
-<li><strong>风险管理：</strong> 信用评分、欺诈检测、风险预警</li>
-<li><strong>智能客服：</strong> 聊天机器人、智能问答、工单自动化</li>
-<li><strong>内容创作：</strong> 文案生成、图像生成、音乐创作、代码生成 (生成式AI)</li>
-<li><strong>智能产品与服务：</strong> 智能家居、自动驾驶、智能医疗</li>
-</ol>
-</div>
-</div>
-</section>
-<section id="python-机器学习环境搭建" class="level3">
-<h3 class="anchored" data-anchor-id="python-机器学习环境搭建">2. Python 机器学习环境搭建</h3>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Python 解释器安装
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li><strong>从 Python 官网下载并安装 Python 解释器：</strong> <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a> (建议安装 3.9 及以上版本)</li>
-<li><strong>安装过程中，务必勾选 “Add Python to PATH”</strong></li>
-<li><strong>验证安装：</strong> 打开命令行，输入 <code>python --version</code> 和 <code>pip --version</code></li>
-</ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-VS Code 编辑器安装与配置
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li><strong>安装 VS Code：</strong> <a href="https://code.visualstudio.com/download">https://code.visualstudio.com/download</a></li>
-<li><strong>安装 Python 插件：</strong>
+<li><strong>小组汇报 (每组5-10分钟)</strong>
 <ul>
-<li>打开 VS Code，点击左侧 “Extensions” 图标</li>
-<li>搜索并安装 “Python” 插件 (由 Microsoft 提供)</li>
-<li><strong>功能：</strong> 代码智能提示、格式化、调试、Jupyter Notebook 支持等</li>
+<li>项目背景与问题定义</li>
+<li>数据集介绍与预处理方法</li>
+<li>使用的分类算法与原因</li>
+<li>实验结果与模型比较</li>
+<li>结论与实际应用价值</li>
 </ul></li>
-<li><strong>选择 Python 解释器：</strong>
+<li><strong>问答与讨论 (每组5分钟)</strong>
 <ul>
-<li>点击窗口右下角的 Python 版本号</li>
-<li>或使用 <code>Ctrl+Shift+P</code> / <code>Cmd+Shift+P</code> 选择解释器</li>
+<li>教师点评与建议</li>
+<li>同学提问与交流</li>
 </ul></li>
 </ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-warning callout-titled">
+</section>
+</section>
+</section>
+<section id="第二次课回归算法基础---线性回归与多项式回归" class="level2">
+<h2 class="anchored" data-anchor-id="第二次课回归算法基础---线性回归与多项式回归">第二次课：回归算法基础 - 线性回归与多项式回归</h2>
+<section id="内容概要" class="level3">
+<h3 class="anchored" data-anchor-id="内容概要">内容概要</h3>
+<ol type="1">
+<li><strong>回归问题概述</strong></li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-虚拟环境管理
+什么是回归问题？
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>什么是虚拟环境：</strong> 隔离的 Python 环境，可以为不同项目安装不同的 Python 包，避免包版本冲突。</p>
-<ol type="1">
-<li><strong>创建虚拟环境：</strong> <code>python -m venv .venv</code></li>
-<li><strong>激活虚拟环境：</strong>
 <ul>
-<li>Windows (cmd): <code>.venv\Scripts\activate.bat</code></li>
-<li>Windows (PowerShell): <code>.venv\Scripts\Activate.ps1</code></li>
-<li>macOS/Linux: <code>source .venv/bin/activate</code></li>
+<li><strong>定义</strong>: 回归分析是一种预测分析，研究自变量（特征）与因变量（目标）之间的关系，目标是预测连续型数值。</li>
+<li><strong>与分类的区别</strong>: 分类预测的是离散类别，回归预测的是连续数值。</li>
+<li><strong>应用场景</strong>:
+<ul>
+<li>房价预测</li>
+<li>销量预测</li>
+<li>股票价格预测</li>
+<li>温度预测</li>
+<li>能源消耗估计</li>
 </ul></li>
-<li><strong>在 VS Code 中使用：</strong> VS Code 会自动检测项目中的虚拟环境</li>
+</ul>
+</div>
+</div>
+<ol start="2" type="1">
+<li><strong>线性回归</strong></li>
 </ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Python 常用库安装
+线性回归原理
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>在虚拟环境中安装以下库：</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install scikit-learn pandas numpy matplotlib seaborn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>配置 pip 国内镜像源 (推荐)：</strong></p>
-<ol type="1">
-<li><p>创建配置文件：</p>
 <ul>
-<li>Windows: <code>%USERPROFILE%\pip\pip.ini</code></li>
-<li>macOS/Linux: <code>~/.pip/pip.conf</code></li>
+<li><strong>基本模型</strong>: <span class="math inline">\(y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_n x_n + \epsilon\)</span>
+<ul>
+<li><span class="math inline">\(y\)</span> 是目标变量</li>
+<li><span class="math inline">\(x_1, x_2, ..., x_n\)</span> 是特征变量</li>
+<li><span class="math inline">\(\beta_0, \beta_1, ..., \beta_n\)</span> 是模型参数（系数）</li>
+<li><span class="math inline">\(\epsilon\)</span> 是误差项</li>
 </ul></li>
-<li><p>添加配置内容：</p></li>
+<li><strong>参数估计</strong>: 最小二乘法（最小化残差平方和）
+<ul>
+<li>残差平方和：<span class="math inline">\(\sum_{i=1}^{m} (y_i - \hat{y}_i)^2\)</span></li>
+<li>封闭解：<span class="math inline">\(\boldsymbol{\beta} = (X^TX)^{-1}X^Ty\)</span></li>
+</ul></li>
+<li><strong>假设条件</strong>:
+<ul>
+<li>线性关系</li>
+<li>误差项独立同分布</li>
+<li>误差项服从均值为0的正态分布</li>
+<li>无多重共线性</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<ol start="3" type="1">
+<li><strong>多项式回归</strong></li>
 </ol>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[global]</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">index-url </span><span class="ot">=</span><span class="st"> https://pypi.tuna.tsinghua.edu.cn/simple</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">[install]</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dt">trusted-host </span><span class="ot">=</span><span class="st"> pypi.tuna.tsinghua.edu.cn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-AI 辅助编程工具体验
+多项式回归
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li><strong>GitHub Copilot:</strong> <a href="https://github.com/features/copilot">github.com/features/copilot</a></li>
-<li><strong>通义灵码:</strong> <a href="https://tongyi.aliyun.com/lingma">tongyi.aliyun.com/lingma</a></li>
-<li><strong>Cursor:</strong> <a href="https://cursor.sh/">cursor.sh</a></li>
+<li><strong>基本模型</strong>: <span class="math inline">\(y = \beta_0 + \beta_1 x + \beta_2 x^2 + ... + \beta_n x^n + \epsilon\)</span></li>
+<li><strong>本质</strong>: 线性回归的扩展，通过引入高阶特征捕捉非线性关系</li>
+<li><strong>特征转换</strong>: 将原始特征转换为多项式特征，然后应用线性回归</li>
+<li><strong>过拟合风险</strong>: 高阶多项式容易过拟合，需要正则化</li>
 </ul>
 </div>
 </div>
-</section>
-</section>
-<section id="第二次课python-基础语法与数据操作" class="level2">
-<h2 class="anchored" data-anchor-id="第二次课python-基础语法与数据操作">第二次课：Python 基础语法与数据操作</h2>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-课程目标
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li>回顾 Python 基础语法</li>
-<li>掌握 <code>Numpy</code> 库的基本操作</li>
-<li>掌握 <code>Pandas</code> 库的基本操作</li>
-<li>能够使用 AI 辅助编程工具完成编程练习</li>
-</ul>
-</div>
-</div>
-<section id="python-基础语法回顾" class="level3">
-<h3 class="anchored" data-anchor-id="python-基础语法回顾">1. Python 基础语法回顾</h3>
+<ol start="4" type="1">
+<li><strong>回归模型评估指标</strong></li>
+</ol>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-基础语法要点
+评估指标
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<section id="变量与数据类型" class="level4">
-<h4 class="anchored" data-anchor-id="变量与数据类型">变量与数据类型</h4>
 <ul>
-<li>变量命名规则、动态类型</li>
-<li>常用数据类型：<code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>list</code>, <code>tuple</code>, <code>dict</code>, <code>set</code></li>
-</ul>
-</section>
-<section id="运算符" class="level4">
-<h4 class="anchored" data-anchor-id="运算符">运算符</h4>
+<li><strong>均方误差(MSE)</strong>: <span class="math inline">\(\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2\)</span></li>
+<li><strong>均方根误差(RMSE)</strong>: <span class="math inline">\(\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}\)</span></li>
+<li><strong>平均绝对误差(MAE)</strong>: <span class="math inline">\(\frac{1}{n}\sum_{i=1}^{n}|y_i-\hat{y}_i|\)</span></li>
+<li><strong>决定系数(R²)</strong>: <span class="math inline">\(1 - \frac{\sum_{i=1}^{n}(y_i-\hat{y}_i)^2}{\sum_{i=1}^{n}(y_i-\bar{y})^2}\)</span>
 <ul>
-<li>算术运算符</li>
-<li>比较运算符</li>
-<li>逻辑运算符</li>
-<li>赋值运算符</li>
-<li>成员运算符</li>
-<li>身份运算符</li>
+<li>取值范围：(-∞, 1]，1表示完美拟合</li>
+<li>可解释为模型解释的目标变量方差比例</li>
+</ul></li>
 </ul>
-</section>
-<section id="控制流" class="level4">
-<h4 class="anchored" data-anchor-id="控制流">控制流</h4>
-<ul>
-<li>条件语句：<code>if</code>, <code>elif</code>, <code>else</code></li>
-<li>循环语句：<code>for</code>, <code>while</code>, <code>break</code>, <code>continue</code></li>
-</ul>
-</section>
-<section id="函数" class="level4">
-<h4 class="anchored" data-anchor-id="函数">函数</h4>
-<ul>
-<li>函数定义</li>
-<li>函数参数</li>
-<li>函数返回值</li>
-<li>匿名函数 (lambda)</li>
-</ul>
-</section>
-<section id="模块与包" class="level4">
-<h4 class="anchored" data-anchor-id="模块与包">模块与包</h4>
-<ul>
-<li>模块导入：<code>import</code>, <code>from ... import ...</code></li>
-<li>常用内置模块：<code>math</code>, <code>random</code>, <code>os</code>, <code>sys</code>, <code>datetime</code></li>
-</ul>
-</section>
 </div>
 </div>
-</section>
-<section id="numpy-基础" class="level3">
-<h3 class="anchored" data-anchor-id="numpy-基础">2. Numpy 基础</h3>
+<ol start="5" type="1">
+<li><strong>正则化方法</strong></li>
+</ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Numpy 数组操作
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="数组创建" class="level4">
-<h4 class="anchored" data-anchor-id="数组创建">数组创建</h4>
-<ul>
-<li><code>np.array()</code>, <code>np.zeros()</code>, <code>np.ones()</code></li>
-<li><code>np.arange()</code>, <code>np.linspace()</code></li>
-<li><code>np.random.rand()</code></li>
-</ul>
-</section>
-<section id="数组属性" class="level4">
-<h4 class="anchored" data-anchor-id="数组属性">数组属性</h4>
-<ul>
-<li><code>shape</code>, <code>dtype</code>, <code>ndim</code>, <code>size</code></li>
-<li>数组索引和切片</li>
-<li>维度变换：<code>reshape()</code>, <code>flatten()</code>, <code>transpose()</code></li>
-</ul>
-</section>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-数组运算
+正则化简介
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li><strong>元素级运算：</strong> 加减乘除、幂运算、比较运算</li>
-<li><strong>矩阵运算：</strong> 矩阵乘法 (<code>np.dot()</code>, <code>@</code> 运算符)</li>
-<li><strong>广播机制</strong></li>
-</ul>
-<section id="常用函数" class="level4">
-<h4 class="anchored" data-anchor-id="常用函数">常用函数</h4>
+<li><strong>L1正则化(LASSO)</strong>: 向目标函数添加L1范数惩罚项 <span class="math inline">\(\lambda\sum_{j=1}^{n}|\beta_j|\)</span>
 <ul>
-<li><strong>数学函数：</strong> <code>np.sin()</code>, <code>np.cos()</code>, <code>np.exp()</code>, <code>np.log()</code>, <code>np.sqrt()</code></li>
-<li><strong>统计函数：</strong> <code>np.mean()</code>, <code>np.median()</code>, <code>np.std()</code>, <code>np.max()</code>, <code>np.min()</code>, <code>np.sum()</code></li>
-<li><strong>排序和查找：</strong> <code>np.sort()</code>, <code>np.argsort()</code>, <code>np.unique()</code>, <code>np.where()</code></li>
-</ul>
-</section>
-</div>
-</div>
-</section>
-<section id="pandas-基础" class="level3">
-<h3 class="anchored" data-anchor-id="pandas-基础">3. Pandas 基础</h3>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Pandas 数据结构
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="series" class="level4">
-<h4 class="anchored" data-anchor-id="series">Series</h4>
+<li>特点：可产生稀疏解，进行特征选择</li>
+</ul></li>
+<li><strong>L2正则化(Ridge)</strong>: 向目标函数添加L2范数惩罚项 <span class="math inline">\(\lambda\sum_{j=1}^{n}\beta_j^2\)</span>
 <ul>
-<li>带标签的一维数组</li>
-<li>创建、索引、切片、属性和方法</li>
-</ul>
-</section>
-<section id="dataframe" class="level4">
-<h4 class="anchored" data-anchor-id="dataframe">DataFrame</h4>
+<li>特点：减小模型复杂度，但不产生稀疏解</li>
+</ul></li>
+<li><strong>弹性网(Elastic Net)</strong>: 结合L1和L2正则化
 <ul>
-<li>带标签的二维数据表</li>
-<li>创建、列选择、行选择、索引、切片</li>
-<li>常用属性和方法</li>
+<li>特点：结合两者优点，适用于多重共线性情况</li>
+</ul></li>
 </ul>
+</div>
+</div>
 </section>
-</div>
-</div>
+<section id="实践-scikit-learn实现" class="level3">
+<h3 class="anchored" data-anchor-id="实践-scikit-learn实现">实践: scikit-learn实现</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression, Ridge, Lasso</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> PolynomialFeatures</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error, r2_score</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成示例数据</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.random.rand(<span class="dv">100</span>, <span class="dv">1</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> <span class="dv">4</span> <span class="op">+</span> <span class="dv">3</span> <span class="op">*</span> X <span class="op">+</span> np.random.randn(<span class="dv">100</span>, <span class="dv">1</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 划分训练集和测试集</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 线性回归</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>lin_reg <span class="op">=</span> LinearRegression()</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>lin_reg.fit(X_train, y_train)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>y_pred <span class="op">=</span> lin_reg.predict(X_test)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"线性回归系数:"</span>, lin_reg.coef_)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"线性回归截距:"</span>, lin_reg.intercept_)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MSE:"</span>, mean_squared_error(y_test, y_pred))</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, r2_score(y_test, y_pred))</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 多项式回归</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>poly_reg <span class="op">=</span> Pipeline([</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"poly_features"</span>, PolynomialFeatures(degree<span class="op">=</span><span class="dv">2</span>, include_bias<span class="op">=</span><span class="va">False</span>)),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"lin_reg"</span>, LinearRegression())</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>poly_reg.fit(X_train, y_train)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>y_poly_pred <span class="op">=</span> poly_reg.predict(X_test)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">多项式回归MSE:"</span>, mean_squared_error(y_test, y_poly_pred))</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"多项式回归R²:"</span>, r2_score(y_test, y_poly_pred))</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Ridge回归（L2正则化）</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>ridge_reg <span class="op">=</span> Ridge(alpha<span class="op">=</span><span class="fl">1.0</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>ridge_reg.fit(X_train, y_train)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>y_ridge_pred <span class="op">=</span> ridge_reg.predict(X_test)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Ridge回归MSE:"</span>, mean_squared_error(y_test, y_ridge_pred))</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Ridge回归R²:"</span>, r2_score(y_test, y_ridge_pred))</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Lasso回归（L1正则化）</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>lasso_reg <span class="op">=</span> Lasso(alpha<span class="op">=</span><span class="fl">0.1</span>)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>lasso_reg.fit(X_train, y_train)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>y_lasso_pred <span class="op">=</span> lasso_reg.predict(X_test)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Lasso回归MSE:"</span>, mean_squared_error(y_test, y_lasso_pred))</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Lasso回归R²:"</span>, r2_score(y_test, y_lasso_pred))</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="co"># 可视化结果</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>plt.scatter(X_test, y_test, color<span class="op">=</span><span class="st">'black'</span>, label<span class="op">=</span><span class="st">'实际值'</span>)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>plt.plot(X_test, y_pred, color<span class="op">=</span><span class="st">'blue'</span>, linewidth<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="st">'线性回归'</span>)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>plt.plot(X_test, y_poly_pred, color<span class="op">=</span><span class="st">'red'</span>, linewidth<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="st">'多项式回归'</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>plt.plot(X_test, y_ridge_pred, color<span class="op">=</span><span class="st">'green'</span>, linewidth<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="st">'Ridge回归'</span>)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>plt.plot(X_test, y_lasso_pred, color<span class="op">=</span><span class="st">'orange'</span>, linewidth<span class="op">=</span><span class="dv">3</span>, label<span class="op">=</span><span class="st">'Lasso回归'</span>)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'X'</span>)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'y'</span>)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'回归模型比较'</span>)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="小组项目二房价预测模型构建" class="level3">
+<h3 class="anchored" data-anchor-id="小组项目二房价预测模型构建">小组项目二：房价预测模型构建</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-数据操作
+项目介绍
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<section id="数据读取" class="level4">
-<h4 class="anchored" data-anchor-id="数据读取">数据读取</h4>
 <ul>
-<li><code>pd.read_csv()</code>: 读取 CSV 文件</li>
-<li><code>pd.read_excel()</code>: 读取 Excel 文件</li>
-<li><code>pd.read_json()</code>: 读取 JSON 文件</li>
-<li>常用参数：<code>filepath_or_buffer</code>, <code>sep</code>, <code>header</code>, <code>index_col</code>, <code>encoding</code></li>
+<li><strong>目标</strong>: 构建房价预测模型，根据房屋特征预测房价</li>
+<li><strong>数据</strong>: 各小组自主选择房价数据集，应包含房价相关特征，数据量不低于500条</li>
+<li><strong>算法</strong>: 线性回归或多项式回归</li>
+<li><strong>提交内容</strong>: 模型代码、实验结果报告（包括模型评估指标）</li>
 </ul>
-</section>
-<section id="数据选择" class="level4">
-<h4 class="anchored" data-anchor-id="数据选择">数据选择</h4>
-<ul>
-<li>列选择：<code>df['列名']</code>, <code>df[['列名1', '列名2']]</code></li>
-<li>行选择：<code>df.loc[]</code>, <code>df.iloc[]</code>, 条件索引</li>
-<li>索引方式的区别和应用场景</li>
-</ul>
-</section>
-<section id="数据清洗" class="level4">
-<h4 class="anchored" data-anchor-id="数据清洗">数据清洗</h4>
-<ul>
-<li>重复值处理：<code>df.duplicated()</code>, <code>df.drop_duplicates()</code></li>
-<li>缺失值处理：<code>df.isnull()</code>, <code>df.fillna()</code>, <code>df.dropna()</code></li>
-</ul>
-</section>
 </div>
 </div>
-<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-实践环节
+项目要求
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li><strong>Python 基础语法练习</strong></li>
-<li><strong>Numpy 数组操作练习</strong></li>
-<li><strong>Pandas 数据操作练习</strong></li>
-<li><strong>使用 AI 工具辅助完成代码</strong></li>
-</ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-课后作业
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li>完成 Python 基础语法和数据操作的编程练习</li>
-<li>将代码上传到 GitHub 仓库</li>
-<li>预习下周课程内容：数据预处理与特征工程基础</li>
-</ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-相关资源
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<li>数据探索与预处理
 <ul>
-<li><a href="https://docs.python.org/3/">Python 官方文档</a></li>
-<li><a href="https://numpy.org/doc/stable/">Numpy 官方文档</a></li>
-<li><a href="https://pandas.pydata.org/docs/">Pandas 官方文档</a></li>
-<li><a href="https://www.w3schools.com/python/">W3School Python 教程</a></li>
-<li><a href="https://www.liaoxuefeng.com/wiki/1016959663602400">廖雪峰 Python 教程</a></li>
-</ul>
+<li>处理缺失值和异常值</li>
+<li>进行特征工程（特征转换、特征选择等）</li>
+<li>进行数据可视化，理解特征分布与相关性</li>
+</ul></li>
+<li>模型构建
+<ul>
+<li>实现线性回归和/或多项式回归模型</li>
+<li>考虑应用正则化方法（Ridge、Lasso）减少过拟合</li>
+</ul></li>
+<li>模型评估
+<ul>
+<li>使用多种评估指标（MSE、RMSE、MAE、R²）</li>
+<li>进行交叉验证，确保模型稳定性</li>
+</ul></li>
+<li>结果分析
+<ul>
+<li>解释模型系数的含义</li>
+<li>分析特征重要性</li>
+<li>讨论模型局限性和可能的改进方向</li>
+</ul></li>
+</ol>
 </div>
 </div>
+</section>
+<section id="下次课预告" class="level3">
+<h3 class="anchored" data-anchor-id="下次课预告">下次课预告</h3>
+<p>下一次课我们将继续深入探讨回归算法，重点介绍集成学习（XGBoost）在回归问题中的应用，并进行小组项目二的代码实践。</p>
 
 
 </section>
@@ -1138,13 +1020,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./syllabus.html" class="pagination-link" aria-label="课程大纲">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">课程大纲</span></span>
+      <a href="./week4.html" class="pagination-link" aria-label="第四周：分类算法基础 (二) - 决策树与集成学习 (随机森林)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第四周：分类算法基础 (二) - 决策树与集成学习 (随机森林)</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./week2.html" class="pagination-link" aria-label="第二周：数据预处理与特征工程基础">
-        <span class="nav-page-text"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./week6.html" class="pagination-link" aria-label="第六周：集成学习与回归模型优化">
+        <span class="nav-page-text"><span class="chapter-title">第六周：集成学习与回归模型优化</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

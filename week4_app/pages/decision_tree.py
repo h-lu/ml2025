@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+from pathlib import Path
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_curve, auc
 from sklearn.model_selection import train_test_split
@@ -27,32 +29,37 @@ def show():
     决策树学习的目标就是为了产生一棵泛化能力强，即处理未见示例能力强的决策树。
     """)
     
+    # 获取当前文件所在的目录路径
+    current_file_dir = os.path.dirname(os.path.abspath(__file__))
+    # 获取week4_app目录路径（与run.py同级）
+    app_dir = os.path.dirname(current_file_dir)
+    
+    # 构建SVG文件的绝对路径（只查找week4_app/img/目录）
+    svg_path = os.path.join(app_dir, "img", "decision_tree_concept.svg")
+    
     # 概念图
     st.markdown("#### 决策树概念图")
     try:
-        # 尝试从不同的路径加载SVG文件
-        try:
-            st.image("img/decision_tree_concept.svg", caption="决策树概念示意图", use_column_width=True)
-        except:
-            # 如果第一个路径失败，尝试使用绝对路径
-            with open("week4_app/img/decision_tree_concept.svg", "r") as f:
-                svg_content = f.read()
-            st.image("week4_app/img/decision_tree_concept.svg", caption="决策树概念示意图", use_column_width=True)
+        # 检查文件是否存在
+        if os.path.exists(svg_path):
+            st.image(svg_path, caption="决策树概念示意图", use_column_width=True)
+        else:
+            st.error(f"找不到决策树概念图文件，路径：{svg_path}")
+            # 显示纯文本描述作为备选
+            st.markdown("""
+            **决策树简单示例**:
+            ```
+            是否有收入 > 5000?
+            ├── 是: 是否有房产?
+            │   ├── 是: 批准贷款 ✓
+            │   └── 否: 是否有担保人?
+            │       ├── 是: 批准贷款 ✓
+            │       └── 否: 拒绝贷款 ✗
+            └── 否: 拒绝贷款 ✗
+            ```
+            """)
     except Exception as e:
-        st.error(f"找不到决策树概念图: {e}")
-        # 显示纯文本描述作为备选
-        st.markdown("""
-        **决策树简单示例**:
-        ```
-        是否有收入 > 5000?
-        ├── 是: 是否有房产?
-        │   ├── 是: 批准贷款 ✓
-        │   └── 否: 是否有担保人?
-        │       ├── 是: 批准贷款 ✓
-        │       └── 否: 拒绝贷款 ✗
-        └── 否: 拒绝贷款 ✗
-        ```
-        """)
+        st.error(f"加载决策树概念图时出错: {e}")
     
     # 创建选项卡
     tabs = st.tabs(["算法原理", "特征选择", "Scikit-learn实现", "优缺点", "交互式演示"])
@@ -70,9 +77,13 @@ def show():
         """)
         
         # 使用自定义SVG图代替外部图像链接
-        with open("img/decision_tree_concept.svg", "r") as f:
-            svg_content = f.read()
-        st.image("img/decision_tree_concept.svg", caption="决策树概念示意图", use_column_width=True)
+        try:
+            if os.path.exists(svg_path):
+                st.image(svg_path, caption="决策树概念示意图", use_column_width=True)
+            else:
+                st.error(f"找不到决策树概念图文件，路径：{svg_path}")
+        except Exception as e:
+            st.error(f"加载决策树概念图时出错: {e}")
         
         st.markdown("""
         ### 决策过程
@@ -110,7 +121,7 @@ def show():
             
             #### 信息增益 (Information Gain) 公式:
             
-            $Gain(S, A) = Entropy(S) - \sum_{v \in Values(A)} \frac{|S_v|}{|S|} Entropy(S_v)$
+            $Gain(S, A) = Entropy(S) - \\sum_{v \\in Values(A)} \\frac{|S_v|}{|S|} Entropy(S_v)$
             
             其中 $A$ 是特征， $Values(A)$ 是特征 $A$ 的取值集合， $S_v$ 是特征 $A$ 取值为 $v$ 的子数据集。
             

@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_curve, auc
 from sklearn.model_selection import train_test_split, cross_val_score
+import os
 
 from utils.data_loader import load_dataset
 from utils.visualization import (
@@ -31,24 +32,22 @@ def show():
     - **Boosting**：串行训练一系列基学习器，每个基学习器都试图修正前面基学习器的错误。
     """)
     
+    # 获取当前文件所在的目录路径
+    current_file_dir = os.path.dirname(os.path.abspath(__file__))
+    # 获取week4_app目录路径（与run.py同级）
+    app_dir = os.path.dirname(current_file_dir)
+    
     # 随机森林概念图
     st.markdown("#### 随机森林概念图")
+    # 构建SVG文件的绝对路径
+    svg_path_rf = os.path.join(app_dir, "img", "random_forest_concept.svg")
     try:
-        # 尝试从不同的路径加载SVG文件
-        try:
-            st.image("img/random_forest_concept.svg", caption="随机森林集成学习示意图", use_column_width=True)
-        except:
-            st.image("week4_app/img/random_forest_concept.svg", caption="随机森林集成学习示意图", use_column_width=True)
+        if os.path.exists(svg_path_rf):
+            st.image(svg_path_rf, caption="随机森林集成学习示意图", use_column_width=True)
+        else:
+            st.error(f"找不到随机森林概念图文件，路径：{svg_path_rf}")
     except Exception as e:
-        st.error(f"加载图片时出错: {e}")
-        # 提供文本描述作为备选
-        st.markdown("""
-        **随机森林原理简述**:
-        
-        1. 从原始数据集中有放回抽样，构建多个子数据集
-        2. 对每个子数据集训练一个决策树，但在每个节点分裂时只考虑特征的随机子集
-        3. 每棵树独立进行预测，最终结果通过投票或平均得出
-        """)
+        st.error(f"加载随机森林概念图时出错: {e}")
     
     # 创建选项卡
     tabs = st.tabs(["集成学习基础", "Bagging方法", "随机森林算法", "优缺点", "交互式演示"])
@@ -78,7 +77,21 @@ def show():
         """)
         
         # 使用自定义SVG图
-        st.image("img/random_forest_concept.svg", caption="随机森林集成学习示意图", use_column_width=True)
+        if 'svg_path_rf' not in locals():
+            # 获取当前文件所在的目录路径
+            current_file_dir = os.path.dirname(os.path.abspath(__file__))
+            # 获取week4_app目录路径（与run.py同级）
+            app_dir = os.path.dirname(current_file_dir)
+            # 构建SVG文件的绝对路径
+            svg_path_rf = os.path.join(app_dir, "img", "random_forest_concept.svg")
+            
+        try:
+            if os.path.exists(svg_path_rf):
+                st.image(svg_path_rf, caption="随机森林集成学习示意图", use_column_width=True)
+            else:
+                st.error(f"找不到随机森林概念图文件，路径：{svg_path_rf}")
+        except Exception as e:
+            st.error(f"加载随机森林概念图时出错: {e}")
     
     # Bagging方法选项卡
     with tabs[1]:
@@ -180,8 +193,17 @@ plt.title("随机森林特征重要性")
 plt.show()
         """, language="python")
         
-        # 添加特征重要性可视化
-        st.image("img/feature_importance_concept.svg", caption="随机森林特征重要性示例", use_column_width=True)
+        # 特征重要性示意图
+        st.markdown("#### 特征重要性")
+        # 构建SVG文件的绝对路径
+        svg_path_fi = os.path.join(app_dir, "img", "feature_importance_concept.svg")
+        try:
+            if os.path.exists(svg_path_fi):
+                st.image(svg_path_fi, caption="随机森林特征重要性示例", use_column_width=True)
+            else:
+                st.error(f"找不到特征重要性图文件，路径：{svg_path_fi}")
+        except Exception as e:
+            st.error(f"加载特征重要性图时出错: {e}")
     
     # 优缺点选项卡
     with tabs[3]:
@@ -319,14 +341,22 @@ def show_feature_importance():
     """展示随机森林的特征重要性"""
     # 添加特征重要性的可视化图
     st.subheader("特征重要性示例")
+    
+    # 获取当前文件所在的目录路径
+    current_file_dir = os.path.dirname(os.path.abspath(__file__))
+    # 获取week4_app目录路径（与run.py同级）
+    app_dir = os.path.dirname(current_file_dir)
+    
+    # 构建SVG文件的绝对路径
+    svg_path_fi = os.path.join(app_dir, "img", "feature_importance_concept.svg")
+    
     try:
-        # 尝试从不同的路径加载SVG文件
-        try:
-            st.image("img/feature_importance_concept.svg", caption="随机森林特征重要性示例", use_column_width=True)
-        except:
-            st.image("week4_app/img/feature_importance_concept.svg", caption="随机森林特征重要性示例", use_column_width=True)
+        if os.path.exists(svg_path_fi):
+            st.image(svg_path_fi, caption="随机森林特征重要性示例", use_column_width=True)
+        else:
+            st.error(f"找不到特征重要性图文件，路径：{svg_path_fi}")
     except Exception as e:
-        st.error(f"加载特征重要性图片时出错: {e}")
+        st.error(f"加载特征重要性图时出错: {e}")
         # 提供文本描述作为备选
         st.markdown("""
         **特征重要性直观解释**:

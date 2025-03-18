@@ -175,51 +175,60 @@ def plot_learning_curves(train_scores, test_scores, train_sizes):
     st.plotly_chart(fig)
 
 def plot_grid_search_results(grid_results, param_name):
-    """可视化网格搜索结果"""
+    """
+    绘制网格搜索结果
+    
+    参数:
+        grid_results: GridSearchCV的cv_results_属性
+        param_name: 要绘制的参数名称
+    """
+    plt.figure(figsize=(10, 6))
+    
+    # 提取必要的信息
     mean_scores = grid_results['mean_test_score']
     std_scores = grid_results['std_test_score']
     
     # 修复处理参数值的方式，避免KeyError
-    # 旧代码：
-    # params = grid_results['params']
-    # param_values = [p[param_name] for p in params]
-    
-    # 新的改进代码：直接使用网格搜索结果中的参数值
-    param_values = grid_results[param_name]
-    
-    # 由于param_values可能包含None值，我们需要将其转换为可排序的形式
-    # 对于数值类型，保持不变；对于None值或其他类型，转换为字符串
-    param_values_display = [str(val) if val is None or not isinstance(val, (int, float)) else val 
-                           for val in param_values]
-    
-    # 为了正确显示，我们需要同时对分数和参数值进行排序
-    sorted_indices = np.argsort(param_values_display)
-    sorted_param_values = [param_values_display[i] for i in sorted_indices]
-    sorted_mean_scores = [mean_scores[i] for i in sorted_indices]
-    sorted_std_scores = [std_scores[i] for i in sorted_indices]
-    
-    fig = go.Figure()
-    
-    fig.add_trace(go.Scatter(
-        x=sorted_param_values,
-        y=sorted_mean_scores,
-        error_y=dict(
-            type='data',
-            array=sorted_std_scores,
-            visible=True
-        ),
-        mode='lines+markers',
-        name='验证得分'
-    ))
-    
-    fig.update_layout(
-        title=f'参数 {param_name} 的网格搜索结果',
-        xaxis_title=param_name,
-        yaxis_title='验证得分',
-    )
-    
-    st.plotly_chart(fig)
-    
+    params = grid_results['params']
+    try:
+        # 首先尝试直接从grid_results中获取参数名，如果没有则从params中提取
+        if f'param_{param_name}' in grid_results:
+            param_values = grid_results[f'param_{param_name}']
+        else:
+            # 从params列表中提取指定参数的值
+            param_values = [p.get(param_name) for p in params]
+            
+        # 过滤掉None值，并保持相应的分数
+        valid_indices = [i for i, v in enumerate(param_values) if v is not None]
+        param_values = [param_values[i] for i in valid_indices]
+        mean_scores = [mean_scores[i] for i in valid_indices]
+        std_scores = [std_scores[i] for i in valid_indices]
+        
+        # 如果仍然没有有效值，则引发异常
+        if not param_values:
+            raise ValueError(f"没有找到参数 '{param_name}' 的有效值")
+        
+        # 根据参数值排序
+        sorted_indices = np.argsort(param_values)
+        param_values = [param_values[i] for i in sorted_indices]
+        mean_scores = [mean_scores[i] for i in sorted_indices]
+        std_scores = [std_scores[i] for i in sorted_indices]
+        
+        # 绘制结果
+        plt.errorbar(param_values, mean_scores, yerr=std_scores, marker='o', linestyle='-')
+        plt.title(f'参数 {param_name} 的网格搜索结果')
+        plt.xlabel(param_name)
+        plt.ylabel('验证分数')
+        plt.grid(True)
+        
+        # 在Streamlit中显示图像
+        st.pyplot(plt)
+    except Exception as e:
+        st.error(f"绘制网格搜索结果时出错: {e}")
+        st.write("网格搜索参数:")
+        st.write(f"可用的参数: {list(params[0].keys()) if params else 'None'}")
+        st.write(f"当前尝试的参数: {param_name}")
+
 def plot_cross_validation(cv_scores):
     """可视化交叉验证结果"""
     fold_indices = np.arange(1, len(cv_scores) + 1)
