@@ -1,0 +1,39 @@
+<svg width="400" height="320" xmlns="http://www.w3.org/2000/svg">
+    <!-- 标题 -->
+    <text x="200" y="30" font-family="Arial, 'PingFang HK', 'Microsoft YaHei'" font-size="18" text-anchor="middle" fill="#1E88E5">集成学习流程图</text>
+    
+    <!-- 数据集 -->
+    <rect x="150" y="50" width="100" height="30" rx="5" fill="#E3F2FD" stroke="#1565C0"/>
+    <text x="200" y="70" font-family="Arial, 'PingFang HK', 'Microsoft YaHei'" font-size="14" text-anchor="middle">训练数据</text>
+    
+    <!-- 箭头指向各个模型 -->
+    <line x1="200" y1="80" x2="100" y2="120" stroke="#1565C0" stroke-width="2"/>
+    <line x1="200" y1="80" x2="200" y2="120" stroke="#1565C0" stroke-width="2"/>
+    <line x1="200" y1="80" x2="300" y2="120" stroke="#1565C0" stroke-width="2"/>
+    
+    <!-- 基础模型 -->
+    <rect x="60" y="120" width="80" height="40" rx="5" fill="#BBDEFB" stroke="#1565C0"/>
+    <text x="100" y="145" font-family="Arial, 'PingFang HK', 'Microsoft YaHei'" font-size="14" text-anchor="middle">模型 1</text>
+    
+    <rect x="160" y="120" width="80" height="40" rx="5" fill="#BBDEFB" stroke="#1565C0"/>
+    <text x="200" y="145" font-family="Arial, 'PingFang HK', 'Microsoft YaHei'" font-size="14" text-anchor="middle">模型 2</text>
+    
+    <rect x="260" y="120" width="80" height="40" rx="5" fill="#BBDEFB" stroke="#1565C0"/>
+    <text x="300" y="145" font-family="Arial, 'PingFang HK', 'Microsoft YaHei'" font-size="14" text-anchor="middle">模型 3</text>
+    
+    <!-- 箭头指向集成 -->
+    <line x1="100" y1="160" x2="150" y2="200" stroke="#1565C0" stroke-width="2"/>
+    <line x1="200" y1="160" x2="200" y2="200" stroke="#1565C0" stroke-width="2"/>
+    <line x1="300" y1="160" x2="250" y2="200" stroke="#1565C0" stroke-width="2"/>
+    
+    <!-- 集成部分 -->
+    <rect x="150" y="200" width="100" height="40" rx="5" fill="#0D47A1" stroke="#1565C0"/>
+    <text x="200" y="225" font-family="Arial, 'PingFang HK', 'Microsoft YaHei'" font-size="14" text-anchor="middle" fill="white">模型集成</text>
+    
+    <!-- 箭头指向最终预测 -->
+    <line x1="200" y1="240" x2="200" y2="270" stroke="#1565C0" stroke-width="2"/>
+    
+    <!-- 最终预测 -->
+    <rect x="150" y="270" width="100" height="40" rx="5" fill="#1E88E5" stroke="#1565C0"/>
+    <text x="200" y="295" font-family="Arial, 'PingFang HK', 'Microsoft YaHei'" font-size="14" text-anchor="middle" fill="white">最终预测</text>
+</svg> 
