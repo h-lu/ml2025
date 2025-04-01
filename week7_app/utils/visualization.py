@@ -246,32 +246,72 @@ def plot_kmeans_centroid_sensitivity(X, K=3, n_init=3, random_state_base=42):
     绘制K-means对初始质心敏感性的图
     
     参数:
-        X: 数据集 shape=(n_samples, 2)
+        X: 数据集，可以被忽略，函数内部会生成更适合展示的数据
         K: 簇数量
         n_init: 不同初始化的数量
         random_state_base: 随机种子基数
     """
     from sklearn.cluster import KMeans
+    import numpy as np
+    
+    # 创建更适合展示初始质心敏感性的数据
+    # 使用两个稍微重叠的环形结构，这种数据对初始质心非常敏感
+    np.random.seed(42)
+    n_samples = 300
+    
+    # 第一个环
+    theta = np.linspace(0, 2*np.pi, n_samples//2)
+    radius1 = 5 + np.random.randn(n_samples//2) * 0.3
+    x1 = radius1 * np.cos(theta)
+    y1 = radius1 * np.sin(theta)
+    
+    # 第二个环（半径略小并有一个缺口）
+    theta2 = np.linspace(0.5, 2*np.pi-0.5, n_samples//2)
+    radius2 = 2 + np.random.randn(n_samples//2) * 0.2
+    x2 = radius2 * np.cos(theta2)
+    y2 = radius2 * np.sin(theta2)
+    
+    # 合并数据
+    X_circle = np.vstack([np.column_stack([x1, y1]), np.column_stack([x2, y2])])
     
     fig, axes = plt.subplots(1, n_init, figsize=(15, 5))
     
+    # 使用明显不同的随机种子以获得差异化的结果
+    random_states = [10, 42, 100]  # 这些种子会产生明显不同的结果
+    
     for i in range(n_init):
-        random_state = random_state_base + i
-        kmeans = KMeans(n_clusters=K, random_state=random_state, n_init=1)
-        labels = kmeans.fit_predict(X)
+        kmeans = KMeans(n_clusters=K, random_state=random_states[i], n_init=1)
+        labels = kmeans.fit_predict(X_circle)
         centroids = kmeans.cluster_centers_
         
-        axes[i].scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', 
+        # 计算惯性（簇内平方和）
+        inertia = kmeans.inertia_
+        
+        # 绘制聚类结果和质心
+        scatter = axes[i].scatter(X_circle[:, 0], X_circle[:, 1], c=labels, cmap='viridis', 
                       alpha=0.8, s=50, edgecolors='w')
         axes[i].scatter(centroids[:, 0], centroids[:, 1], 
                       s=200, marker='X', c='red', 
                       edgecolors='k')
-        axes[i].set_title(f'初始化 {i+1}')
+        
+        # 为每个质心添加标号
+        for j, centroid in enumerate(centroids):
+            axes[i].text(centroid[0], centroid[1]+0.3, f'C{j+1}', 
+                       fontsize=12, fontweight='bold',
+                       ha='center', va='center',
+                       bbox=dict(facecolor='white', alpha=0.7, edgecolor='none'))
+        
+        axes[i].set_title(f'初始化 {i+1}\n惯性: {inertia:.1f}')
         axes[i].set_aspect('equal')
         axes[i].grid(True, linestyle='--', alpha=0.7)
+        
+        # 添加图例
+        legend1 = axes[i].legend(*scatter.legend_elements(),
+                         title="簇")
+        axes[i].add_artist(legend1)
     
     plt.tight_layout()
-    plt.suptitle("K-means 对初始质心的敏感性", y=1.05)
+    plt.suptitle("K-means 对初始质心的敏感性\n不同初始化导致明显不同的聚类结果", y=1.05)
     
     return fig
 

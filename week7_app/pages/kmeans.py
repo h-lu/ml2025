@@ -558,23 +558,32 @@ def show_kmeans_pros_cons():
     # 演示K-means对初始质心的敏感性
     st.subheader("K-means 对初始质心的敏感性演示")
     
-    # 生成数据
-    X, _ = generate_blob_data(n_samples=200, n_centers=3, random_state=42)
+    st.markdown("""
+    K-means算法的聚类结果对初始质心的选择非常敏感，尤其是在处理形状复杂的数据时。
+    下面的演示使用同样的数据集但不同的初始质心，观察最终的聚类结果有何不同。
+    """)
     
-    # 绘制对初始质心敏感性的图
-    fig = plot_kmeans_centroid_sensitivity(X, K=3, n_init=3)
+    # 使用plot_kmeans_centroid_sensitivity函数绘制，它会自动生成适合演示的数据
+    fig = plot_kmeans_centroid_sensitivity(None, K=3, n_init=3)
     st.pyplot(fig)
     
     st.markdown("""
-    如上图所示，不同的初始质心可能导致不同的聚类结果。这是K-means算法的一个主要缺点。
+    从上图可以清楚地看到，**不同的初始质心会导致显著不同的聚类结果：**
+    
+    * **簇的形状和大小不同：** 可以看到不同初始化条件下，簇的划分边界明显不同
+    * **惯性(Inertia)不同：** 惯性是衡量簇内距离平方和的指标，值越小表示聚类效果越好
+    * **极易陷入局部最优：** 特别是对于环形或复杂形状的数据，K-means很容易找到次优解
+    
     为了缓解这个问题，通常的做法是：
     
     1. **多次运行K-means**，使用不同的随机初始化，选择簇内平方和最小的结果。
-       这就是scikit-learn中KMeans的`n_init`参数的作用。
+       这就是scikit-learn中KMeans的`n_init`参数的作用，默认为10。
     
-    2. **使用更智能的初始化方法**，如K-means++，它使初始质心尽可能分散。
+    2. **使用更智能的初始化方法**，如K-means++，它使初始质心尽可能分散，这是scikit-learn的默认初始化方法。
     
     3. **使用更鲁棒的聚类算法**，如K-medoids，它使用实际数据点作为中心而不是均值。
+    
+    4. **对于特定形状的数据**，考虑使用其他更适合的聚类算法，如基于密度的DBSCAN或谱聚类。
     """)
     
     # 演示K-means的形状限制
