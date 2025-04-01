@@ -19,7 +19,7 @@ def show():
     # 侧边栏选择
     topic = st.sidebar.radio(
         "选择主题",
-        ["集成学习简介", "GBDT基础", "XGBoost详解", "XGBoost模型比较", "评估指标"]
+        ["集成学习简介", "GBDT基础", "XGBoost详解", "XGBoost模型比较", "Stacking集成", "评估指标"]
     )
     
     if topic == "集成学习简介":
@@ -30,6 +30,8 @@ def show():
         show_xgboost_details()
     elif topic == "XGBoost模型比较":
         show_xgboost_comparison()
+    elif topic == "Stacking集成":
+        show_stacking()
     elif topic == "评估指标":
         show_evaluation_metrics()
 
@@ -956,6 +958,399 @@ def show_xgboost_comparison():
     }
     
     st.table(pd.DataFrame(comparison_data).set_index("特性"))
+
+def show_stacking():
+    st.header("Stacking集成学习")
+    
+    col1, col2 = st.columns([3, 2])
+    
+    with col1:
+        st.markdown("""
+        ### Stacking的基本原理
+        
+        Stacking(堆叠集成)是一种将多个不同模型组合在一起的集成学习方法，通过"元学习器"(meta-learner)来整合基础模型的预测结果。
+        
+        ### 与其他集成方法的对比
+        
+        | 集成方法 | 基本思想 | 训练方式 | 权重确定 | 适用场景 |
+        |---------|---------|----------|----------|---------|
+        | Bagging | 并行训练多个相同类型模型 | 并行 | 平均/投票 | 高方差模型(如决策树) |
+        | Boosting | 串行训练模型，关注难分样本 | 串行 | 加权 | 高偏差模型(如浅层树) |
+        | Stacking | 使用元模型组合基础模型 | 分层 | 元模型学习 | 多种类型模型综合 |
+        
+        Stacking相比其他集成方法的最大特点是:
+        
+        1. **模型多样性**: 可以组合完全不同类型的模型(如线性模型、树模型、神经网络)
+        2. **自动权重学习**: 元学习器自动学习最优的组合权重
+        3. **表达能力**: 能捕捉不同模型在不同区域的优势
+        """)
+        
+        st.subheader("Stacking工作流程")
+        st.markdown("""
+        1. **第一层：基础模型训练**
+           - 训练多个不同的基础模型(例如RandomForest、XGBoost、LightGBM等)
+           - 通常使用K折交叉验证生成"无泄漏"的预测
+        
+        2. **第二层：元模型训练**
+           - 将基础模型的预测结果作为新特征
+           - 训练元模型学习如何最佳组合这些预测
+        
+        3. **预测阶段**
+           - 对新数据，先通过所有基础模型生成预测
+           - 将这些预测输入到元模型中获得最终预测
+        """)
+    
+    with col2:
+        st.image("https://scikit-learn.org/stable/_images/sphx_glr_plot_stack_predictors_001.png", 
+                caption="Stacking示意图（来源: scikit-learn）")
+        
+        st.markdown("""
+        ### 元学习器选择
+        
+        常见的元学习器包括:
+        
+        - **线性模型**: 简单有效，不易过拟合
+        - **树模型**: 能学习非线性组合关系
+        - **简单神经网络**: 表达能力强但需要更多数据
+        
+        理想的元学习器应该:
+        - 足够简单，避免过拟合
+        - 能处理特征之间的相关性
+        - 计算效率高
+        """)
+    
+    # 交互式Stacking演示
+    st.subheader("交互式Stacking过程可视化")
+    
+    # 数据集选择
+    dataset = st.selectbox(
+        "选择数据集",
+        ["回归问题 (波士顿房价)", "分类问题 (鸢尾花)"]
+    )
+    
+    # 基础模型选择
+    st.markdown("#### 选择基础模型")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        use_lr = st.checkbox("线性模型", value=True)
+    with col2:
+        use_rf = st.checkbox("随机森林", value=True)
+    with col3:
+        use_gb = st.checkbox("梯度提升树", value=True)
+    
+    # 元模型选择
+    meta_model = st.selectbox(
+        "选择元模型",
+        ["线性回归/分类", "随机森林", "XGBoost"]
+    )
+    
+    # 验证方式选择
+    cv_folds = st.slider("交叉验证折数", 2, 10, 5)
+    
+    if st.button("运行Stacking演示"):
+        show_stacking_demo(dataset, use_lr, use_rf, use_gb, meta_model, cv_folds)
+    
+    # Stacking优缺点
+    st.subheader("Stacking的优缺点")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""
+        #### 优点
+        
+        1. **性能提升**: 通常比单一模型表现更好
+        2. **自动权重分配**: 元模型能学到最优的组合方式
+        3. **领域灵活性**: 适用于几乎所有机器学习问题
+        4. **减少过拟合**: 元学习器有助于平滑预测结果
+        5. **降低方差**: 多个模型组合减小随机性影响
+        """)
+    
+    with col2:
+        st.markdown("""
+        #### 缺点
+        
+        1. **计算复杂度**: 需要训练多个模型，计算成本高
+        2. **实现复杂**: 交叉验证生成偏置训练特征较复杂
+        3. **调参难度**: 需要为多个模型调参
+        4. **解释性降低**: 最终模型解释性不如单一模型
+        5. **边际收益递减**: 随模型数量增加，性能提升变小
+        """)
+    
+    # Stacking实际应用
+    st.subheader("Stacking的应用场景")
+    st.markdown("""
+    Stacking在许多领域都有成功应用:
+    
+    1. **竞赛**: 几乎所有数据科学竞赛的顶级解决方案都使用了Stacking
+    2. **金融预测**: 结合不同模型预测股价、风险评估
+    3. **医疗诊断**: 组合多种模型提高疾病诊断准确率
+    4. **推荐系统**: 整合不同推荐算法的结果
+    5. **计算机视觉**: 组合CNN、LSTM等模型进行图像分类
+    
+    Stacking最适合:
+    - 有足够计算资源的场景
+    - 对精度要求极高的任务
+    - 可用多种不同类型模型的问题
+    """)
+    
+    # 实现代码示例
+    st.subheader("Python实现示例")
+    st.code("""
+# 使用scikit-learn实现Stacking
+from sklearn.ensemble import StackingRegressor  # 或 StackingClassifier
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.svm import SVR
+from sklearn.model_selection import train_test_split
+
+# 定义基础模型
+base_models = [
+    ('rf', RandomForestRegressor(n_estimators=100, random_state=42)),
+    ('gb', GradientBoostingRegressor(n_estimators=100, random_state=42)),
+    ('svr', SVR(kernel='rbf'))
+]
+
+# 定义元模型
+meta_model = LinearRegression()
+
+# 创建Stacking模型
+stacking_model = StackingRegressor(
+    estimators=base_models,
+    final_estimator=meta_model,
+    cv=5  # 5折交叉验证
+)
+
+# 训练和预测
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+stacking_model.fit(X_train, y_train)
+predictions = stacking_model.predict(X_test)
+    """, language="python")
+
+def show_stacking_demo(dataset, use_lr, use_rf, use_gb, meta_model, cv_folds):
+    """展示Stacking过程的交互式演示"""
+    from sklearn.datasets import load_iris
+    from sklearn.model_selection import cross_val_predict, KFold
+    from sklearn.linear_model import LinearRegression, LogisticRegression
+    from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+    from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
+    from sklearn.metrics import mean_squared_error, accuracy_score
+    import numpy as np
+    
+    st.markdown("### Stacking流程演示")
+    
+    # 加载数据集
+    if dataset == "回归问题 (波士顿房价)":
+        # 波士顿房价数据集已在scikit-learn中弃用，这里使用模拟数据
+        np.random.seed(42)
+        n_samples = 500
+        n_features = 10
+        X = np.random.randn(n_samples, n_features)
+        # 创建一些非线性关系
+        y = 5 + np.sum(X[:, :3], axis=1) + 3 * (X[:, 3] ** 2) + np.random.randn(n_samples) * 2
+        st.info("注意: 使用的是模拟的房价数据集，而非真实的波士顿房价数据")
+        task_type = "regression"
+        metric_name = "均方根误差 (RMSE)"
+        lower_is_better = True
+    else:
+        X, y = load_iris(return_X_y=True)
+        task_type = "classification"
+        metric_name = "准确率"
+        lower_is_better = False
+    
+    # 创建进度条
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    
+    # 可视化准备
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+    
+    # 定义模型
+    models = []
+    model_names = []
+    
+    status_text.text("准备模型...")
+    progress_bar.progress(10)
+    
+    if task_type == "regression":
+        if use_lr:
+            models.append(LinearRegression())
+            model_names.append("线性回归")
+        if use_rf:
+            models.append(RandomForestRegressor(n_estimators=100, random_state=42))
+            model_names.append("随机森林")
+        if use_gb:
+            models.append(GradientBoostingRegressor(n_estimators=100, random_state=42))
+            model_names.append("梯度提升树")
+            
+        if meta_model == "线性回归/分类":
+            final_model = LinearRegression()
+            meta_name = "线性回归"
+        elif meta_model == "随机森林":
+            final_model = RandomForestRegressor(n_estimators=50, random_state=42)
+            meta_name = "随机森林"
+        else:  # XGBoost
+            try:
+                import xgboost as xgb
+                final_model = xgb.XGBRegressor(n_estimators=50, random_state=42)
+                meta_name = "XGBoost"
+            except ImportError:
+                final_model = GradientBoostingRegressor(n_estimators=50, random_state=42)
+                meta_name = "梯度提升树 (XGBoost未安装)"
+    else:  # 分类
+        if use_lr:
+            models.append(LogisticRegression(max_iter=1000, random_state=42))
+            model_names.append("逻辑回归")
+        if use_rf:
+            models.append(RandomForestClassifier(n_estimators=100, random_state=42))
+            model_names.append("随机森林")
+        if use_gb:
+            models.append(GradientBoostingClassifier(n_estimators=100, random_state=42))
+            model_names.append("梯度提升树")
+            
+        if meta_model == "线性回归/分类":
+            final_model = LogisticRegression(max_iter=1000, random_state=42)
+            meta_name = "逻辑回归"
+        elif meta_model == "随机森林":
+            final_model = RandomForestClassifier(n_estimators=50, random_state=42)
+            meta_name = "随机森林"
+        else:  # XGBoost
+            try:
+                import xgboost as xgb
+                final_model = xgb.XGBClassifier(n_estimators=50, random_state=42)
+                meta_name = "XGBoost"
+            except ImportError:
+                final_model = GradientBoostingClassifier(n_estimators=50, random_state=42)
+                meta_name = "梯度提升树 (XGBoost未安装)"
+    
+    if len(models) == 0:
+        st.error("请至少选择一个基础模型!")
+        return
+    
+    # 生成交叉验证预测
+    status_text.text("第一层: 使用交叉验证为基础模型生成预测...")
+    progress_bar.progress(30)
+    
+    kf = KFold(n_splits=cv_folds, shuffle=True, random_state=42)
+    meta_features = np.zeros((X.shape[0], len(models)))
+    
+    # 基础模型性能
+    base_performances = []
+    
+    for i, model in enumerate(models):
+        # 使用交叉验证生成预测
+        if task_type == "regression":
+            preds = cross_val_predict(model, X, y, cv=kf)
+            score = np.sqrt(mean_squared_error(y, preds))
+        else:
+            preds = cross_val_predict(model, X, y, cv=kf)
+            score = accuracy_score(y, preds)
+        
+        meta_features[:, i] = preds
+        base_performances.append(score)
+        
+        # 更新进度
+        progress_percent = 30 + (i + 1) * 20 / len(models)
+        progress_bar.progress(int(progress_percent))
+        status_text.text(f"训练基础模型: {model_names[i]} 完成")
+    
+    # 第二层: 元模型训练
+    status_text.text("第二层: 训练元模型...")
+    progress_bar.progress(70)
+    
+    # 使用交叉验证评估堆叠模型
+    if task_type == "regression":
+        meta_preds = cross_val_predict(final_model, meta_features, y, cv=kf)
+        stack_score = np.sqrt(mean_squared_error(y, meta_preds))
+    else:
+        meta_preds = cross_val_predict(final_model, meta_features, y, cv=kf)
+        stack_score = accuracy_score(y, meta_preds)
+    
+    # 展示完整结果
+    progress_bar.progress(100)
+    status_text.text("演示完成!")
+    
+    # 绘制性能对比条形图
+    all_models = model_names + ["Stacking集成"]
+    all_scores = base_performances + [stack_score]
+    
+    # 调整颜色
+    colors = ['blue'] * len(model_names) + ['red']
+    
+    # 绘制性能对比
+    axes[0].bar(all_models, all_scores, color=colors)
+    axes[0].set_title(f'模型性能对比 ({metric_name})')
+    axes[0].set_ylabel(metric_name)
+    
+    # 在正确的位置添加标签
+    for i, v in enumerate(all_scores):
+        axes[0].text(i, v * 1.05, f'{v:.3f}', ha='center')
+    
+    if lower_is_better:
+        best_idx = np.argmin(all_scores)
+        worst_idx = np.argmax(all_scores)
+    else:
+        best_idx = np.argmax(all_scores)
+        worst_idx = np.argmin(all_scores)
+    
+    axes[0].get_children()[best_idx].set_color('green')
+    
+    # 绘制预测分布散点图
+    if task_type == "regression":
+        # 随机选择部分样本以避免图形过于拥挤
+        np.random.seed(42)
+        sample_idx = np.random.choice(len(y), min(100, len(y)), replace=False)
+        
+        for i, model_name in enumerate(model_names):
+            axes[1].scatter(y[sample_idx], meta_features[sample_idx, i], 
+                         alpha=0.5, label=model_name)
+        
+        axes[1].scatter(y[sample_idx], meta_preds[sample_idx], 
+                      color='red', marker='X', s=100, label='Stacking集成')
+        
+        axes[1].plot([min(y), max(y)], [min(y), max(y)], 'k--', lw=2)
+        axes[1].set_xlabel('实际值')
+        axes[1].set_ylabel('预测值')
+        axes[1].set_title('预测值与实际值对比')
+        axes[1].legend()
+    else:
+        # 为分类问题创建简单的混淆矩阵热图
+        from sklearn.metrics import confusion_matrix
+        import seaborn as sns
+        
+        cm = confusion_matrix(y, meta_preds)
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=axes[1])
+        axes[1].set_title('Stacking模型混淆矩阵')
+        axes[1].set_xlabel('预测类别')
+        axes[1].set_ylabel('实际类别')
+    
+    plt.tight_layout()
+    st.pyplot(fig)
+    
+    # 性能提升分析
+    if task_type == "regression" and lower_is_better:
+        base_avg = np.mean(base_performances)
+        improvement = (base_avg - stack_score) / base_avg * 100
+        best_base = min(base_performances)
+        best_improvement = (best_base - stack_score) / best_base * 100
+        
+        if stack_score < best_base:
+            st.success(f"Stacking相比所有单一模型平均提升了 {improvement:.2f}%，相比最佳单一模型提升了 {best_improvement:.2f}%")
+        elif stack_score < base_avg:
+            st.info(f"Stacking相比单一模型平均提升了 {improvement:.2f}%，但没有超过最佳单一模型")
+        else:
+            st.warning("在这个例子中，Stacking没有提升性能，可能是因为数据集太小或基础模型相似度高")
+    elif task_type == "classification" and not lower_is_better:
+        base_avg = np.mean(base_performances)
+        improvement = (stack_score - base_avg) / base_avg * 100
+        best_base = max(base_performances)
+        best_improvement = (stack_score - best_base) / best_base * 100
+        
+        if stack_score > best_base:
+            st.success(f"Stacking相比所有单一模型平均提升了 {improvement:.2f}%，相比最佳单一模型提升了 {best_improvement:.2f}%")
+        elif stack_score > base_avg:
+            st.info(f"Stacking相比单一模型平均提升了 {improvement:.2f}%，但没有超过最佳单一模型")
+        else:
+            st.warning("在这个例子中，Stacking没有提升性能，可能是因为数据集太小或基础模型相似度高")
 
 def show_evaluation_metrics():
     st.header("回归模型评估指标选择")

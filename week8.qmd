@@ -1,0 +1,204 @@
+---
+title: "第 8 周：概率聚类、密度聚类与现代应用"
+---
+
+## 学习目标
+
+*   理解高斯混合模型 (GMM) 的原理、概率聚类思想和 EM 算法的基本概念。
+*   掌握使用 `scikit-learn` 实现 GMM 的方法。
+*   回顾 DBSCAN 算法的原理，并理解其在发现任意形状簇和异常点检测方面的优势。
+*   能够对比 K-Means、层次聚类、GMM 和 DBSCAN 的特点、适用场景和优缺点。
+*   理解基于 Embeddings 的聚类基本概念及其在处理文本、图像等非结构化数据中的应用。
+*   继续推进小组项目三，实现所选算法并分析聚类结果。
+
+## 第一次课：高斯混合模型 (GMM)
+
+我们在 K-Means 中假设簇是球状的，并且每个点只能硬性地属于一个簇。高斯混合模型 (GMM) 提供了一种更灵活的概率聚类方法。
+
+### 1. 高斯混合模型 (Gaussian Mixture Models, GMM)
+
+*   **核心思想:** GMM 假设数据是由 K 个不同的高斯分布（正态分布）混合生成的。每个高斯分布代表一个簇，具有自己的均值 (mean)、协方差 (covariance) 和权重 (weight)。
+*   **概率聚类 (Soft Clustering):** 与 K-Means 将每个点分配给唯一一个簇（硬分配）不同，GMM 计算的是每个数据点**属于每个高斯分布（簇）的概率**。一个点可以同时属于多个簇，只是概率不同。这对于描述簇之间存在重叠或边界模糊的数据很有用。
+*   **参数:**
+    *   **均值 (μ):** 每个高斯分布的中心。
+    *   **协方差 (Σ):** 描述每个高斯分布的形状和方向。协方差矩阵决定了簇是圆形的、椭圆形的，以及椭圆的方向。这是 GMM 能适应更复杂簇形状的关键。
+    *   **权重 (π):** 每个高斯分布在整个混合模型中所占的比例或先验概率。所有权重的和为 1。
+*   **期望最大化 (Expectation-Maximization, EM) 算法:** GMM 通常使用 EM 算法来估计模型的参数（均值、协方差、权重）。EM 算法是一个迭代过程：
+    1.  **E 步 (Expectation):** 基于当前的参数，估计每个数据点属于每个高斯分布的后验概率（责任 Rresponsibility）。
+    2.  **M 步 (Maximization):** 基于 E 步计算出的概率，重新估计模型的参数（均值、协方差、权重），使得模型的似然函数最大化。
+    3.  重复 E 步和 M 步，直到参数收敛或达到最大迭代次数。
+    *   *注：我们不需要深入 EM 的数学推导，理解其迭代优化思想即可。*
+*   **优点:**
+    *   **灵活性高:** 可以拟合非球状的簇（椭圆形），因为每个高斯分量有自己的协方差矩阵。
+    *   **提供概率信息:** 软聚类提供了更丰富的信息，表示数据点属于每个簇的不确定性。
+    *   模型有扎实的概率基础。
+*   **缺点:**
+    *   **对初始化敏感:** EM 算法可能收敛到局部最优解，不同的初始参数可能导致不同的结果。`scikit-learn` 中的 `n_init` 参数可以运行多次来缓解。
+    *   **可能需要较多数据:** 估计协方差矩阵需要足够的数据支持。
+    *   **计算可能较慢:** 特别是对于高维数据或大量簇。
+    *   **需要预先指定 K 值 (组件数量):** 与 K-Means 类似，需要确定高斯分布的数量。可以使用 AIC (Akaike Information Criterion) 或 BIC (Bayesian Information Criterion) 等模型选择准则来辅助选择。
+
+### 2. 实践：使用 `scikit-learn` 实现 GMM
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
+from sklearn.mixture import GaussianMixture
+from matplotlib.patches import Ellipse # 用于绘制椭圆
+
+# 1. 生成一些可能重叠或非球状的数据
+X, y_true = make_blobs(n_samples=300, centers=3, cluster_std=[1.0, 2.5, 0.5], random_state=170)
+# 稍微变换数据使其更像椭圆
+transformation = [[0.6, -0.6], [-0.4, 0.8]]
+X = np.dot(X, transformation)
+
+# 2. 使用 GMM 进行聚类
+n_components = 3 # 假设我们知道有 3 个簇
+gmm = GaussianMixture(n_components=n_components, random_state=42, n_init=10)
+gmm.fit(X)
+gmm_labels = gmm.predict(X)
+gmm_probs = gmm.predict_proba(X) # 获取每个点属于每个簇的概率
+
+# 3. 可视化 GMM 聚类结果和概率椭圆
+plt.figure(figsize=(10, 8))
+ax = plt.gca()
+
+# 绘制数据点，颜色根据 GMM 预测的标签
+colors = plt.cm.viridis(gmm_labels / (n_components - 1)) if n_components > 1 else ['blue'] * len(X)
+plt.scatter(X[:, 0], X[:, 1], c=colors, s=10, alpha=0.7)
+
+# 绘制表示每个高斯分量的椭圆
+for i in range(n_components):
+    mean = gmm.means_[i]
+    covar = gmm.covariances_[i]
+
+    # 计算椭圆参数
+    v, w = np.linalg.eigh(covar)
+    v = 2. * np.sqrt(2.) * np.sqrt(v) # 放大椭圆以包含约 95% 的点
+    u = w[0] / np.linalg.norm(w[0])
+    angle = np.arctan2(u[1], u[0])
+    angle = 180. * angle / np.pi # 转换为度
+
+    # 绘制椭圆
+    ellipse = Ellipse(mean, v[0], v[1], angle=angle, fill=False, edgecolor='red', linewidth=2)
+    ax.add_patch(ellipse)
+
+plt.title(f'Gaussian Mixture Model Clustering (k={n_components})')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.grid(True)
+plt.axis('equal') # 保持横纵轴比例一致，以便正确显示椭圆形状
+plt.show()
+
+# 打印一些样本的概率
+print("前 5 个样本属于每个簇的概率:\n", gmm_probs[:5].round(3))
+```
+
+**AI 辅助编程提示:**
+
+*   询问 AI 如何使用 AIC 或 BIC 来帮助选择 GMM 的最佳组件数量 (`n_components`)。
+*   让 AI 解释 `GaussianMixture` 类中 `covariance_type` 参数的不同选项 (`'full'`, `'tied'`, `'diag'`, `'spherical'`) 及其含义。
+*   尝试让 AI 生成一个对比 K-Means 和 GMM 在同一份非球状数据集上聚类效果的示例代码和可视化。
+
+## 第二次课：DBSCAN 回顾、算法对比与现代应用
+
+### 1. DBSCAN 算法回顾
+
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise) 是一种基于密度的聚类算法。
+
+*   **核心思想:** 寻找被低密度区域分隔的高密度区域作为簇。它不需要预先指定簇的数量。
+*   **关键概念:**
+    *   **核心点 (Core Point):** 在半径 `eps` 内至少包含 `min_samples` 个点的点。
+    *   **边界点 (Border Point):** 不是核心点，但在某个核心点的半径 `eps` 内。
+    *   **噪声点 (Noise Point):** 既不是核心点也不是边界点。
+    *   **密度可达 (Directly Density-Reachable):** 点 p 在核心点 q 的 `eps` 邻域内。
+    *   **密度相连 (Density-Connected):** 存在一个核心点 r，使得 p 和 q 都从 r 密度可达。
+*   **算法流程:**
+    1.  随机选择一个未访问的点 p。
+    2.  检查 p 是否为核心点。
+    3.  如果是核心点，则创建一个新簇，并将 p 加入该簇。然后找到所有从 p 密度可达的点，将它们也加入该簇。递归地查找这些新加入点的密度可达点。
+    4.  如果 p 不是核心点，则暂时标记为噪声点（后续可能被发现是边界点而加入某个簇）。
+    5.  重复步骤 1-4，直到所有点都被访问。
+*   **优点:**
+    *   **可以发现任意形状的簇:** 不局限于球状或凸形。
+    *   **对噪声点不敏感:** 可以识别并标记噪声点。
+    *   **无需预先指定 K 值:** 簇的数量由算法根据数据密度自动确定。
+*   **缺点:**
+    *   **对参数 `eps` 和 `min_samples` 敏感:** 参数选择对结果影响很大，需要调试。
+    *   **对于密度变化较大的数据集效果不佳:** 难以用一组全局参数处理密度差异很大的簇。
+    *   **对于高维数据效果可能下降:** "维度灾难" 会导致点之间的距离趋于一致，密度定义变得困难（k-近邻图等方法可以辅助选择 `eps`）。
+
+### 2. 聚类算法选择与对比
+
+| 特性             | K-Means                     | 层次聚类 (凝聚式)           | GMM (高斯混合模型)          | DBSCAN                      |
+| :--------------- | :-------------------------- | :-------------------------- | :-------------------------- | :-------------------------- |
+| **簇形状**       | 球状 (各向同性)             | 任意 (取决于连接标准)       | 椭圆状 (灵活)               | 任意形状                    |
+| **簇数量 (K)**   | 需预先指定                  | 无需预先指定 (看树状图)     | 需预先指定 (可用AIC/BIC)    | 无需预先指定                |
+| **聚类类型**     | 硬聚类                      | 硬聚类                      | 软聚类 (概率)               | 硬聚类 (含噪声点)           |
+| **对异常值**     | 敏感                        | 较敏感 (取决于连接标准)     | 相对鲁棒                    | 不敏感 (识别为噪声)         |
+| **主要优点**     | 简单、高效、适合球状簇      | 可视化层次结构、无需定 K    | 概率模型、适应椭圆簇        | 发现任意形状、处理噪声      |
+| **主要缺点**     | 对 K 和初始值敏感、限球状   | 计算复杂度高、合并不可逆    | 对初始化敏感、计算可能较慢  | 对参数敏感、难处理密度变化 |
+| **适用场景**     | 簇较规则、数据量大          | 需要探索层次结构、簇数量未知 | 簇可能重叠或呈椭圆状        | 簇形状不规则、含噪声数据    |
+| **主要参数**     | `n_clusters`                | `n_clusters` (或切割高度), `linkage` | `n_components`, `covariance_type` | `eps`, `min_samples`        |
+
+**选择建议:**
+
+*   没有绝对最好的算法，选择取决于数据特性和分析目标。
+*   **先探索数据:** 可视化数据分布、了解特征含义。
+*   **尝试多种算法:** 对比不同算法的结果。
+*   **评估结果:** 使用轮廓系数、DB 指数等内部指标，并结合业务知识进行外部评估。
+*   **考虑计算成本:** 对于大数据集，K-Means 和 MiniBatchKMeans 通常更快。
+
+### 3. 新概念：基于 Embeddings 的聚类
+
+传统的聚类算法主要处理数值型数据。但现实中我们经常遇到**非结构化数据**，如文本、图像、音频等。如何对这些数据进行聚类？
+
+**核心思想:** 将高维、稀疏、非结构化的数据，通过 **Embedding 技术** 转换为低维、稠密的**向量表示 (Embeddings)**，这些向量能够捕捉原始数据的语义信息。然后，在这些 Embedding 向量上应用**标准的聚类算法**（如 K-Means, DBSCAN 等）。
+
+*   **什么是 Embedding?**
+    *   可以理解为一种 "编码" 或 "映射"，将复杂的对象（如一个词、一篇文档、一张图片）表示为一个固定长度的实数向量。
+    *   好的 Embedding 应该使得语义上相似的对象在向量空间中距离也相近。
+*   **常见的 Embedding 技术:**
+    *   **文本:**
+        *   **Word Embeddings:** Word2Vec, GloVe, FastText (将词映射为向量)。
+        *   **Sentence/Document Embeddings:** Sentence-BERT (SBERT), Universal Sentence Encoder (USE), 或通过预训练语言模型 (如 BERT, GPT) 获取 [CLS] token 或对词向量进行池化 (Pooling)。
+    *   **图像:** 通过预训练的卷积神经网络 (CNN) 如 ResNet, VGG, EfficientNet 等，提取其中间层或最后一层的特征向量。
+    *   **其他:** 图神经网络 (GNN) 用于图数据，Autoencoders 用于通用降维和特征提取。
+*   **流程:**
+    1.  **选择/训练 Embedding 模型:** 根据数据类型选择合适的预训练模型或自行训练。
+    2.  **数据转换:** 将原始数据（文本、图像等）输入 Embedding 模型，得到对应的向量表示。
+    3.  **聚类:** 在得到的 Embedding 向量上应用 K-Means, DBSCAN, GMM 或层次聚类等算法。
+    4.  **结果分析:** 分析聚类结果，解读每个簇的含义（例如，查看文本簇中的高频词，或图像簇中的代表性图片）。
+
+*   **应用场景:**
+    *   **用户评论/反馈聚类:** 发现用户关注的主要问题或意见类别。
+    *   **新闻/文档主题挖掘:** 对大量文章进行聚类，自动发现潜在主题。
+    *   **商品推荐:** 对商品描述或图片进行 Embedding 和聚类，找到相似商品。
+    *   **图像检索/分类:** 对图像进行聚类，用于相似图像查找或无监督分类。
+
+**AI 辅助编程提示:**
+
+*   询问 AI 如何使用 `Sentence-Transformers` 库将句子列表转换为 Embeddings。
+*   让 AI 提供一个简单的示例：获取文本 Embeddings 后，使用 K-Means 进行聚类。
+*   询问 AI 在图像聚类中，如何使用预训练的 `ResNet` (例如通过 `PyTorch` 或 `TensorFlow/Keras`) 来提取图像特征向量。
+
+### 4. 小组项目三：模型实现与结果分析
+
+*   **课堂活动:**
+    *   学生分组继续实现小组项目三。
+    *   重点关注：
+        *   实现至少两种选择的聚类算法。
+        *   使用轮廓系数、DB 指数等指标评估不同算法和不同参数下的结果。
+        *   可视化聚类结果（二维散点图，如果维度较高可先降维）。
+        *   开始尝试对聚类结果进行业务解读。
+    *   教师巡回指导，解答代码实现、算法选择、结果评估和解读中遇到的问题。
+    *   对于选择挑战“基于 Embeddings 的聚类”的小组，提供额外的指导和资源。
+
+### 5. 思考与练习
+
+1.  GMM 与 K-Means 的主要区别是什么？GMM 的“软聚类”体现在哪里？
+2.  DBSCAN 相比于 K-Means 的主要优势是什么？它在什么场景下特别有用？
+3.  假设你要对一个包含不同密度区域和一些噪声点的数据集进行聚类，你会优先考虑哪种算法？为什么？
+4.  解释“基于 Embeddings 的聚类”的基本流程。为什么需要 Embedding 这一步？
+5.  如果你要对大量用户评论进行聚类以发现主要抱怨点，你会如何设计技术方案？（提示：考虑 Embedding 和聚类算法的选择）
