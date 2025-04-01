@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第 8 周：概率聚类、密度聚类与现代应用 – 机器学习 (Python)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week7.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xkm/sYwpb+ilR5gUw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+
+<link rel="stylesheet" href="styles/custom.css">
+<link rel="stylesheet" href="styles/mermaid.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week8.html"><span class="chapter-title">第 8 周：概率聚类、密度聚类与现代应用</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习 (Python)</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习 (Python)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./syllabus.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">课程大纲</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：分类算法基础 (一) - 逻辑回归与支持向量机</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：分类算法基础 (二) - 决策树与集成学习 (随机森林)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：项目汇报与回归算法基础</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：集成学习与回归模型优化</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 7 周：聚类基础与层次结构</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第 8 周：概率聚类、密度聚类与现代应用</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#学习目标" id="toc-学习目标" class="nav-link active" data-scroll-target="#学习目标">学习目标</a></li>
+  <li><a href="#第一次课高斯混合模型-gmm" id="toc-第一次课高斯混合模型-gmm" class="nav-link" data-scroll-target="#第一次课高斯混合模型-gmm">第一次课：高斯混合模型 (GMM)</a>
+  <ul class="collapse">
+  <li><a href="#高斯混合模型-gaussian-mixture-models-gmm" id="toc-高斯混合模型-gaussian-mixture-models-gmm" class="nav-link" data-scroll-target="#高斯混合模型-gaussian-mixture-models-gmm">1. 高斯混合模型 (Gaussian Mixture Models, GMM)</a></li>
+  <li><a href="#实践使用-scikit-learn-实现-gmm" id="toc-实践使用-scikit-learn-实现-gmm" class="nav-link" data-scroll-target="#实践使用-scikit-learn-实现-gmm">2. 实践：使用 <code>scikit-learn</code> 实现 GMM</a></li>
+  </ul></li>
+  <li><a href="#第二次课dbscan-回顾算法对比与现代应用" id="toc-第二次课dbscan-回顾算法对比与现代应用" class="nav-link" data-scroll-target="#第二次课dbscan-回顾算法对比与现代应用">第二次课：DBSCAN 回顾、算法对比与现代应用</a>
+  <ul class="collapse">
+  <li><a href="#dbscan-算法回顾" id="toc-dbscan-算法回顾" class="nav-link" data-scroll-target="#dbscan-算法回顾">1. DBSCAN 算法回顾</a></li>
+  <li><a href="#聚类算法选择与对比" id="toc-聚类算法选择与对比" class="nav-link" data-scroll-target="#聚类算法选择与对比">2. 聚类算法选择与对比</a></li>
+  <li><a href="#新概念基于-embeddings-的聚类" id="toc-新概念基于-embeddings-的聚类" class="nav-link" data-scroll-target="#新概念基于-embeddings-的聚类">3. 新概念：基于 Embeddings 的聚类</a></li>
+  <li><a href="#小组项目三模型实现与结果分析" id="toc-小组项目三模型实现与结果分析" class="nav-link" data-scroll-target="#小组项目三模型实现与结果分析">4. 小组项目三：模型实现与结果分析</a></li>
+  <li><a href="#思考与练习" id="toc-思考与练习" class="nav-link" data-scroll-target="#思考与练习">5. 思考与练习</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第 8 周：概率聚类、密度聚类与现代应用</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="学习目标" class="level2">
+<h2 class="anchored" data-anchor-id="学习目标">学习目标</h2>
+<ul>
+<li>理解高斯混合模型 (GMM) 的原理、概率聚类思想和 EM 算法的基本概念。</li>
+<li>掌握使用 <code>scikit-learn</code> 实现 GMM 的方法。</li>
+<li>回顾 DBSCAN 算法的原理，并理解其在发现任意形状簇和异常点检测方面的优势。</li>
+<li>能够对比 K-Means、层次聚类、GMM 和 DBSCAN 的特点、适用场景和优缺点。</li>
+<li>理解基于 Embeddings 的聚类基本概念及其在处理文本、图像等非结构化数据中的应用。</li>
+<li>继续推进小组项目三，实现所选算法并分析聚类结果。</li>
+</ul>
+</section>
+<section id="第一次课高斯混合模型-gmm" class="level2">
+<h2 class="anchored" data-anchor-id="第一次课高斯混合模型-gmm">第一次课：高斯混合模型 (GMM)</h2>
+<p>我们在 K-Means 中假设簇是球状的，并且每个点只能硬性地属于一个簇。高斯混合模型 (GMM) 提供了一种更灵活的概率聚类方法。</p>
+<section id="高斯混合模型-gaussian-mixture-models-gmm" class="level3">
+<h3 class="anchored" data-anchor-id="高斯混合模型-gaussian-mixture-models-gmm">1. 高斯混合模型 (Gaussian Mixture Models, GMM)</h3>
+<ul>
+<li><strong>核心思想:</strong> GMM 假设数据是由 K 个不同的高斯分布（正态分布）混合生成的。每个高斯分布代表一个簇，具有自己的均值 (mean)、协方差 (covariance) 和权重 (weight)。</li>
+<li><strong>概率聚类 (Soft Clustering):</strong> 与 K-Means 将每个点分配给唯一一个簇（硬分配）不同，GMM 计算的是每个数据点<strong>属于每个高斯分布（簇）的概率</strong>。一个点可以同时属于多个簇，只是概率不同。这对于描述簇之间存在重叠或边界模糊的数据很有用。</li>
+<li><strong>参数:</strong>
+<ul>
+<li><strong>均值 (μ):</strong> 每个高斯分布的中心。</li>
+<li><strong>协方差 (Σ):</strong> 描述每个高斯分布的形状和方向。协方差矩阵决定了簇是圆形的、椭圆形的，以及椭圆的方向。这是 GMM 能适应更复杂簇形状的关键。</li>
+<li><strong>权重 (π):</strong> 每个高斯分布在整个混合模型中所占的比例或先验概率。所有权重的和为 1。</li>
+</ul></li>
+<li><strong>期望最大化 (Expectation-Maximization, EM) 算法:</strong> GMM 通常使用 EM 算法来估计模型的参数（均值、协方差、权重）。EM 算法是一个迭代过程：
+<ol type="1">
+<li><strong>E 步 (Expectation):</strong> 基于当前的参数，估计每个数据点属于每个高斯分布的后验概率（责任 Rresponsibility）。</li>
+<li><strong>M 步 (Maximization):</strong> 基于 E 步计算出的概率，重新估计模型的参数（均值、协方差、权重），使得模型的似然函数最大化。</li>
+<li>重复 E 步和 M 步，直到参数收敛或达到最大迭代次数。</li>
+</ol>
+<ul>
+<li><em>注：我们不需要深入 EM 的数学推导，理解其迭代优化思想即可。</em></li>
+</ul></li>
+<li><strong>优点:</strong>
+<ul>
+<li><strong>灵活性高:</strong> 可以拟合非球状的簇（椭圆形），因为每个高斯分量有自己的协方差矩阵。</li>
+<li><strong>提供概率信息:</strong> 软聚类提供了更丰富的信息，表示数据点属于每个簇的不确定性。</li>
+<li>模型有扎实的概率基础。</li>
+</ul></li>
+<li><strong>缺点:</strong>
+<ul>
+<li><strong>对初始化敏感:</strong> EM 算法可能收敛到局部最优解，不同的初始参数可能导致不同的结果。<code>scikit-learn</code> 中的 <code>n_init</code> 参数可以运行多次来缓解。</li>
+<li><strong>可能需要较多数据:</strong> 估计协方差矩阵需要足够的数据支持。</li>
+<li><strong>计算可能较慢:</strong> 特别是对于高维数据或大量簇。</li>
+<li><strong>需要预先指定 K 值 (组件数量):</strong> 与 K-Means 类似，需要确定高斯分布的数量。可以使用 AIC (Akaike Information Criterion) 或 BIC (Bayesian Information Criterion) 等模型选择准则来辅助选择。</li>
+</ul></li>
+</ul>
+</section>
+<section id="实践使用-scikit-learn-实现-gmm" class="level3">
+<h3 class="anchored" data-anchor-id="实践使用-scikit-learn-实现-gmm">2. 实践：使用 <code>scikit-learn</code> 实现 GMM</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.mixture <span class="im">import</span> GaussianMixture</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.patches <span class="im">import</span> Ellipse <span class="co"># 用于绘制椭圆</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 生成一些可能重叠或非球状的数据</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>X, y_true <span class="op">=</span> make_blobs(n_samples<span class="op">=</span><span class="dv">300</span>, centers<span class="op">=</span><span class="dv">3</span>, cluster_std<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">2.5</span>, <span class="fl">0.5</span>], random_state<span class="op">=</span><span class="dv">170</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 稍微变换数据使其更像椭圆</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>transformation <span class="op">=</span> [[<span class="fl">0.6</span>, <span class="op">-</span><span class="fl">0.6</span>], [<span class="op">-</span><span class="fl">0.4</span>, <span class="fl">0.8</span>]]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.dot(X, transformation)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 使用 GMM 进行聚类</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>n_components <span class="op">=</span> <span class="dv">3</span> <span class="co"># 假设我们知道有 3 个簇</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>gmm <span class="op">=</span> GaussianMixture(n_components<span class="op">=</span>n_components, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>gmm.fit(X)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>gmm_labels <span class="op">=</span> gmm.predict(X)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>gmm_probs <span class="op">=</span> gmm.predict_proba(X) <span class="co"># 获取每个点属于每个簇的概率</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 可视化 GMM 聚类结果和概率椭圆</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> plt.gca()</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制数据点，颜色根据 GMM 预测的标签</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> plt.cm.viridis(gmm_labels <span class="op">/</span> (n_components <span class="op">-</span> <span class="dv">1</span>)) <span class="cf">if</span> n_components <span class="op">&gt;</span> <span class="dv">1</span> <span class="cf">else</span> [<span class="st">'blue'</span>] <span class="op">*</span> <span class="bu">len</span>(X)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>plt.scatter(X[:, <span class="dv">0</span>], X[:, <span class="dv">1</span>], c<span class="op">=</span>colors, s<span class="op">=</span><span class="dv">10</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制表示每个高斯分量的椭圆</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_components):</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    mean <span class="op">=</span> gmm.means_[i]</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    covar <span class="op">=</span> gmm.covariances_[i]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 计算椭圆参数</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    v, w <span class="op">=</span> np.linalg.eigh(covar)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> <span class="fl">2.</span> <span class="op">*</span> np.sqrt(<span class="fl">2.</span>) <span class="op">*</span> np.sqrt(v) <span class="co"># 放大椭圆以包含约 95% 的点</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    u <span class="op">=</span> w[<span class="dv">0</span>] <span class="op">/</span> np.linalg.norm(w[<span class="dv">0</span>])</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    angle <span class="op">=</span> np.arctan2(u[<span class="dv">1</span>], u[<span class="dv">0</span>])</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    angle <span class="op">=</span> <span class="fl">180.</span> <span class="op">*</span> angle <span class="op">/</span> np.pi <span class="co"># 转换为度</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 绘制椭圆</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    ellipse <span class="op">=</span> Ellipse(mean, v[<span class="dv">0</span>], v[<span class="dv">1</span>], angle<span class="op">=</span>angle, fill<span class="op">=</span><span class="va">False</span>, edgecolor<span class="op">=</span><span class="st">'red'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    ax.add_patch(ellipse)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'Gaussian Mixture Model Clustering (k=</span><span class="sc">{</span>n_components<span class="sc">}</span><span class="ss">)'</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Feature 1'</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Feature 2'</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>plt.axis(<span class="st">'equal'</span>) <span class="co"># 保持横纵轴比例一致，以便正确显示椭圆形状</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="co"># 打印一些样本的概率</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"前 5 个样本属于每个簇的概率:</span><span class="ch">\n</span><span class="st">"</span>, gmm_probs[:<span class="dv">5</span>].<span class="bu">round</span>(<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>AI 辅助编程提示:</strong></p>
+<ul>
+<li>询问 AI 如何使用 AIC 或 BIC 来帮助选择 GMM 的最佳组件数量 (<code>n_components</code>)。</li>
+<li>让 AI 解释 <code>GaussianMixture</code> 类中 <code>covariance_type</code> 参数的不同选项 (<code>'full'</code>, <code>'tied'</code>, <code>'diag'</code>, <code>'spherical'</code>) 及其含义。</li>
+<li>尝试让 AI 生成一个对比 K-Means 和 GMM 在同一份非球状数据集上聚类效果的示例代码和可视化。</li>
+</ul>
+</section>
+</section>
+<section id="第二次课dbscan-回顾算法对比与现代应用" class="level2">
+<h2 class="anchored" data-anchor-id="第二次课dbscan-回顾算法对比与现代应用">第二次课：DBSCAN 回顾、算法对比与现代应用</h2>
+<section id="dbscan-算法回顾" class="level3">
+<h3 class="anchored" data-anchor-id="dbscan-算法回顾">1. DBSCAN 算法回顾</h3>
+<p>DBSCAN (Density-Based Spatial Clustering of Applications with Noise) 是一种基于密度的聚类算法。</p>
+<ul>
+<li><strong>核心思想:</strong> 寻找被低密度区域分隔的高密度区域作为簇。它不需要预先指定簇的数量。</li>
+<li><strong>关键概念:</strong>
+<ul>
+<li><strong>核心点 (Core Point):</strong> 在半径 <code>eps</code> 内至少包含 <code>min_samples</code> 个点的点。</li>
+<li><strong>边界点 (Border Point):</strong> 不是核心点，但在某个核心点的半径 <code>eps</code> 内。</li>
+<li><strong>噪声点 (Noise Point):</strong> 既不是核心点也不是边界点。</li>
+<li><strong>密度可达 (Directly Density-Reachable):</strong> 点 p 在核心点 q 的 <code>eps</code> 邻域内。</li>
+<li><strong>密度相连 (Density-Connected):</strong> 存在一个核心点 r，使得 p 和 q 都从 r 密度可达。</li>
+</ul></li>
+<li><strong>算法流程:</strong>
+<ol type="1">
+<li>随机选择一个未访问的点 p。</li>
+<li>检查 p 是否为核心点。</li>
+<li>如果是核心点，则创建一个新簇，并将 p 加入该簇。然后找到所有从 p 密度可达的点，将它们也加入该簇。递归地查找这些新加入点的密度可达点。</li>
+<li>如果 p 不是核心点，则暂时标记为噪声点（后续可能被发现是边界点而加入某个簇）。</li>
+<li>重复步骤 1-4，直到所有点都被访问。</li>
+</ol></li>
+<li><strong>优点:</strong>
+<ul>
+<li><strong>可以发现任意形状的簇:</strong> 不局限于球状或凸形。</li>
+<li><strong>对噪声点不敏感:</strong> 可以识别并标记噪声点。</li>
+<li><strong>无需预先指定 K 值:</strong> 簇的数量由算法根据数据密度自动确定。</li>
+</ul></li>
+<li><strong>缺点:</strong>
+<ul>
+<li><strong>对参数 <code>eps</code> 和 <code>min_samples</code> 敏感:</strong> 参数选择对结果影响很大，需要调试。</li>
+<li><strong>对于密度变化较大的数据集效果不佳:</strong> 难以用一组全局参数处理密度差异很大的簇。</li>
+<li><strong>对于高维数据效果可能下降:</strong> “维度灾难” 会导致点之间的距离趋于一致，密度定义变得困难（k-近邻图等方法可以辅助选择 <code>eps</code>）。</li>
+</ul></li>
+</ul>
+</section>
+<section id="聚类算法选择与对比" class="level3">
+<h3 class="anchored" data-anchor-id="聚类算法选择与对比">2. 聚类算法选择与对比</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">K-Means</th>
+<th style="text-align: left;">层次聚类 (凝聚式)</th>
+<th style="text-align: left;">GMM (高斯混合模型)</th>
+<th style="text-align: left;">DBSCAN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>簇形状</strong></td>
+<td style="text-align: left;">球状 (各向同性)</td>
+<td style="text-align: left;">任意 (取决于连接标准)</td>
+<td style="text-align: left;">椭圆状 (灵活)</td>
+<td style="text-align: left;">任意形状</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>簇数量 (K)</strong></td>
+<td style="text-align: left;">需预先指定</td>
+<td style="text-align: left;">无需预先指定 (看树状图)</td>
+<td style="text-align: left;">需预先指定 (可用AIC/BIC)</td>
+<td style="text-align: left;">无需预先指定</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>聚类类型</strong></td>
+<td style="text-align: left;">硬聚类</td>
+<td style="text-align: left;">硬聚类</td>
+<td style="text-align: left;">软聚类 (概率)</td>
+<td style="text-align: left;">硬聚类 (含噪声点)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>对异常值</strong></td>
+<td style="text-align: left;">敏感</td>
+<td style="text-align: left;">较敏感 (取决于连接标准)</td>
+<td style="text-align: left;">相对鲁棒</td>
+<td style="text-align: left;">不敏感 (识别为噪声)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>主要优点</strong></td>
+<td style="text-align: left;">简单、高效、适合球状簇</td>
+<td style="text-align: left;">可视化层次结构、无需定 K</td>
+<td style="text-align: left;">概率模型、适应椭圆簇</td>
+<td style="text-align: left;">发现任意形状、处理噪声</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>主要缺点</strong></td>
+<td style="text-align: left;">对 K 和初始值敏感、限球状</td>
+<td style="text-align: left;">计算复杂度高、合并不可逆</td>
+<td style="text-align: left;">对初始化敏感、计算可能较慢</td>
+<td style="text-align: left;">对参数敏感、难处理密度变化</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>适用场景</strong></td>
+<td style="text-align: left;">簇较规则、数据量大</td>
+<td style="text-align: left;">需要探索层次结构、簇数量未知</td>
+<td style="text-align: left;">簇可能重叠或呈椭圆状</td>
+<td style="text-align: left;">簇形状不规则、含噪声数据</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>主要参数</strong></td>
+<td style="text-align: left;"><code>n_clusters</code></td>
+<td style="text-align: left;"><code>n_clusters</code> (或切割高度), <code>linkage</code></td>
+<td style="text-align: left;"><code>n_components</code>, <code>covariance_type</code></td>
+<td style="text-align: left;"><code>eps</code>, <code>min_samples</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>选择建议:</strong></p>
+<ul>
+<li>没有绝对最好的算法，选择取决于数据特性和分析目标。</li>
+<li><strong>先探索数据:</strong> 可视化数据分布、了解特征含义。</li>
+<li><strong>尝试多种算法:</strong> 对比不同算法的结果。</li>
+<li><strong>评估结果:</strong> 使用轮廓系数、DB 指数等内部指标，并结合业务知识进行外部评估。</li>
+<li><strong>考虑计算成本:</strong> 对于大数据集，K-Means 和 MiniBatchKMeans 通常更快。</li>
+</ul>
+</section>
+<section id="新概念基于-embeddings-的聚类" class="level3">
+<h3 class="anchored" data-anchor-id="新概念基于-embeddings-的聚类">3. 新概念：基于 Embeddings 的聚类</h3>
+<p>传统的聚类算法主要处理数值型数据。但现实中我们经常遇到<strong>非结构化数据</strong>，如文本、图像、音频等。如何对这些数据进行聚类？</p>
+<p><strong>核心思想:</strong> 将高维、稀疏、非结构化的数据，通过 <strong>Embedding 技术</strong> 转换为低维、稠密的<strong>向量表示 (Embeddings)</strong>，这些向量能够捕捉原始数据的语义信息。然后，在这些 Embedding 向量上应用<strong>标准的聚类算法</strong>（如 K-Means, DBSCAN 等）。</p>
+<ul>
+<li><strong>什么是 Embedding?</strong>
+<ul>
+<li>可以理解为一种 “编码” 或 “映射”，将复杂的对象（如一个词、一篇文档、一张图片）表示为一个固定长度的实数向量。</li>
+<li>好的 Embedding 应该使得语义上相似的对象在向量空间中距离也相近。</li>
+</ul></li>
+<li><strong>常见的 Embedding 技术:</strong>
+<ul>
+<li><strong>文本:</strong>
+<ul>
+<li><strong>Word Embeddings:</strong> Word2Vec, GloVe, FastText (将词映射为向量)。</li>
+<li><strong>Sentence/Document Embeddings:</strong> Sentence-BERT (SBERT), Universal Sentence Encoder (USE), 或通过预训练语言模型 (如 BERT, GPT) 获取 [CLS] token 或对词向量进行池化 (Pooling)。</li>
+</ul></li>
+<li><strong>图像:</strong> 通过预训练的卷积神经网络 (CNN) 如 ResNet, VGG, EfficientNet 等，提取其中间层或最后一层的特征向量。</li>
+<li><strong>其他:</strong> 图神经网络 (GNN) 用于图数据，Autoencoders 用于通用降维和特征提取。</li>
+</ul></li>
+<li><strong>流程:</strong>
+<ol type="1">
+<li><strong>选择/训练 Embedding 模型:</strong> 根据数据类型选择合适的预训练模型或自行训练。</li>
+<li><strong>数据转换:</strong> 将原始数据（文本、图像等）输入 Embedding 模型，得到对应的向量表示。</li>
+<li><strong>聚类:</strong> 在得到的 Embedding 向量上应用 K-Means, DBSCAN, GMM 或层次聚类等算法。</li>
+<li><strong>结果分析:</strong> 分析聚类结果，解读每个簇的含义（例如，查看文本簇中的高频词，或图像簇中的代表性图片）。</li>
+</ol></li>
+<li><strong>应用场景:</strong>
+<ul>
+<li><strong>用户评论/反馈聚类:</strong> 发现用户关注的主要问题或意见类别。</li>
+<li><strong>新闻/文档主题挖掘:</strong> 对大量文章进行聚类，自动发现潜在主题。</li>
+<li><strong>商品推荐:</strong> 对商品描述或图片进行 Embedding 和聚类，找到相似商品。</li>
+<li><strong>图像检索/分类:</strong> 对图像进行聚类，用于相似图像查找或无监督分类。</li>
+</ul></li>
+</ul>
+<p><strong>AI 辅助编程提示:</strong></p>
+<ul>
+<li>询问 AI 如何使用 <code>Sentence-Transformers</code> 库将句子列表转换为 Embeddings。</li>
+<li>让 AI 提供一个简单的示例：获取文本 Embeddings 后，使用 K-Means 进行聚类。</li>
+<li>询问 AI 在图像聚类中，如何使用预训练的 <code>ResNet</code> (例如通过 <code>PyTorch</code> 或 <code>TensorFlow/Keras</code>) 来提取图像特征向量。</li>
+</ul>
+</section>
+<section id="小组项目三模型实现与结果分析" class="level3">
+<h3 class="anchored" data-anchor-id="小组项目三模型实现与结果分析">4. 小组项目三：模型实现与结果分析</h3>
+<ul>
+<li><strong>课堂活动:</strong>
+<ul>
+<li>学生分组继续实现小组项目三。</li>
+<li>重点关注：
+<ul>
+<li>实现至少两种选择的聚类算法。</li>
+<li>使用轮廓系数、DB 指数等指标评估不同算法和不同参数下的结果。</li>
+<li>可视化聚类结果（二维散点图，如果维度较高可先降维）。</li>
+<li>开始尝试对聚类结果进行业务解读。</li>
+</ul></li>
+<li>教师巡回指导，解答代码实现、算法选择、结果评估和解读中遇到的问题。</li>
+<li>对于选择挑战“基于 Embeddings 的聚类”的小组，提供额外的指导和资源。</li>
+</ul></li>
+</ul>
+</section>
+<section id="思考与练习" class="level3">
+<h3 class="anchored" data-anchor-id="思考与练习">5. 思考与练习</h3>
+<ol type="1">
+<li>GMM 与 K-Means 的主要区别是什么？GMM 的“软聚类”体现在哪里？</li>
+<li>DBSCAN 相比于 K-Means 的主要优势是什么？它在什么场景下特别有用？</li>
+<li>假设你要对一个包含不同密度区域和一些噪声点的数据集进行聚类，你会优先考虑哪种算法？为什么？</li>
+<li>解释“基于 Embeddings 的聚类”的基本流程。为什么需要 Embedding 这一步？</li>
+<li>如果你要对大量用户评论进行聚类以发现主要抱怨点，你会如何设计技术方案？（提示：考虑 Embedding 和聚类算法的选择）</li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./week7.html" class="pagination-link" aria-label="第 7 周：聚类基础与层次结构">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第 7 周：聚类基础与层次结构</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

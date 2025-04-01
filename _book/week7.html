@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>第一周：机器学习导论与Python环境搭建 – 机器学习 (Python)</title>
+<title>第 7 周：聚类基础与层次结构 – 机器学习 (Python)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./week2.html" rel="next">
-<link href="./syllabus.html" rel="prev">
+<link href="./week8.html" rel="next">
+<link href="./week6.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -118,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1.html"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week7.html"><span class="chapter-title">第 7 周：聚类基础与层次结构</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -155,7 +155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week1.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
+  <a href="./week1.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -185,7 +185,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./week7.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 7 周：聚类基础与层次结构</span></a>
+  <a href="./week7.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第 7 周：聚类基础与层次结构</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -203,16 +203,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#第一次课机器学习导论与python环境搭建" id="toc-第一次课机器学习导论与python环境搭建" class="nav-link active" data-scroll-target="#第一次课机器学习导论与python环境搭建">第一次课：机器学习导论与Python环境搭建</a>
+  <li><a href="#学习目标" id="toc-学习目标" class="nav-link active" data-scroll-target="#学习目标">学习目标</a></li>
+  <li><a href="#第一次课k-means-回顾与层次聚类入门" id="toc-第一次课k-means-回顾与层次聚类入门" class="nav-link" data-scroll-target="#第一次课k-means-回顾与层次聚类入门">第一次课：K-Means 回顾与层次聚类入门</a>
   <ul class="collapse">
-  <li><a href="#机器学习导论" id="toc-机器学习导论" class="nav-link" data-scroll-target="#机器学习导论">1. 机器学习导论</a></li>
-  <li><a href="#python-机器学习环境搭建" id="toc-python-机器学习环境搭建" class="nav-link" data-scroll-target="#python-机器学习环境搭建">2. Python 机器学习环境搭建</a></li>
+  <li><a href="#k-means-算法回顾与局限性" id="toc-k-means-算法回顾与局限性" class="nav-link" data-scroll-target="#k-means-算法回顾与局限性">1. K-Means 算法回顾与局限性</a></li>
+  <li><a href="#层次聚类-hierarchical-clustering" id="toc-层次聚类-hierarchical-clustering" class="nav-link" data-scroll-target="#层次聚类-hierarchical-clustering">2. 层次聚类 (Hierarchical Clustering)</a></li>
+  <li><a href="#实践使用-scikit-learn-实现层次聚类" id="toc-实践使用-scikit-learn-实现层次聚类" class="nav-link" data-scroll-target="#实践使用-scikit-learn-实现层次聚类">3. 实践：使用 <code>scikit-learn</code> 实现层次聚类</a></li>
+  <li><a href="#小组项目三启动用户分群模型构建与分析-更新" id="toc-小组项目三启动用户分群模型构建与分析-更新" class="nav-link" data-scroll-target="#小组项目三启动用户分群模型构建与分析-更新">4. 小组项目三启动：用户分群模型构建与分析 (更新)</a></li>
   </ul></li>
-  <li><a href="#第二次课python-基础语法与数据操作" id="toc-第二次课python-基础语法与数据操作" class="nav-link" data-scroll-target="#第二次课python-基础语法与数据操作">第二次课：Python 基础语法与数据操作</a>
+  <li><a href="#第二次课层次聚类应用与项目讨论" id="toc-第二次课层次聚类应用与项目讨论" class="nav-link" data-scroll-target="#第二次课层次聚类应用与项目讨论">第二次课：层次聚类应用与项目讨论</a>
   <ul class="collapse">
-  <li><a href="#python-基础语法回顾" id="toc-python-基础语法回顾" class="nav-link" data-scroll-target="#python-基础语法回顾">1. Python 基础语法回顾</a></li>
-  <li><a href="#numpy-基础" id="toc-numpy-基础" class="nav-link" data-scroll-target="#numpy-基础">2. Numpy 基础</a></li>
-  <li><a href="#pandas-基础" id="toc-pandas-基础" class="nav-link" data-scroll-target="#pandas-基础">3. Pandas 基础</a></li>
+  <li><a href="#层次聚类应用场景" id="toc-层次聚类应用场景" class="nav-link" data-scroll-target="#层次聚类应用场景">1. 层次聚类应用场景</a></li>
+  <li><a href="#小组项目三数据探索与算法选择讨论" id="toc-小组项目三数据探索与算法选择讨论" class="nav-link" data-scroll-target="#小组项目三数据探索与算法选择讨论">2. 小组项目三：数据探索与算法选择讨论</a></li>
+  <li><a href="#思考与练习" id="toc-思考与练习" class="nav-link" data-scroll-target="#思考与练习">3. 思考与练习</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -222,7 +225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-title">第一周：机器学习导论与Python环境搭建</span></h1>
+<h1 class="title"><span class="chapter-title">第 7 周：聚类基础与层次结构</span></h1>
 </div>
 
 
@@ -239,487 +242,213 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-本周学习目标
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<section id="学习目标" class="level2">
+<h2 class="anchored" data-anchor-id="学习目标">学习目标</h2>
 <ul>
-<li>了解机器学习的核心概念和类型 (监督学习、无监督学习、强化学习)</li>
-<li>理解机器学习与传统统计分析、数据挖掘的区别与联系</li>
-<li>认识机器学习和生成式AI 在商业领域的应用前景</li>
-<li><strong>掌握 Python 和 VS Code 的安装配置，包括 Python 解释器、VS Code 编辑器、Python 插件、虚拟环境 <code>venv</code> 的使用</strong></li>
-<li>初步体验 AI 辅助编程工具，如 GitHub Copilot, 通义灵码, Cline</li>
-</ul>
-</div>
-</div>
-<section id="第一次课机器学习导论与python环境搭建" class="level2">
-<h2 class="anchored" data-anchor-id="第一次课机器学习导论与python环境搭建">第一次课：机器学习导论与Python环境搭建</h2>
-<section id="机器学习导论" class="level3">
-<h3 class="anchored" data-anchor-id="机器学习导论">1. 机器学习导论</h3>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-什么是机器学习
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>无需显式编程，让计算机从数据中学习规律和知识。</p>
-<p><strong>与传统编程的区别：</strong> 传统编程 (显式规则) vs.&nbsp;机器学习 (从数据中学习规则)。</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-机器学习的核心概念
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="监督学习-supervised-learning" class="level4">
-<h4 class="anchored" data-anchor-id="监督学习-supervised-learning">监督学习 (Supervised Learning)</h4>
-<p>从带有标签的数据中学习，用于分类和回归任务。</p>
-<ul>
-<li><strong>示例：</strong> 垃圾邮件识别 (分类)、房价预测 (回归)</li>
+<li>回顾 K-Means 算法的原理、优缺点和局限性。</li>
+<li>理解层次聚类的基本原理、不同连接标准和树状图 (Dendrogram) 的解读。</li>
+<li>掌握使用 <code>scikit-learn</code> 实现 K-Means 和层次聚类的方法。</li>
+<li>了解层次聚类在市场细分等场景的应用。</li>
+<li>启动小组项目三，明确项目要求和可选算法。</li>
 </ul>
 </section>
-<section id="无监督学习-unsupervised-learning" class="level4">
-<h4 class="anchored" data-anchor-id="无监督学习-unsupervised-learning">无监督学习 (Unsupervised Learning)</h4>
-<p>从无标签数据中学习数据结构和模式，用于聚类、降维、关联规则挖掘等任务。</p>
+<section id="第一次课k-means-回顾与层次聚类入门" class="level2">
+<h2 class="anchored" data-anchor-id="第一次课k-means-回顾与层次聚类入门">第一次课：K-Means 回顾与层次聚类入门</h2>
+<section id="k-means-算法回顾与局限性" class="level3">
+<h3 class="anchored" data-anchor-id="k-means-算法回顾与局限性">1. K-Means 算法回顾与局限性</h3>
+<p>我们在之前的课程中已经学习了 K-Means 算法，它是一种非常常用且高效的划分式聚类算法。</p>
 <ul>
-<li><strong>示例：</strong> 用户分群 (聚类)、商品推荐 (关联规则)</li>
-</ul>
-</section>
-<section id="强化学习-reinforcement-learning" class="level4">
-<h4 class="anchored" data-anchor-id="强化学习-reinforcement-learning">强化学习 (Reinforcement Learning)</h4>
-<p>通过与环境交互学习最优策略，以获得最大奖励。</p>
+<li><strong>核心思想:</strong> 将数据点划分为预先设定的 K 个簇，使得每个点都属于离其最近的簇中心（质心），并且簇内数据点的平方和最小。</li>
+<li><strong>优点:</strong>
 <ul>
-<li><strong>示例：</strong> 游戏 AI、自动驾驶</li>
-</ul>
-</section>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-机器学习与相关学科
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="机器学习-vs.-传统统计分析" class="level4">
-<h4 class="anchored" data-anchor-id="机器学习-vs.-传统统计分析">机器学习 vs.&nbsp;传统统计分析</h4>
-<ul>
-<li><strong>侧重点不同：</strong> 统计分析 (解释性、推断) vs.&nbsp;机器学习 (预测性、性能)</li>
-<li><strong>方法论差异：</strong> 统计分析 (模型假设、参数估计) vs.&nbsp;机器学习 (算法迭代、模型优化)</li>
-</ul>
-</section>
-<section id="机器学习-vs.-数据挖掘" class="level4">
-<h4 class="anchored" data-anchor-id="机器学习-vs.-数据挖掘">机器学习 vs.&nbsp;数据挖掘</h4>
-<ul>
-<li><strong>目标相似：</strong> 从数据中发现知识和模式</li>
-<li><strong>侧重面不同：</strong> 数据挖掘 (更侧重数据预处理、模式发现) vs.&nbsp;机器学习 (更侧重模型构建、预测和决策)</li>
-</ul>
-</section>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-机器学习和生成式AI 的商业应用案例
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li><strong>精准营销：</strong> 用户画像、个性化推荐、广告投放优化</li>
-<li><strong>风险管理：</strong> 信用评分、欺诈检测、风险预警</li>
-<li><strong>智能客服：</strong> 聊天机器人、智能问答、工单自动化</li>
-<li><strong>内容创作：</strong> 文案生成、图像生成、音乐创作、代码生成 (生成式AI)</li>
-<li><strong>智能产品与服务：</strong> 智能家居、自动驾驶、智能医疗</li>
-</ol>
-</div>
-</div>
-</section>
-<section id="python-机器学习环境搭建" class="level3">
-<h3 class="anchored" data-anchor-id="python-机器学习环境搭建">2. Python 机器学习环境搭建</h3>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Python 解释器安装
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li><strong>从 Python 官网下载并安装 Python 解释器：</strong> <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a> (建议安装 3.9 及以上版本)</li>
-<li><strong>安装过程中，务必勾选 “Add Python to PATH”</strong></li>
-<li><strong>验证安装：</strong> 打开命令行，输入 <code>python --version</code> 和 <code>pip --version</code></li>
-</ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-VS Code 编辑器安装与配置
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li><strong>安装 VS Code：</strong> <a href="https://code.visualstudio.com/download">https://code.visualstudio.com/download</a></li>
-<li><strong>安装 Python 插件：</strong>
-<ul>
-<li>打开 VS Code，点击左侧 “Extensions” 图标</li>
-<li>搜索并安装 “Python” 插件 (由 Microsoft 提供)</li>
-<li><strong>功能：</strong> 代码智能提示、格式化、调试、Jupyter Notebook 支持等</li>
+<li>算法简单，易于理解和实现。</li>
+<li>对于球状簇且簇之间分离明显的数据集，效果较好。</li>
+<li>计算效率相对较高，适合处理大规模数据集。</li>
 </ul></li>
-<li><strong>选择 Python 解释器：</strong>
+<li><strong>缺点与局限性:</strong>
 <ul>
-<li>点击窗口右下角的 Python 版本号</li>
-<li>或使用 <code>Ctrl+Shift+P</code> / <code>Cmd+Shift+P</code> 选择解释器</li>
+<li><strong>需要预先指定 K 值:</strong> K 值的选择对结果影响很大，选择不当会导致次优的聚类效果。肘部法则和轮廓系数可以辅助选择，但并非总能找到最优 K。</li>
+<li><strong>对初始质心敏感:</strong> 不同的初始质心可能导致不同的聚类结果。<code>scikit-learn</code> 中的 <code>n_init</code> 参数可以通过多次初始化来缓解这个问题。</li>
+<li><strong>对非球状簇效果不佳:</strong> K-Means 假设簇是凸形的、各向同性的（类似圆形或球形），难以发现非规则形状的簇。</li>
+<li><strong>对异常值敏感:</strong> 异常值会对质心的计算产生较大影响，可能导致簇的划分发生偏移。</li>
 </ul></li>
-</ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-虚拟环境管理
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><strong>什么是虚拟环境：</strong> 隔离的 Python 环境，可以为不同项目安装不同的 Python 包，避免包版本冲突。</p>
-<ol type="1">
-<li><strong>创建虚拟环境：</strong> <code>python -m venv .venv</code></li>
-<li><strong>激活虚拟环境：</strong>
+</ul>
+<p>正是因为 K-Means 的这些局限性，我们需要学习其他聚类算法来应对更复杂的数据和场景。</p>
+</section>
+<section id="层次聚类-hierarchical-clustering" class="level3">
+<h3 class="anchored" data-anchor-id="层次聚类-hierarchical-clustering">2. 层次聚类 (Hierarchical Clustering)</h3>
+<p>层次聚类是一种不需要预先指定簇数量的聚类方法，它会构建一个嵌套的簇的层次结构。</p>
 <ul>
-<li>Windows (cmd): <code>.venv\Scripts\activate.bat</code></li>
-<li>Windows (PowerShell): <code>.venv\Scripts\Activate.ps1</code></li>
-<li>macOS/Linux: <code>source .venv/bin/activate</code></li>
+<li><strong>两种主要方式:</strong>
+<ul>
+<li><strong>凝聚式 (Agglomerative):</strong> 自底向上，开始时每个数据点自成一簇，然后逐步合并最相似的簇，直到所有点合并为一个簇。这是最常用的方式。</li>
+<li><strong>分裂式 (Divisive):</strong> 自顶向下，开始时所有数据点在一个簇，然后逐步分裂最不相似的簇，直到每个点自成一簇。计算复杂度较高，不太常用。</li>
 </ul></li>
-<li><strong>在 VS Code 中使用：</strong> VS Code 会自动检测项目中的虚拟环境</li>
-</ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Python 常用库安装
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>在虚拟环境中安装以下库：</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install scikit-learn pandas numpy matplotlib seaborn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>配置 pip 国内镜像源 (推荐)：</strong></p>
+<li><strong>凝聚式层次聚类步骤:</strong>
 <ol type="1">
-<li><p>创建配置文件：</p>
+<li>将每个数据点视为一个单独的簇。</li>
+<li>计算所有簇之间的距离（或相似度）。</li>
+<li>合并距离最近（最相似）的两个簇。</li>
+<li>重新计算新合并簇与其他簇之间的距离。</li>
+<li>重复步骤 3 和 4，直到所有数据点合并为一个簇。</li>
+</ol></li>
+<li><strong>关键概念:</strong>
 <ul>
-<li>Windows: <code>%USERPROFILE%\pip\pip.ini</code></li>
-<li>macOS/Linux: <code>~/.pip/pip.conf</code></li>
+<li><strong>距离度量 (Distance Metric):</strong> 用于计算数据点或簇之间的距离，常用欧氏距离 (Euclidean distance)。</li>
+<li><strong>连接标准 (Linkage Criteria):</strong> 定义如何计算簇之间的距离。常用标准包括：
+<ul>
+<li><strong>Ward:</strong> 最小化簇内方差的增量。通常效果较好，倾向于产生大小相似的簇。(<code>linkage='ward'</code>)</li>
+<li><strong>Average Linkage:</strong> 计算两个簇中所有点对之间距离的平均值。(<code>linkage='average'</code>)</li>
+<li><strong>Complete Linkage (Maximum Linkage):</strong> 计算两个簇中所有点对之间距离的最大值。(<code>linkage='complete'</code>)</li>
+<li><strong>Single Linkage (Minimum Linkage):</strong> 计算两个簇中所有点对之间距离的最小值。(<code>linkage='single'</code>) 对异常值敏感，可能产生链状效果。</li>
 </ul></li>
-<li><p>添加配置内容：</p></li>
-</ol>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[global]</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">index-url </span><span class="ot">=</span><span class="st"> https://pypi.tuna.tsinghua.edu.cn/simple</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">[install]</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dt">trusted-host </span><span class="ot">=</span><span class="st"> pypi.tuna.tsinghua.edu.cn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-AI 辅助编程工具体验
-</div>
-</div>
-<div class="callout-body-container callout-body">
+</ul></li>
+<li><strong>树状图 (Dendrogram):</strong>
 <ul>
-<li><strong>GitHub Copilot:</strong> <a href="https://github.com/features/copilot">github.com/features/copilot</a></li>
-<li><strong>通义灵码:</strong> <a href="https://tongyi.aliyun.com/lingma">tongyi.aliyun.com/lingma</a></li>
-<li><strong>Cursor:</strong> <a href="https://cursor.sh/">cursor.sh</a></li>
-</ul>
-</div>
-</div>
-</section>
-</section>
-<section id="第二次课python-基础语法与数据操作" class="level2">
-<h2 class="anchored" data-anchor-id="第二次课python-基础语法与数据操作">第二次课：Python 基础语法与数据操作</h2>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-课程目标
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<li>层次聚类的结果通常用树状图可视化。</li>
+<li>纵轴表示簇合并时的距离（或不相似度），横轴表示数据点（或样本索引）。</li>
+<li>通过在某个距离阈值水平切割树状图，可以得到指定数量的簇。切割线穿过的垂直线数量即为簇的数量。</li>
+<li>树状图的高度差可以反映簇之间的分离程度。</li>
+</ul></li>
+<li><strong>优点:</strong>
 <ul>
-<li>回顾 Python 基础语法</li>
-<li>掌握 <code>Numpy</code> 库的基本操作</li>
-<li>掌握 <code>Pandas</code> 库的基本操作</li>
-<li>能够使用 AI 辅助编程工具完成编程练习</li>
-</ul>
-</div>
-</div>
-<section id="python-基础语法回顾" class="level3">
-<h3 class="anchored" data-anchor-id="python-基础语法回顾">1. Python 基础语法回顾</h3>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-基础语法要点
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="变量与数据类型" class="level4">
-<h4 class="anchored" data-anchor-id="变量与数据类型">变量与数据类型</h4>
+<li><strong>无需预先指定 K 值:</strong> 可以根据树状图决定合适的簇数量。</li>
+<li><strong>可以揭示数据的层次结构:</strong> 树状图本身提供了丰富的结构信息。</li>
+<li>对于某些连接标准（如 Single Linkage），可以发现非凸形状的簇。</li>
+</ul></li>
+<li><strong>缺点:</strong>
 <ul>
-<li>变量命名规则、动态类型</li>
-<li>常用数据类型：<code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>list</code>, <code>tuple</code>, <code>dict</code>, <code>set</code></li>
+<li><strong>计算复杂度较高:</strong> 通常为 O(n^3) 或 O(n^2 log n)，不适合非常大的数据集。</li>
+<li><strong>合并决策不可撤销:</strong> 一旦两个簇被合并，后续步骤无法撤销。</li>
+<li>对距离度量和连接标准的选择比较敏感。</li>
+</ul></li>
 </ul>
 </section>
-<section id="运算符" class="level4">
-<h4 class="anchored" data-anchor-id="运算符">运算符</h4>
+<section id="实践使用-scikit-learn-实现层次聚类" class="level3">
+<h3 class="anchored" data-anchor-id="实践使用-scikit-learn-实现层次聚类">3. 实践：使用 <code>scikit-learn</code> 实现层次聚类</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> AgglomerativeClustering</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.cluster.hierarchy <span class="im">import</span> dendrogram, linkage</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 生成示例数据</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> make_blobs(n_samples<span class="op">=</span><span class="dv">50</span>, centers<span class="op">=</span><span class="dv">3</span>, cluster_std<span class="op">=</span><span class="fl">1.0</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 计算连接矩阵 (用于绘制树状图)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 'ward' 连接标准</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>linked_ward <span class="op">=</span> linkage(X, method<span class="op">=</span><span class="st">'ward'</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. 绘制树状图 (Dendrogram)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>dendrogram(linked_ward,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            orientation<span class="op">=</span><span class="st">'top'</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            labels<span class="op">=</span>np.arange(<span class="dv">1</span>, X.shape[<span class="dv">0</span>] <span class="op">+</span> <span class="dv">1</span>), <span class="co"># 可以替换为样本标签</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            distance_sort<span class="op">=</span><span class="st">'descending'</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>            show_leaf_counts<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Hierarchical Clustering Dendrogram (Ward Linkage)'</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Sample Index'</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Distance (Ward)'</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 添加一条水平线来建议切割点 (例如，选择3个簇)</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>plt.axhline(y<span class="op">=</span><span class="dv">15</span>, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. 使用 AgglomerativeClustering 进行聚类</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 假设我们根据树状图决定分为 3 个簇</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>n_clusters <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>agg_clustering <span class="op">=</span> AgglomerativeClustering(n_clusters<span class="op">=</span>n_clusters, linkage<span class="op">=</span><span class="st">'ward'</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>agg_labels <span class="op">=</span> agg_clustering.fit_predict(X)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. 可视化聚类结果</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>plt.scatter(X[:, <span class="dv">0</span>], X[:, <span class="dv">1</span>], c<span class="op">=</span>agg_labels, cmap<span class="op">=</span><span class="st">'viridis'</span>, s<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'Agglomerative Clustering (k=</span><span class="sc">{</span>n_clusters<span class="sc">}</span><span class="ss">, Ward)'</span>)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Feature 1'</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Feature 2'</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"层次聚类分配的标签:"</span>, agg_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>AI 辅助编程提示:</strong></p>
 <ul>
-<li>算术运算符</li>
-<li>比较运算符</li>
-<li>逻辑运算符</li>
-<li>赋值运算符</li>
-<li>成员运算符</li>
-<li>身份运算符</li>
+<li>尝试让 AI 解释 <code>scipy.cluster.hierarchy.linkage</code> 和 <code>dendrogram</code> 函数的参数。</li>
+<li>让 AI 生成不同连接标准 (<code>average</code>, <code>complete</code>, <code>single</code>) 的树状图并比较差异。</li>
+<li>询问 AI 如何根据树状图自动选择最佳 K 值（虽然没有完美方法，但可以了解一些启发式策略）。</li>
 </ul>
 </section>
-<section id="控制流" class="level4">
-<h4 class="anchored" data-anchor-id="控制流">控制流</h4>
+<section id="小组项目三启动用户分群模型构建与分析-更新" class="level3">
+<h3 class="anchored" data-anchor-id="小组项目三启动用户分群模型构建与分析-更新">4. 小组项目三启动：用户分群模型构建与分析 (更新)</h3>
 <ul>
-<li>条件语句：<code>if</code>, <code>elif</code>, <code>else</code></li>
-<li>循环语句：<code>for</code>, <code>while</code>, <code>break</code>, <code>continue</code></li>
+<li><strong>目标:</strong> 掌握不同聚类算法的应用，理解聚类结果评估，并能对聚类结果进行业务解读。</li>
+<li><strong>核心要求:</strong>
+<ul>
+<li><strong>算法选择:</strong> <strong>至少尝试两种</strong>聚类算法（从 K-Means, 层次聚类, GMM, DBSCAN 中选择）。</li>
+<li><strong>对比分析:</strong> 对比不同算法在你的数据集上的表现（例如，使用轮廓系数、Davies-Bouldin 指数评估，并结合可视化结果），解释选择最终模型的原因。</li>
+<li><strong>结果解读:</strong> 对最终的聚类结果进行业务层面的分析和解读（例如，不同用户群体的特征是什么？）。</li>
+</ul></li>
+<li><strong>数据集:</strong> 学生小组自主选择，建议选择包含用户画像或用户行为特征的数据集，鼓励寻找能体现不同算法优势的数据。</li>
+<li><strong>可选挑战:</strong> 鼓励有能力的小组尝试<strong>基于文本 Embeddings 的聚类</strong>（我们将在下周介绍概念）。例如，对电商评论数据进行聚类。</li>
+<li><strong>提交时间:</strong>
+<ul>
+<li>初步模型与算法选择理由 (例如 K-Means vs 层次聚类): 第 9 周课前</li>
+<li>最终模型、对比分析与报告: 第 10 或 11 周课前 (待定)</li>
+</ul></li>
 </ul>
 </section>
-<section id="函数" class="level4">
-<h4 class="anchored" data-anchor-id="函数">函数</h4>
+</section>
+<section id="第二次课层次聚类应用与项目讨论" class="level2">
+<h2 class="anchored" data-anchor-id="第二次课层次聚类应用与项目讨论">第二次课：层次聚类应用与项目讨论</h2>
+<section id="层次聚类应用场景" class="level3">
+<h3 class="anchored" data-anchor-id="层次聚类应用场景">1. 层次聚类应用场景</h3>
+<p>层次聚类由于其能够展示数据的层级结构，在许多领域都有应用：</p>
 <ul>
-<li>函数定义</li>
-<li>函数参数</li>
-<li>函数返回值</li>
-<li>匿名函数 (lambda)</li>
+<li><strong>市场细分 (Market Segmentation):</strong>
+<ul>
+<li>通过对用户的购买行为、人口统计学特征、兴趣偏好等数据进行层次聚类，可以发现不同层级的用户群体。</li>
+<li>树状图可以直观地展示细分市场之间的关系和距离，帮助营销人员理解市场的结构，制定更精准的营销策略。例如，先区分高价值和低价值客户，再在高价值客户中细分出不同偏好的群体。</li>
+</ul></li>
+<li><strong>生物信息学 (Bioinformatics):</strong>
+<ul>
+<li>基因表达谱分析：对不同样本或不同条件下的基因表达数据进行聚类，可以发现功能相似或共同调控的基因群，或者对样本进行分类。</li>
+<li>物种分类：构建物种的系统发育树。</li>
+</ul></li>
+<li><strong>社交网络分析 (Social Network Analysis):</strong>
+<ul>
+<li>社群发现：识别社交网络中的紧密连接的子群组或社区。</li>
+</ul></li>
+<li><strong>图像分割 (Image Segmentation):</strong>
+<ul>
+<li>将图像中的像素根据颜色、纹理等特征进行层次聚类，实现图像区域的划分。</li>
+</ul></li>
 </ul>
 </section>
-<section id="模块与包" class="level4">
-<h4 class="anchored" data-anchor-id="模块与包">模块与包</h4>
+<section id="小组项目三数据探索与算法选择讨论" class="level3">
+<h3 class="anchored" data-anchor-id="小组项目三数据探索与算法选择讨论">2. 小组项目三：数据探索与算法选择讨论</h3>
 <ul>
-<li>模块导入：<code>import</code>, <code>from ... import ...</code></li>
-<li>常用内置模块：<code>math</code>, <code>random</code>, <code>os</code>, <code>sys</code>, <code>datetime</code></li>
+<li><strong>课堂活动:</strong>
+<ul>
+<li>各小组展示初步选择的数据集。</li>
+<li>讨论数据集的特点（维度、样本量、特征类型、是否存在明显异常值、预期的簇形状等）。</li>
+<li>基于数据特点和项目目标，初步讨论选择哪两种或更多聚类算法进行尝试。
+<ul>
+<li>如果数据量很大，层次聚类可能计算较慢。</li>
+<li>如果预期簇是球状的，K-Means 是个好的起点。</li>
+<li>如果想探索数据的内在层次结构，层次聚类更合适。</li>
+<li>如果数据中有明显异常值，K-Means 可能受影响较大。</li>
+</ul></li>
+<li>教师巡回指导，提供建议。</li>
+</ul></li>
 </ul>
 </section>
-</div>
-</div>
-</section>
-<section id="numpy-基础" class="level3">
-<h3 class="anchored" data-anchor-id="numpy-基础">2. Numpy 基础</h3>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Numpy 数组操作
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="数组创建" class="level4">
-<h4 class="anchored" data-anchor-id="数组创建">数组创建</h4>
-<ul>
-<li><code>np.array()</code>, <code>np.zeros()</code>, <code>np.ones()</code></li>
-<li><code>np.arange()</code>, <code>np.linspace()</code></li>
-<li><code>np.random.rand()</code></li>
-</ul>
-</section>
-<section id="数组属性" class="level4">
-<h4 class="anchored" data-anchor-id="数组属性">数组属性</h4>
-<ul>
-<li><code>shape</code>, <code>dtype</code>, <code>ndim</code>, <code>size</code></li>
-<li>数组索引和切片</li>
-<li>维度变换：<code>reshape()</code>, <code>flatten()</code>, <code>transpose()</code></li>
-</ul>
-</section>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-数组运算
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><strong>元素级运算：</strong> 加减乘除、幂运算、比较运算</li>
-<li><strong>矩阵运算：</strong> 矩阵乘法 (<code>np.dot()</code>, <code>@</code> 运算符)</li>
-<li><strong>广播机制</strong></li>
-</ul>
-<section id="常用函数" class="level4">
-<h4 class="anchored" data-anchor-id="常用函数">常用函数</h4>
-<ul>
-<li><strong>数学函数：</strong> <code>np.sin()</code>, <code>np.cos()</code>, <code>np.exp()</code>, <code>np.log()</code>, <code>np.sqrt()</code></li>
-<li><strong>统计函数：</strong> <code>np.mean()</code>, <code>np.median()</code>, <code>np.std()</code>, <code>np.max()</code>, <code>np.min()</code>, <code>np.sum()</code></li>
-<li><strong>排序和查找：</strong> <code>np.sort()</code>, <code>np.argsort()</code>, <code>np.unique()</code>, <code>np.where()</code></li>
-</ul>
-</section>
-</div>
-</div>
-</section>
-<section id="pandas-基础" class="level3">
-<h3 class="anchored" data-anchor-id="pandas-基础">3. Pandas 基础</h3>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Pandas 数据结构
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="series" class="level4">
-<h4 class="anchored" data-anchor-id="series">Series</h4>
-<ul>
-<li>带标签的一维数组</li>
-<li>创建、索引、切片、属性和方法</li>
-</ul>
-</section>
-<section id="dataframe" class="level4">
-<h4 class="anchored" data-anchor-id="dataframe">DataFrame</h4>
-<ul>
-<li>带标签的二维数据表</li>
-<li>创建、列选择、行选择、索引、切片</li>
-<li>常用属性和方法</li>
-</ul>
-</section>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-数据操作
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<section id="数据读取" class="level4">
-<h4 class="anchored" data-anchor-id="数据读取">数据读取</h4>
-<ul>
-<li><code>pd.read_csv()</code>: 读取 CSV 文件</li>
-<li><code>pd.read_excel()</code>: 读取 Excel 文件</li>
-<li><code>pd.read_json()</code>: 读取 JSON 文件</li>
-<li>常用参数：<code>filepath_or_buffer</code>, <code>sep</code>, <code>header</code>, <code>index_col</code>, <code>encoding</code></li>
-</ul>
-</section>
-<section id="数据选择" class="level4">
-<h4 class="anchored" data-anchor-id="数据选择">数据选择</h4>
-<ul>
-<li>列选择：<code>df['列名']</code>, <code>df[['列名1', '列名2']]</code></li>
-<li>行选择：<code>df.loc[]</code>, <code>df.iloc[]</code>, 条件索引</li>
-<li>索引方式的区别和应用场景</li>
-</ul>
-</section>
-<section id="数据清洗" class="level4">
-<h4 class="anchored" data-anchor-id="数据清洗">数据清洗</h4>
-<ul>
-<li>重复值处理：<code>df.duplicated()</code>, <code>df.drop_duplicates()</code></li>
-<li>缺失值处理：<code>df.isnull()</code>, <code>df.fillna()</code>, <code>df.dropna()</code></li>
-</ul>
-</section>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-实践环节
-</div>
-</div>
-<div class="callout-body-container callout-body">
+<section id="思考与练习" class="level3">
+<h3 class="anchored" data-anchor-id="思考与练习">3. 思考与练习</h3>
 <ol type="1">
-<li><strong>Python 基础语法练习</strong></li>
-<li><strong>Numpy 数组操作练习</strong></li>
-<li><strong>Pandas 数据操作练习</strong></li>
-<li><strong>使用 AI 工具辅助完成代码</strong></li>
+<li>K-Means 的主要局限性有哪些？在什么情况下它可能不是最佳选择？</li>
+<li>解释凝聚式层次聚类和分裂式层次聚类的区别。为什么凝聚式更常用？</li>
+<li>什么是连接标准 (Linkage Criteria)？ ‘Ward’ 连接和 ‘Single’ 连接的主要区别和适用场景是什么？</li>
+<li>如何解读树状图 (Dendrogram)？如何利用它来帮助选择簇的数量？</li>
+<li>假设你要对一批客户根据他们的消费金额和购买频率进行聚类，你会优先考虑 K-Means 还是层次聚类？为什么？如果数据量非常大（百万级别），你的选择会改变吗？</li>
 </ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-课后作业
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li>完成 Python 基础语法和数据操作的编程练习</li>
-<li>将代码上传到 GitHub 仓库</li>
-<li>预习下周课程内容：数据预处理与特征工程基础</li>
-</ol>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-相关资源
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li><a href="https://docs.python.org/3/">Python 官方文档</a></li>
-<li><a href="https://numpy.org/doc/stable/">Numpy 官方文档</a></li>
-<li><a href="https://pandas.pydata.org/docs/">Pandas 官方文档</a></li>
-<li><a href="https://www.w3schools.com/python/">W3School Python 教程</a></li>
-<li><a href="https://www.liaoxuefeng.com/wiki/1016959663602400">廖雪峰 Python 教程</a></li>
-</ul>
-</div>
-</div>
 
 
 </section>
@@ -1148,13 +877,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./syllabus.html" class="pagination-link" aria-label="课程大纲">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">课程大纲</span></span>
+      <a href="./week6.html" class="pagination-link" aria-label="第六周：集成学习与回归模型优化">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第六周：集成学习与回归模型优化</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./week2.html" class="pagination-link" aria-label="第二周：数据预处理与特征工程基础">
-        <span class="nav-page-text"><span class="chapter-title">第二周：数据预处理与特征工程基础</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./week8.html" class="pagination-link" aria-label="第 8 周：概率聚类、密度聚类与现代应用">
+        <span class="nav-page-text"><span class="chapter-title">第 8 周：概率聚类、密度聚类与现代应用</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
