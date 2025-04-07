@@ -1,0 +1,349 @@
+---
+title: "第十一周：时间序列分析基础 - 捕捉时间的脉络"
+subtitle: "理解时间序列特性，掌握 Pandas 处理技巧，启动预测项目"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+    number-sections: true
+---
+
+# 第十一周：时间序列分析基础
+
+欢迎来到时间序列分析的世界！与我们之前处理的截面数据（在某个时间点收集的数据）不同，**时间序列数据 (Time Series Data)** 是按照**时间顺序**记录的一系列观测值。例如，每日股票价格、每月销售额、每小时网站访问量等。理解和分析时间序列数据对于预测未来、发现趋势、制定决策至关重要。本周，我们将学习时间序列数据的基本特性、使用 Pandas 处理时间序列的核心技巧，并启动我们的第四个实践项目：商业时间序列预测。
+
+## 1. 时间序列在商业中的重要性
+
+时间序列分析在商业决策中扮演着关键角色：
+
+*   **需求预测:** 预测未来产品销量，指导库存管理和生产计划。
+*   **金融预测:** 预测股票价格、汇率、利率等（虽然非常困难且风险高）。
+*   **资源规划:** 预测电力消耗、网站流量、客服呼叫量，以合理分配资源。
+*   **经济预测:** 预测 GDP、通货膨胀率、失业率等宏观经济指标。
+*   **异常检测:** 识别时间序列中与正常模式显著偏离的异常点，如设备故障预警、网络攻击检测。
+*   **效果评估:** 分析营销活动或政策变化对某个指标（如销售额）随时间推移的影响。
+
+## 2. 时间序列数据的特性
+
+时间序列数据通常具有以下几种模式或组成部分：
+
+*   **时间依赖性 (Temporal Dependence):** 当前观测值通常与其过去的观测值相关。这是时间序列分析的核心。
+*   **趋势 (Trend):** 数据随时间呈现的长期上升或下降的模式。例如，公司销售额的长期增长趋势。
+*   **季节性 (Seasonality):** 数据在固定周期内（如每年、每季度、每周、每天）呈现的重复性模式。例如，冰淇淋销量在夏季较高，冬季较低。
+*   **周期性 (Cyclicality):** 数据在**不固定**的、较长周期内呈现的起伏模式，通常与经济周期或商业周期相关。例如，经济的繁荣与衰退周期。周期性与季节性的主要区别在于其**周期长度不固定**。
+*   **噪声/随机波动 (Noise/Random Variation):** 数据中除去趋势、季节性和周期性后剩余的、不规则的波动。
+
+![Time Series Components](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Decomposition.png/600px-Decomposition.png){fig-alt="Time Series Components Example" width=70%}
+*(图片来源: Wikimedia Commons - 展示了趋势、季节性和残差（噪声）)*
+
+理解这些特性对于选择合适的分析方法和模型至关重要。
+
+## 3. 使用 Pandas 处理时间序列
+
+Pandas 提供了强大的工具来处理时间序列数据。
+
+### 3.1 时间戳索引 (`DatetimeIndex`)
+
+处理时间序列的第一步通常是将时间信息转换为 Pandas 的 `Timestamp` 对象，并将其设置为 DataFrame 的索引 (`DatetimeIndex`)。
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# --- 创建示例时间序列数据 ---
+# 创建日期范围
+dates = pd.date_range(start='2023-01-01', periods=100, freq='D') # 'D' 表示每天
+# 创建随机数据
+data = np.random.randn(100) * 10 + 50
+# 创建 DataFrame
+ts_df = pd.DataFrame({'Value': data}, index=dates)
+print("时间序列 DataFrame (前 5 行):\n", ts_df.head())
+print("\n索引类型:", type(ts_df.index))
+
+# --- 如果数据中的时间列是字符串 ---
+# 假设有一个 DataFrame df_str_date，其中 'DateString' 列是字符串格式
+# df_str_date = pd.DataFrame({'DateString': ['2023-01-01', '2023-01-02', ...], 'Value': [...]})
+# 转换 'DateString' 列为 datetime 对象
+# df_str_date['Timestamp'] = pd.to_datetime(df_str_date['DateString'], format='%Y-%m-%d') # format 参数可选，如果格式标准 Pandas 通常能自动识别
+# 将 Timestamp 列设为索引
+# df_str_date.set_index('Timestamp', inplace=True)
+# print(df_str_date.head())
+# print(type(df_str_date.index))
+```
+
+将时间设为索引后，可以方便地按时间进行选择和切片：
+
+```python
+# 选择特定日期
+print("\n选择 2023-01-05 的数据:\n", ts_df.loc['2023-01-05'])
+
+# 选择日期范围
+print("\n选择 2023年1月 的数据:\n", ts_df.loc['2023-01']) # 选择整个月份
+print("\n选择 2023-01-10 到 2023-01-20 的数据:\n", ts_df.loc['2023-01-10':'2023-01-20'])
+```
+
+### 3.2 重采样 (`resample`)
+
+重采样是指**改变时间序列的频率**。
+
+*   **降采样 (Downsampling):** 将高频率数据聚合到低频率（例如，将日数据聚合为月数据）。需要指定聚合函数（如 `sum()`, `mean()`, `min()`, `max()`, `last()`, `first()`）。
+*   **升采样 (Upsampling):** 将低频率数据转换为高频率（例如，将月数据转换为日数据）。通常需要指定如何**填充**新产生的缺失值（插值方法）。
+
+```python
+# --- 降采样：将日数据聚合为月度平均值 ---
+monthly_mean = ts_df['Value'].resample('M').mean() # 'M' 表示月末频率
+print("\n月度平均值:\n", monthly_mean)
+
+# --- 降采样：将日数据聚合为周度总和 ---
+weekly_sum = ts_df['Value'].resample('W').sum() # 'W' 表示每周日频率
+print("\n周度总和:\n", weekly_sum.head())
+
+# --- 升采样：将日数据升采样为小时数据 (需要填充) ---
+# hourly_data = ts_df['Value'].resample('H').asfreq() # asfreq() 不进行填充，产生 NaN
+# print("\n小时数据 (含 NaN):\n", hourly_data.head(10))
+# 使用 ffill (forward fill) 填充：用前一个有效值填充
+hourly_data_ffill = ts_df['Value'].resample('H').ffill()
+print("\n小时数据 (ffill 填充):\n", hourly_data_ffill.head(10))
+# 也可以使用 bfill (backward fill) 或 interpolate() 进行插值
+```
+
+### 3.3 滚动窗口 (`rolling`)
+
+滚动窗口计算允许我们在一个**固定大小的滑动窗口**上执行聚合计算，常用于计算**移动平均 (Moving Average)** 或移动标准差等，以平滑数据或识别趋势。
+
+```python
+# --- 计算 7 天移动平均值 ---
+rolling_mean_7d = ts_df['Value'].rolling(window=7).mean()
+print("\n7 天移动平均值 (前 10 个):\n", rolling_mean_7d.head(10)) # 前 6 个是 NaN
+
+# --- 可视化原始数据和移动平均值 ---
+plt.figure(figsize=(12, 6))
+plt.plot(ts_df.index, ts_df['Value'], label='Original Data', alpha=0.6)
+plt.plot(rolling_mean_7d.index, rolling_mean_7d, label='7-Day Rolling Mean', color='red')
+plt.title('Original Data vs. Rolling Mean')
+plt.xlabel('Date')
+plt.ylabel('Value')
+plt.legend()
+# plt.show()
+```
+
+移动平均可以帮助我们更清晰地看到数据的长期趋势，因为它平滑了短期的随机波动。
+
+### 3.4 数据平移 (`shift`)
+
+`shift()` 方法可以将时间序列的数据向前或向后移动指定的期数，常用于计算**变化量**或**百分比变化**，或者创建用于监督学习的**滞后特征 (Lagged Features)**。
+
+```python
+# --- 向前移动 1 期 (获取昨天的数据) ---
+ts_df['Yesterday_Value'] = ts_df['Value'].shift(1)
+print("\n包含昨天值的数据:\n", ts_df.head())
+
+# --- 计算日变化量 ---
+ts_df['Daily_Change'] = ts_df['Value'] - ts_df['Value'].shift(1)
+# ts_df['Daily_Change'] = ts_df['Value'].diff() # diff() 是计算差分的快捷方式
+print("\n包含日变化量的数据:\n", ts_df.head())
+
+# --- 计算日百分比变化 ---
+ts_df['Daily_Pct_Change'] = ts_df['Value'].pct_change() # pct_change() 计算百分比变化
+print("\n包含日百分比变化的数据:\n", ts_df.head())
+```
+
+## 4. 实践：时间序列数据处理
+
+请使用一个真实的时间序列数据集（例如股票价格、天气数据、销售数据等，老师可提供或自行寻找），完成以下练习：
+
+1.  加载数据，确保时间列已正确解析为 `datetime` 对象并设为索引。
+2.  选择一个时间范围的数据进行查看。
+3.  将数据重采样到不同的频率（例如，日数据转周/月，或分钟数据转小时），尝试不同的聚合函数。
+4.  计算一个合适的滚动窗口（例如 7 天或 30 天）的移动平均值，并将其与原始数据绘制在同一张图上。
+5.  使用 `shift()` 或 `diff()` 计算数据的周期性变化（例如日变化或月变化）。
+
+## 5. 小组项目四 (阶段一)：商业时间序列预测 - EDA
+
+启动我们的第四个项目！这次我们将聚焦于预测。
+
+*   **主题:** 商业时间序列预测 (例如：商品销售额、网站流量预测)
+*   **目标:** 掌握时间序列分析的基本流程和预测方法。
+*   **数据集:** (老师提供或推荐，或自行寻找合适的公开商业时间序列数据集)
+*   **任务 (阶段一):**
+    1.  **选择数据集:** 确定你的小组要预测的商业指标和对应的数据集。
+    2.  **数据加载与初步处理:**
+        *   加载数据。
+        *   确保时间列被正确解析为 `datetime` 类型，并设置为索引。
+        *   检查数据是否有明显的缺失或异常。
+        *   (如果频率过高，可以考虑先进行降采样，例如将分钟级数据聚合到小时级或天级)。
+    3.  **时间序列探索性分析 (EDA):**
+        *   **可视化:** 绘制时间序列图，直观感受数据的整体走势。
+        *   **识别模式:** 尝试识别数据中是否存在明显的**趋势 (Trend)** 和**季节性 (Seasonality)**。季节性模式的周期是多长（年/月/周/日）？
+        *   (可选) 计算并绘制移动平均线，辅助观察趋势。
+        *   (可选) 绘制自相关图 (ACF) 和偏自相关图 (PACF) 来探索时间依赖性（我们后面会详细讲）。
+*   **提交:** 包含上述数据加载、初步处理、EDA 过程（特别是可视化和模式识别分析）的 Jupyter Notebook (`.ipynb`)。
+*   **DDL:** 第十二周第一次课前。
+
+## 6. 时间序列分解 (Time Series Decomposition)
+
+时间序列分解是一种将时间序列拆分成其主要组成部分（趋势、季节性、残差）的技术，有助于我们更好地理解数据的内在模式。
+
+`statsmodels` 库提供了 `seasonal_decompose` 函数来实现分解。 (需要安装: `pip install statsmodels`)
+
+```python
+# 检查 statsmodels 是否已安装，如果需要安装，取消下一行注释
+# !pip install statsmodels
+
+from statsmodels.tsa.seasonal import seasonal_decompose
+import matplotlib.pyplot as plt
+
+# --- 假设 ts_df['Value'] 是你的时间序列数据 (需要有足够长的周期才能分解季节性) ---
+# 创建一个更有规律的示例序列
+time = np.arange(1, 101)
+# 趋势 + 季节性 + 噪声
+seasonal_data = 10 + time * 0.5 + 5 * np.sin(time * 2 * np.pi / 12) + np.random.randn(100) * 2
+ts_seasonal_df = pd.DataFrame({'Value': seasonal_data}, index=pd.date_range(start='2020-01-01', periods=100, freq='M')) # 改为月度频率
+
+
+# --- 执行分解 ---
+# model='additive': 假设成分是相加关系 Y = T + S + R (常用)
+# model='multiplicative': 假设成分是相乘关系 Y = T * S * R (当季节性波动随趋势变化时使用)
+# period: 指定季节性周期 (例如，对于月度数据，年季节性周期是 12)
+decomposition = seasonal_decompose(ts_seasonal_df['Value'], model='additive', period=12)
+
+# 获取分解结果
+trend = decomposition.trend
+seasonal = decomposition.seasonal
+residual = decomposition.resid
+
+# --- 可视化分解结果 ---
+plt.figure(figsize=(10, 8))
+plt.subplot(411)
+plt.plot(ts_seasonal_df['Value'], label='Original')
+plt.legend(loc='upper left')
+plt.subplot(412)
+plt.plot(trend, label='Trend')
+plt.legend(loc='upper left')
+plt.subplot(413)
+plt.plot(seasonal, label='Seasonality')
+plt.legend(loc='upper left')
+plt.subplot(414)
+plt.plot(residual, label='Residuals')
+plt.legend(loc='upper left')
+plt.tight_layout()
+# plt.show()
+```
+
+分解结果可以帮助我们：
+
+*   确认趋势和季节性的存在及其模式。
+*   去除季节性影响（得到季节性调整后的序列 `original - seasonal`）。
+*   分析残差项是否为白噪声（随机波动）。
+
+## 7. 平稳性 (Stationarity)
+
+**平稳性**是时间序列分析中的一个核心概念。一个**平稳时间序列 (Stationary Time Series)** 的统计特性（如**均值、方差、自相关性**）**不随时间推移而发生显著变化**。
+
+*   **为什么重要？** 许多经典的时间序列模型（如 ARIMA）都**假设**输入数据是平稳的。如果数据不平稳，模型的预测能力会大大降低。
+*   **直观理解:** 平稳序列看起来像是在一个固定的水平线上下随机波动，没有明显的趋势或季节性模式导致其均值或波动性随时间变化。
+
+### 7.1 如何检验平稳性？
+
+1.  **可视化观察:**
+    *   绘制时间序列图：观察是否存在明显的**趋势**或**季节性**。如果存在，通常是非平稳的。
+    *   绘制滚动统计量：计算并绘制**滚动均值 (Rolling Mean)** 和**滚动标准差 (Rolling Standard Deviation)**。如果滚动均值或滚动标准差随时间变化很大，则序列可能不平稳。
+2.  **统计检验 (ADF Test):**
+    *   **ADF 检验 (Augmented Dickey-Fuller Test)** 是一种常用的统计假设检验方法，用于检验序列中是否存在**单位根 (Unit Root)**。单位根的存在是序列非平稳的一个重要标志。
+    *   **原假设 (H0):** 序列存在单位根（非平稳）。
+    *   **备择假设 (H1):** 序列不存在单位根（平稳）。
+    *   **检验逻辑:** 我们计算一个 ADF 统计量。如果这个统计量**小于**某个显著性水平（如 1%, 5%, 10%）对应的**临界值 (Critical Value)**，或者对应的 **p 值小于**显著性水平（如 0.05），我们就有理由**拒绝原假设**，认为序列是平稳的。
+    *   **实现:** `statsmodels.tsa.stattools.adfuller`
+
+```python
+from statsmodels.tsa.stattools import adfuller
+
+# --- ADF 检验函数 ---
+def test_stationarity(timeseries, window=12):
+    # 计算滚动统计量
+    rolmean = timeseries.rolling(window=window).mean()
+    rolstd = timeseries.rolling(window=window).std()
+
+    # 绘制滚动统计量
+    plt.figure(figsize=(12, 6))
+    orig = plt.plot(timeseries, color='blue', label='Original')
+    mean = plt.plot(rolmean, color='red', label='Rolling Mean')
+    std = plt.plot(rolstd, color='black', label='Rolling Std')
+    plt.legend(loc='best')
+    plt.title('Rolling Mean & Standard Deviation')
+    # plt.show(block=False) # block=False 避免阻塞后续代码
+
+    # 执行 ADF 检验
+    print('Results of Dickey-Fuller Test:')
+    # adfuller 返回: adf statistic, p-value, n_lags, n_obs, critical values, icbest
+    dftest = adfuller(timeseries.dropna(), autolag='AIC') # dropna() 处理因滚动或差分产生的 NaN
+    dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+    for key, value in dftest[4].items():
+        dfoutput['Critical Value (%s)' % key] = value
+    print(dfoutput)
+
+    # 判断平稳性
+    if dftest[1] <= 0.05 and dftest[0] < dftest[4]['5%']:
+        print("=> Conclusion: Reject H0, the series is likely stationary.")
+    else:
+        print("=> Conclusion: Fail to reject H0, the series is likely non-stationary.")
+
+# --- 对示例数据进行检验 ---
+# print("\nTesting stationarity of original seasonal data:")
+# test_stationarity(ts_seasonal_df['Value']) # 原始数据通常非平稳
+```
+
+::: {.callout-tip title="AI 辅助理解平稳性"}
+*   "用简单的语言解释什么是平稳时间序列？为什么它在时间序列建模中很重要？"
+*   "ADF 检验的原假设和备择假设分别是什么？"
+*   "如果 ADF 检验的 p 值是 0.1，Test Statistic 是 -2.5，5% 临界值是 -2.9，我应该得出什么结论？"
+*   "除了 ADF 检验，还有哪些常用的平稳性检验方法？（例如 KPSS 检验）"
+:::
+
+### 7.2 如何使序列平稳？
+
+如果序列非平稳，需要对其进行转换，常用的方法有：
+
+*   **差分 (Differencing):** 计算相邻观测值之间的差值 `y_t' = y_t - y_{t-1}`。一阶差分通常可以消除线性趋势。如果一次差分后仍不平稳，可以进行二次差分。`pandas.Series.diff()`。
+*   **对数变换 (Log Transform):** `numpy.log()`。当序列的方差随时间增大时（异方差性），对数变换可以帮助稳定方差。通常在差分之前进行。
+*   **去除季节性:** 可以使用 `seasonal_decompose` 得到季节性成分，然后从原始序列中减去它。
+
+```python
+# --- 对数变换 (如果方差不稳定) ---
+# ts_log = np.log(ts_seasonal_df['Value'])
+# 注意：值必须大于 0 才能取对数
+
+# --- 一阶差分 ---
+ts_diff = ts_seasonal_df['Value'].diff().dropna() # dropna() 移除第一个 NaN 值
+# plt.figure(figsize=(12, 6))
+# plt.plot(ts_diff)
+# plt.title('First Order Differencing')
+# plt.show()
+
+# --- 检验差分后序列的平稳性 ---
+# print("\nTesting stationarity of differenced data:")
+# test_stationarity(ts_diff) # 差分后的序列通常更平稳
+```
+
+## 8. 小组项目四 (阶段一续)：数据处理与平稳性
+
+继续你的时间序列预测项目：
+
+*   **任务:**
+    1.  **时间序列分解:** 对你的目标预测序列（例如销售额）使用 `seasonal_decompose` 进行分解，观察其趋势、季节性和残差。
+    2.  **平稳性检验:**
+        *   通过可视化（滚动均值/标准差）和 ADF 检验来判断你的原始目标序列是否平稳。
+        *   记录 ADF 检验结果（Test Statistic, p-value, Critical Values）和你的结论。
+    3.  **使序列平稳:**
+        *   如果序列不平稳，尝试使用**差分**（可能需要一阶或二阶）或**对数变换+差分**等方法使其平稳。
+        *   对转换后的序列再次进行平稳性检验，确保其变得平稳。
+*   **更新 Notebook:** 将时间序列分解、平稳性检验（包括图表和 ADF 结果）、以及使序列平稳的过程和结果添加到你的项目 Notebook 中。
+
+## 9. 本周总结
+
+本周我们正式踏入了时间序列分析的领域。我们了解了时间序列数据的重要性、核心特性（趋势、季节性等），并掌握了使用 Pandas 进行时间序列处理的关键技术（时间索引、重采样、滚动窗口、平移）。我们还学习了时间序列分解的方法，并深入探讨了平稳性的概念、检验方法（可视化、ADF 检验）以及使序列平稳的常用技巧（差分、对数变换）。最后，我们启动了项目四，并完成了初步的 EDA 和数据处理。
+
+**下周我们将学习经典的时间序列预测模型——ARIMA！**

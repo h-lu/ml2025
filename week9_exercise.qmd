@@ -1,0 +1,302 @@
+---
+title: "第九周：课堂练习与实验"
+subtitle: "高级模型评估与不平衡数据处理"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+---
+
+# 第九周：课堂练习与实验
+
+本周我们聚焦于更深入的模型评估技术，特别是处理不平衡数据集时的挑战和方法。我们将练习绘制和解读 P-R 曲线，理解不同的交叉验证策略，并应用 SMOTE 和代价敏感学习来处理类别不平衡问题。
+
+## 准备工作
+
+确保导入本周所需的库：
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from collections import Counter
+
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split, StratifiedKFold, KFold, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.metrics import (accuracy_score, confusion_matrix, classification_report,
+                             precision_recall_curve, average_precision_score,
+                             roc_curve, auc, f1_score)
+
+# 检查 imbalanced-learn 是否已安装
+try:
+    from imblearn.over_sampling import SMOTE
+    from imblearn.under_sampling import RandomUnderSampler # 引入欠采样示例
+    from imblearn.pipeline import Pipeline as ImbPipeline # 使用 imblearn 的 Pipeline
+    from sklearn.pipeline import Pipeline # Scikit-learn Pipeline for comparison
+    imblearn_installed = True
+except ImportError:
+    print("imbalanced-learn is not installed. Run 'pip install imbalanced-learn' or 'conda install -c conda-forge imbalanced-learn'")
+    imblearn_installed = False
+    SMOTE, RandomUnderSampler, ImbPipeline, Pipeline = None, None, None, None # Placeholder
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+# %matplotlib inline # 取消注释以便在 Jupyter 环境中显示绘图
+
+# --- 生成不平衡的示例数据 ---
+# weights=[0.95, 0.05] 表示类别 0 占 95%，类别 1 (正类/少数类) 占 5%
+X_imb, y_imb = make_classification(n_samples=2000, n_features=20, n_informative=5,
+                               n_redundant=10, n_classes=2, weights=[0.95, 0.05],
+                               flip_y=0.01, random_state=42)
+
+# --- 数据预处理和划分 ---
+scaler = StandardScaler()
+X_imb_scaled = scaler.fit_transform(X_imb)
+X_train_imb, X_test_imb, y_train_imb, y_test_imb = train_test_split(
+    X_imb_scaled, y_imb, test_size=0.3, random_state=42, stratify=y_imb # 使用 stratify 很重要
+)
+
+print("原始训练集类别分布:", Counter(y_train_imb))
+print("测试集类别分布:", Counter(y_test_imb))
+
+# --- 训练一个基线模型 (例如逻辑回归) ---
+lr_imb = LogisticRegression(solver='liblinear', random_state=42)
+lr_imb.fit(X_train_imb, y_train_imb)
+y_pred_imb = lr_imb.predict(X_test_imb)
+y_pred_proba_imb = lr_imb.predict_proba(X_test_imb)[:, 1] # 获取正类的预测概率
+
+print("\n--- 原始逻辑回归评估 (测试集) ---")
+print(classification_report(y_test_imb, y_pred_imb, target_names=['Class 0', 'Class 1']))
+ap_score = average_precision_score(y_test_imb, y_pred_proba_imb)
+print(f"原始 Average Precision (AP) Score: {ap_score:.4f}")
+fpr_lr, tpr_lr, _ = roc_curve(y_test_imb, y_pred_proba_imb)
+roc_auc_lr = auc(fpr_lr, tpr_lr)
+print(f"原始 ROC AUC Score: {roc_auc_lr:.4f}")
+```
+
+## 练习 1: P-R 曲线 vs. ROC 曲线 (不平衡数据)
+
+**目标:** 在不平衡数据集上直观比较 P-R 曲线和 ROC 曲线对模型性能的反映。
+
+**使用练习准备工作中生成的不平衡数据和训练好的 `lr_imb` 模型。**
+
+1.  **计算与绘制 P-R 曲线:**
+    *   使用 `precision_recall_curve()` 计算精确率和召回率。
+    *   使用 `average_precision_score()` 计算 AP 分数 (已在准备工作中计算)。
+    *   绘制 P-R 曲线，在图例中显示 AP 分数。添加标题和坐标轴标签。
+    ```python
+    precision, recall, thresholds = precision_recall_curve(y_test_imb, y_pred_proba_imb)
+    plt.figure(figsize=(8, 6))
+    plt.plot(recall, precision, marker='.', label=f'Logistic Regression (AP = {ap_score:.2f})')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall Curve (Imbalanced Data)')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    ```
+
+2.  **计算与绘制 ROC 曲线:**
+    *   使用 `roc_curve()` 计算 FPR 和 TPR (已在准备工作中计算)。
+    *   使用 `auc()` 计算 AUC 分数 (已在准备工作中计算)。
+    *   绘制 ROC 曲线，在图例中显示 AUC 分数。添加标题和坐标轴标签。
+    ```python
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr_lr, tpr_lr, color='darkorange', lw=2, label=f'Logistic Regression (AUC = {roc_auc_lr:.2f})')
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Guess')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate (FPR)')
+    plt.ylabel('True Positive Rate (TPR)')
+    plt.title('ROC Curve (Imbalanced Data)')
+    plt.legend(loc="lower right")
+    plt.grid(True)
+    plt.show()
+    ```
+
+3.  **分析:**
+    *   在 Markdown 单元格中比较两个图。对于这个不平衡数据集，哪个图更能揭示模型在识别少数类（类别 1）方面的潜在问题？为什么？
+    *   查看原始逻辑回归的分类报告（准备工作中已打印），结合 P-R 曲线和 ROC 曲线，讨论为什么 AUC 可能看起来还不错，但 P-R 曲线和少数类的 F1 分数更能反映实际问题。
+
+## 练习 2: Stratified K-Fold 交叉验证
+
+**目标:** 理解分层 K 折交叉验证在不平衡数据上评估的稳定性。
+
+**继续使用练习准备工作中的不平衡数据集 (`X_imb_scaled`, `y_imb`)。**
+
+1.  **使用普通 K-Fold:**
+    *   创建一个 `KFold` 实例 (`kf`)，设置 `n_splits=5`, `shuffle=True`, `random_state=42`。
+    *   创建一个 `LogisticRegression` 模型实例 (`lr_cv = LogisticRegression(solver='liblinear', random_state=42)`)。
+    *   使用 `cross_val_score`，将 `cv=kf`，评估模型在 `X_imb_scaled`, `y_imb` 上的 `f1_macro` 得分（宏平均 F1 更关注少数类）。
+    *   打印每一折的 `f1_macro` 得分和平均得分。
+    *   **检查类别分布 (可选但推荐):** 循环遍历 `kf.split(X_imb_scaled, y_imb)`，打印每一折训练集和验证集中的类别比例 (`Counter(y_imb[train_index])`, `Counter(y_imb[test_index])`)，观察是否均衡。
+
+2.  **使用 Stratified K-Fold:**
+    *   创建一个 `StratifiedKFold` 实例 (`skf`)，设置 `n_splits=5`, `shuffle=True`, `random_state=42`。
+    *   使用**相同**的 `LogisticRegression` 模型实例 (`lr_cv`)。
+    *   使用 `cross_val_score`，将 `cv=skf`，评估模型在 `X_imb_scaled`, `y_imb` 上的 `f1_macro` 得分。
+    *   打印每一折的 `f1_macro` 得分和平均得分。
+    *   **检查类别分布 (可选但推荐):** 循环遍历 `skf.split(X_imb_scaled, y_imb)`，打印每一折训练集和验证集中的类别比例，观察是否均衡。
+
+3.  **分析:** 在 Markdown 单元格中比较两种 K-Fold 方法得到的 F1 分数的稳定性和平均值。解释为什么 Stratified K-Fold 在不平衡数据上通常是更好的选择。
+
+## 练习 3: 多分类评估
+
+**目标:** 练习评估多分类模型的性能。
+
+1.  **生成多分类数据:**
+    *   使用 `make_classification` 生成一个三分类数据集，设置 `n_samples=1500`, `n_features=20`, `n_informative=10`, `n_redundant=5`, `n_classes=3`, `n_clusters_per_class=1`, `weights=[0.6, 0.3, 0.1]`, `random_state=42` (创建一个稍微不平衡的三分类问题)。
+    *   划分训练集和测试集 (`test_size=0.3`, `random_state=42`, `stratify=y`)。
+    *   进行特征缩放。
+
+2.  **训练模型:**
+    *   训练一个 `SVC` 模型 (`decision_function_shape='ovr'`, `random_state=42`)。
+
+3.  **评估:**
+    *   对测试集进行预测。
+    *   使用 `classification_report()` 打印分类报告，设置 `target_names=['Class A', 'Class B', 'Class C']`。
+    *   **解读:** 在 Markdown 单元格中解释报告中 'macro avg' 和 'weighted avg' 的 F1 分数。如果这两个分数差异较大，可能是什么原因？哪个更能反映模型在少数类（Class C）上的表现？
+
+## 练习 4: 使用 SMOTE 处理不平衡数据
+
+**目标:** 应用 SMOTE 过采样技术来改善模型在少数类上的性能。
+
+**继续使用练习 1 生成的不平衡数据集 (`X_train_imb`, `y_train_imb`, `X_test_imb`, `y_test_imb`) 和原始逻辑回归模型 `lr_imb` 的评估结果。**
+
+*前置条件检查：确保 `imblearn` 库已安装。*
+
+```python
+if imblearn_installed:
+    # 1. 应用 SMOTE
+    print("应用 SMOTE...")
+    smote = SMOTE(random_state=42)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train_imb, y_train_imb) # 注意只对训练集重采样
+    print("原始训练集类别分布:", Counter(y_train_imb))
+    print("SMOTE 重采样后训练集类别分布:", Counter(y_train_resampled))
+
+    # 2. 训练新模型
+    lr_smote = LogisticRegression(solver='liblinear', random_state=42)
+    lr_smote.fit(X_train_resampled, y_train_resampled)
+
+    # 3. 评估新模型
+    y_pred_smote = lr_smote.predict(X_test_imb)
+    y_pred_proba_smote = lr_smote.predict_proba(X_test_imb)[:, 1]
+
+    print("\n--- SMOTE 后逻辑回归评估 (测试集) ---")
+    print(classification_report(y_test_imb, y_pred_smote, target_names=['Class 0', 'Class 1']))
+
+    ap_score_smote = average_precision_score(y_test_imb, y_pred_proba_smote)
+    print(f"SMOTE 后 Average Precision (AP) Score: {ap_score_smote:.4f}")
+
+    # 4. 绘制 P-R 曲线对比
+    precision_smote, recall_smote, _ = precision_recall_curve(y_test_imb, y_pred_proba_smote)
+    # 获取原始模型的 precision 和 recall (在练习1中已计算)
+    # precision, recall, _ = precision_recall_curve(y_test_imb, y_pred_proba_imb)
+    # ap_score = average_precision_score(y_test_imb, y_pred_proba_imb) # 已在准备工作中计算
+
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(recall, precision, marker='.', label=f'Original LR (AP = {ap_score:.2f})') # 使用练习1的结果
+    plt.plot(recall_smote, precision_smote, marker='.', label=f'LR with SMOTE (AP = {ap_score_smote:.2f})') # Corrected variable name
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('P-R Curve Comparison: Original vs. SMOTE')
+    plt.legend()
+    plt.grid(True)
+    # plt.show()
+
+else:
+    print("imblearn 库未安装，无法执行 SMOTE 练习。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中比较应用 SMOTE 前后模型在测试集上的分类报告（特别是少数类的 Precision, Recall, F1）和 AP 分数。SMOTE 是否改善了模型对少数类的识别能力？
+
+## 练习 5: 使用代价敏感学习处理不平衡数据
+
+**目标:** 应用 `class_weight='balanced'` 来处理不平衡数据。
+
+**继续使用练习 1 生成的不平衡数据集 (`X_train_imb`, `y_train_imb`, `X_test_imb`, `y_test_imb`) 和原始逻辑回归模型 `lr_imb` 的评估结果。**
+
+1.  **训练代价敏感模型:**
+    *   创建一个 `LogisticRegression` 实例，设置 `solver='liblinear'`, `class_weight='balanced'`, `random_state=42`。
+    *   在**原始**不平衡训练集 (`X_train_imb`, `y_train_imb`) 上训练模型。
+
+2.  **评估模型:**
+    *   对测试集 `X_test_imb` 进行预测 (`y_pred_balanced`) 和概率预测 (`y_pred_proba_balanced`)。
+    *   打印分类报告。
+    *   计算并打印 AP 分数 (`average_precision_score`)。
+
+3.  **对比分析:**
+    *   在 Markdown 单元格中比较使用 `class_weight='balanced'` 的模型与原始模型、SMOTE 模型（如果已完成练习 4）在测试集上的性能（关注少数类的指标和 AP 分数）。哪种方法在这个数据集上效果更好？
+
+## 练习 6: (可选) 结合 Pipeline 使用 SMOTE
+
+**目标:** 学习如何在交叉验证或网格搜索中正确使用 SMOTE，避免数据泄露。
+
+**背景:** 直接对整个数据集进行 SMOTE 然后再交叉验证是**错误**的，因为验证集的信息会泄露到训练过程中。正确的做法是在交叉验证的每一折内部，**仅对该折的训练数据**进行 SMOTE。`imblearn` 库的 `Pipeline` 可以方便地实现这一点。
+
+*前置条件检查：确保 `imblearn` 库已安装。*
+
+```python
+if imblearn_installed:
+    from sklearn.pipeline import Pipeline # 导入 scikit-learn 的 Pipeline
+    # 创建一个包含 SMOTE 和 Logistic Regression 的 Pipeline (使用 imblearn Pipeline)
+    imb_pipeline = ImbPipeline([
+        # ('scaler', StandardScaler()), # 注意：如果需要缩放，应在 SMOTE 之前或之后进行，取决于策略
+                                        # 这里假设 X_train_imb, X_test_imb 已经是缩放过的
+        ('oversample', SMOTE(random_state=42)),
+        ('classification', LogisticRegression(solver='liblinear', random_state=42))
+    ])
+
+    # 使用 StratifiedKFold 进行交叉验证
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+    # 使用 cross_val_score 评估 Pipeline
+    # 使用 X_train_imb, y_train_imb 进行交叉验证评估
+    cv_scores_pipeline = cross_val_score(imb_pipeline, X_train_imb, y_train_imb, cv=skf, scoring='average_precision', n_jobs=-1)
+
+    print("\n--- Pipeline (SMOTE + LR) 5折交叉验证 AP 分数 ---")
+    print(f"Scores: {cv_scores_pipeline}")
+    print(f"Mean AP: {cv_scores_pipeline.mean():.4f} (+/- {cv_scores_pipeline.std() * 2:.4f})")
+
+    # 对比不使用 SMOTE 的 Pipeline (仅 LR)
+    # 注意：如果数据需要缩放，这里也应该包含 Scaler
+    pipeline_no_smote = Pipeline([
+        # ('scaler', StandardScaler()), # 假设 X_train_imb 已缩放
+        ('classification', LogisticRegression(solver='liblinear', random_state=42))
+    ])
+    cv_scores_no_smote = cross_val_score(pipeline_no_smote, X_train_imb, y_train_imb, cv=skf, scoring='average_precision', n_jobs=-1)
+    print("\n--- Pipeline (LR only) 5折交叉验证 AP 分数 ---")
+    print(f"Scores: {cv_scores_no_smote}")
+    print(f"Mean AP: {cv_scores_no_smote.mean():.4f} (+/- {cv_scores_no_smote.std() * 2:.4f})")
+
+else:
+    print("imblearn 库未安装，无法执行 Pipeline 练习。")
+
+```
+
+**分析:**
+
+*   比较使用 SMOTE 的 Pipeline 和不使用 SMOTE 的 Pipeline 的交叉验证结果 (平均 AP 分数)。SMOTE 是否在交叉验证中稳定地提升了性能？
+
+## 练习 7: (可选) 项目回顾与应用
+
+**目标:** 将不平衡数据处理技术应用到之前的项目中。
+
+1.  **选择项目:** 回顾你的项目一（分类任务）。检查目标变量的类别分布是否不平衡。
+2.  **应用技术:** 如果存在不平衡：
+    *   尝试使用 `class_weight='balanced'` 参数重新训练你表现最好的模型（例如，调优后的随机森林）。
+    *   尝试使用 `imblearn.pipeline.Pipeline` 结合 `SMOTE` 和你的最佳模型，并使用 `GridSearchCV` 或 `RandomizedSearchCV` 对 Pipeline 中的模型参数进行调优（注意参数名称前缀，如 `classification__n_estimators`）。
+3.  **重新评估:** 使用 P-R 曲线、AUC-PR (Average Precision) 或 F1-Macro 等适合不平衡数据的指标，评估应用了处理技术后的模型性能，并与原始模型进行比较。
+4.  **记录发现:** 在项目一的 Notebook 中补充这部分内容，记录你的发现和分析。
+
+**掌握处理不平衡数据的方法对于解决许多现实世界的分类问题至关重要。**

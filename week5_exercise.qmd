@@ -1,0 +1,258 @@
+---
+title: "第五周：课堂练习与实验"
+subtitle: "线性回归、多项式回归与正则化实践"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+---
+
+# 第五周：课堂练习与实验
+
+本周我们开始学习回归模型，重点练习线性回归、多项式回归以及用于防止过拟合的正则化技术。同时，我们将启动第二个项目：房价预测。
+
+## 准备工作
+
+确保导入本周所需的库：
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, RidgeCV, LassoCV
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+# 尝试导入数据集加载函数
+try:
+    from sklearn.datasets import fetch_california_housing
+except ImportError:
+    print("Scikit-learn version might be old. Consider updating if California Housing data is needed.")
+    # Fallback or alternative dataset loading can be placed here
+    fetch_california_housing = None
+
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+
+# --- 生成线性数据函数 (方便复用) ---
+def generate_linear_data(n_samples=100, noise=1, random_state=42):
+    np.random.seed(random_state)
+    X = 2 * np.random.rand(n_samples, 1)
+    y = 4 + 3 * X + np.random.randn(n_samples, 1) * noise
+    return X, y.ravel() # Ensure y is 1D
+
+# --- 生成非线性数据函数 (方便复用) ---
+def generate_nonlinear_data(n_samples=100, noise=1, random_state=42):
+    np.random.seed(random_state)
+    X = 6 * np.random.rand(n_samples, 1) - 3
+    y = 0.5 * X**2 + X + 2 + np.random.randn(n_samples, 1) * noise
+    return X, y.ravel() # 将 y 转换为一维数组
+
+# --- 准备线性数据 ---
+X_lin, y_lin = generate_linear_data()
+X_train_lin, X_test_lin, y_train_lin, y_test_lin = train_test_split(
+    X_lin, y_lin, test_size=0.2, random_state=42
+)
+
+# --- 准备非线性数据 ---
+X_poly_data, y_poly_data = generate_nonlinear_data()
+X_train_poly, X_test_poly, y_train_poly, y_test_poly = train_test_split(
+    X_poly_data, y_poly_data, test_size=0.2, random_state=42
+)
+```
+
+## 练习 1: 线性回归实践与评估
+
+**目标:** 训练线性回归模型并理解回归评估指标。
+
+1.  **训练模型:**
+    *   创建一个 `LinearRegression` 模型实例。
+    *   使用准备好的线性训练数据 (`X_train_lin`, `y_train_lin`) 训练模型。
+    *   打印模型的截距 (`intercept_`) 和系数 (`coef_`)。
+
+2.  **预测:**
+    *   使用训练好的模型对测试集 `X_test_lin` 进行预测，得到 `y_pred_lin`。
+
+3.  **评估:**
+    *   计算并打印测试集上的 MSE, RMSE, MAE, R²。
+    *   在 Markdown 单元格中解释 RMSE 和 R² 的含义。RMSE 的单位是什么？R²=0.8 意味着什么？
+
+4.  **可视化:**
+    *   绘制散点图展示测试集数据 (`X_test_lin`, `y_test_lin`)。
+    *   在同一张图上绘制线性回归的拟合线 (`X_test_lin`, `y_pred_lin`)。
+    *   添加图例、标题和坐标轴标签。
+    *   调用 `plt.show()` 显示图像。
+
+## 练习 2: 多项式回归实践
+
+**目标:** 使用多项式特征拟合非线性数据。
+
+1.  **特征转换:**
+    *   创建一个 `PolynomialFeatures` 实例 (`poly_features`)，设置 `degree=2` 和 `include_bias=False`。
+    *   使用该实例对**非线性训练数据** `X_train_poly` 进行 `fit_transform`，得到 `X_train_poly_deg2`。
+    *   使用**同一个**实例对**非线性测试数据** `X_test_poly` 进行 `transform`，得到 `X_test_poly_deg2`。
+    *   打印转换前后训练数据的形状，观察特征数量的变化。
+
+2.  **训练模型:**
+    *   创建一个 `LinearRegression` 模型实例 (`poly_lin_reg`)。
+    *   使用转换后的多项式训练特征 `X_train_poly_deg2` 和对应的 `y_train_poly` 训练模型。
+
+3.  **预测与评估:**
+    *   使用训练好的模型对转换后的测试特征 `X_test_poly_deg2` 进行预测，得到 `y_pred_poly_deg2`。
+    *   计算并打印测试集上的 RMSE 和 R²。
+    *   **(可选):** 训练一个普通的线性回归模型在 `X_train_poly`, `y_train_poly` 上，并在 `X_test_poly` 上评估，比较 RMSE 和 R² 与多项式回归的结果。
+
+4.  **可视化:**
+    *   绘制原始非线性测试数据散点图 (`X_test_poly`, `y_test_poly`)。
+    *   为了绘制拟合曲线，需要生成一些排序后的 x 值：`X_new = np.linspace(X_poly_data.min(), X_poly_data.max(), 100).reshape(-1, 1)`。
+    *   对 `X_new` 进行相同的多项式特征转换 `X_new_poly = poly_features.transform(X_new)`。
+    *   使用训练好的多项式回归模型 `poly_lin_reg` 预测 `y_new_poly = poly_lin_reg.predict(X_new_poly)`。
+    *   在散点图上绘制多项式回归拟合曲线 (`X_new`, `y_new_poly`)，用红色表示。
+    *   添加图例、标题和坐标轴标签。
+    *   调用 `plt.show()` 显示图像。
+
+5.  **(可选) 探索不同次数:**
+    *   尝试使用更高的 `degree` (例如 10 或 20) 重复步骤 1-4。观察拟合曲线的变化以及训练集和测试集上的 RMSE/R² 差异，体会过拟合现象。在 Markdown 单元格中记录你的观察。
+
+## 练习 3: 正则化实践 (Ridge & Lasso)
+
+**目标:** 理解 L1 和 L2 正则化如何影响模型系数和性能，特别是在高维或存在共线性（多项式特征可能引入）的情况下。
+
+**我们将使用上一练习中 degree=10 的多项式特征数据进行演示。**
+
+1.  **准备高次多项式数据:**
+    *   创建 `PolynomialFeatures` 实例，`degree=10`, `include_bias=False`。
+    *   转换 `X_train_poly` 和 `X_test_poly` 得到 `X_train_poly_deg10`, `X_test_poly_deg10`。
+    *   **重要:** 对转换后的特征进行标准化。创建 `StandardScaler`，在 `X_train_poly_deg10` 上 `fit_transform`，在 `X_test_poly_deg10` 上 `transform`。得到 `X_train_poly_scaled`, `X_test_poly_scaled`。
+
+2.  **训练普通线性回归 (对比):**
+    *   在**标准化后**的高次多项式训练数据 (`X_train_poly_scaled`, `y_train_poly`) 上训练 `LinearRegression`。
+    *   评估其在测试集 (`X_test_poly_scaled`, `y_test_poly`) 上的 RMSE 和 R²。
+    *   打印模型系数 `coef_` 的 L2 范数 (平方和的平方根: `np.linalg.norm(model.coef_)`)，观察系数的大小。
+
+3.  **训练 Ridge 回归:**
+    *   创建 `Ridge` 模型实例。尝试不同的 `alpha` 值，例如 `alphas_ridge = [0.01, 0.1, 1, 10, 100]`。
+    *   使用循环遍历 `alphas_ridge`：
+        *   创建 `Ridge(alpha=alpha, random_state=42)` 实例。
+        *   在**标准化后**的高次多项式训练数据上训练模型。
+        *   评估模型在测试集上的 RMSE 和 R²。
+        *   打印 `alpha` 值、RMSE、R² 和系数的 L2 范数。
+    *   **(可选) 使用 `RidgeCV`:** 创建 `RidgeCV(alphas=alphas_ridge, store_cv_values=True)` 实例，训练并打印 `best_alpha_`。
+    *   在 Markdown 单元格中比较 Ridge 回归与普通线性回归的性能和系数大小，以及不同 alpha 对结果的影响。
+
+4.  **训练 Lasso 回归:**
+    *   创建 `Lasso` 模型实例。尝试不同的 `alpha` 值，例如 `alphas_lasso = [0.001, 0.01, 0.1, 1]`。**注意：Lasso 对 alpha 更敏感。**
+    *   使用循环遍历 `alphas_lasso`：
+        *   创建 `Lasso(alpha=alpha, random_state=42, max_iter=10000)` 实例 (增加 `max_iter` 可能有助于收敛)。
+        *   在**标准化后**的高次多项式训练数据上训练模型。
+        *   评估模型在测试集上的 RMSE 和 R²。
+        *   打印 `alpha` 值、RMSE、R² 以及**非零系数的数量** (`np.sum(model.coef_ != 0)`)。
+    *   **(可选) 使用 `LassoCV`:** 创建 `LassoCV(alphas=alphas_lasso, cv=3, random_state=42, max_iter=10000)` 实例，训练并打印 `best_alpha_`。
+    *   在 Markdown 单元格中比较 Lasso 回归与普通线性回归、Ridge 回归的性能和系数。Lasso 是否实现了特征选择？
+
+5.  **分析:** 在 Markdown 单元格中总结 Ridge 和 Lasso 的作用，以及它们对模型系数和性能的影响，特别是在处理可能过拟合的高次多项式特征时的表现。
+
+## 练习 4: 项目二 - 阶段一 (数据准备与基线模型)
+
+**目标:** 应用所学知识，开始房价预测项目。
+
+1.  **加载数据:** 加载老师提供或你找到的房价数据集 (例如 Scikit-learn 自带的 California Housing 数据集)。
+    ```python
+    # 尝试加载 California Housing 数据集
+    data_loaded_project = False # Flag to check if data is loaded
+    try:
+        from sklearn.datasets import fetch_california_housing
+        if fetch_california_housing:
+            housing = fetch_california_housing(as_frame=True)
+            df_housing = housing.frame
+            # 分离特征和目标变量
+            X_h = df_housing[housing.feature_names] # 特征
+            y_h = df_housing[housing.target_names[0]] # 目标：房价中位数 (单位：10万美元)
+            print("成功加载 California Housing 数据集。")
+            print("数据集形状:", df_housing.shape)
+            print(df_housing.head())
+            print(df_housing.info())
+            print(df_housing.describe())
+            data_loaded_project = True
+        else:
+             print("fetch_california_housing not available.")
+    except ImportError:
+        print("无法加载 California Housing 数据集。请确保 scikit-learn 已安装或使用其他数据集。")
+    except Exception as e:
+        print(f"加载或处理数据时出错: {e}")
+
+    # 如果未加载示例数据，尝试从本地加载 (需要用户准备 'your_housing_data.csv')
+    if not data_loaded_project:
+        try:
+            df_housing = pd.read_csv('your_housing_data.csv') # 用户需要提供此文件
+            # 假设目标列名为 'Price' 或 'SalePrice' 等
+            target_col = 'MedHouseVal' # <---- 修改为你的目标列名
+            if target_col not in df_housing.columns:
+                raise ValueError(f"目标列 '{target_col}' 不在 CSV 文件中。")
+            X_h = df_housing.drop(columns=[target_col])
+            y_h = df_housing[target_col]
+            print("成功从 CSV 加载数据。")
+            print("数据集形状:", df_housing.shape)
+            data_loaded_project = True
+        except FileNotFoundError:
+            print("未找到 'your_housing_data.csv'。请提供数据集或使用 scikit-learn 数据集。")
+            X_h, y_h = None, None
+        except Exception as e:
+            print(f"从 CSV 加载数据时出错: {e}")
+            X_h, y_h = None, None
+
+    ```
+2.  **数据探索 (EDA):** (仅当 `data_loaded_project` 为 True 时执行)
+    *   检查目标变量 (房价 `y_h`) 的分布（绘制直方图 `y_h.hist(bins=50)`）。是否需要进行变换（如对数变换 `np.log1p()`）使其更接近正态分布？如果需要，创建变换后的目标变量 `y_h_log = np.log1p(y_h)`。
+    *   检查特征 `X_h` 中各列的缺失值 (`X_h.isnull().sum()`)。
+    *   识别数值特征和类别特征。
+    *   (可选) 计算特征与目标变量的相关性 (`df_housing.corr()[y_h.name].sort_values()`)。
+    *   (可选) 绘制部分特征与目标变量的散点图。
+
+3.  **数据预处理:** (仅当 `data_loaded_project` 为 True 时执行)
+    *   **处理缺失值:** 选择合适的策略（例如，对于数值特征，可以使用中位数填充 `X_h = X_h.fillna(X_h.median())`）。
+    *   **处理类别特征:** 如果有类别特征，使用独热编码 (`pd.get_dummies`)。
+    *   **特征缩放:** 对所有**数值特征**使用 `StandardScaler` 进行标准化。创建 `scaler_h = StandardScaler()`，然后 `X_h_scaled = scaler_h.fit_transform(X_h)`。
+
+4.  **划分训练/测试集:** (仅当 `data_loaded_project` 为 True 时执行)
+    *   将预处理后的特征数据 `X_h_scaled` 和目标变量 `y_h` (或变换后的 `y_h_log`) 划分为训练集和测试集 (`test_size=0.2`, `random_state=42`)。
+
+5.  **训练基线模型:** (仅当 `data_loaded_project` 为 True 时执行)
+    *   在训练集上训练一个 `LinearRegression` 模型。
+    *   在测试集上进行预测。
+    *   计算并记录基线模型的 MSE, RMSE, MAE, R²。如果目标变量做了对数变换，记得将预测值转换回去 (`np.expm1(y_pred_log)`) 再与原始测试集目标变量比较。
+
+**将以上步骤的代码和分析记录在你的项目二 Notebook 中。**
+
+## 练习 5: 项目二 - 初步模型改进
+
+**目标:** 尝试使用多项式回归和正则化改进基线模型。
+
+**继续使用项目二的数据和划分好的训练/测试集。确保使用标准化后的特征数据。** (仅当 `data_loaded_project` 为 True 时执行)
+
+1.  **多项式回归:**
+    *   选择 `degree=2`。创建 `PolynomialFeatures(include_bias=False)` 实例。
+    *   对**标准化后**的训练特征 (`X_train_h_scaled`) 和测试特征 (`X_test_h_scaled`) 进行转换。
+    *   在转换后的训练特征上训练 `LinearRegression` 模型。
+    *   在转换后的测试特征上预测，并评估性能 (RMSE, R²)。与基线模型比较。
+
+2.  **Ridge 回归:**
+    *   在**标准化后**的（原始，非多项式）训练特征上训练 `Ridge` 模型。
+    *   尝试几个不同的 `alpha` 值（例如 `[0.1, 1, 10, 100]`）。可以使用 `RidgeCV` 自动选择 alpha，或者手动循环尝试。
+    *   评估每个 alpha（或最优 alpha）在测试集上的性能。与基线模型比较。
+
+3.  **Lasso 回归:**
+    *   在**标准化后**的（原始，非多项式）训练特征上训练 `Lasso` 模型。
+    *   尝试几个不同的 `alpha` 值（例如 `[0.0001, 0.001, 0.01, 0.1, 1]`）。可以使用 `LassoCV` 或手动循环。注意设置 `max_iter` 可能需要更大（如 5000 或 10000）以保证收敛。
+    *   评估每个 alpha（或最优 alpha）在测试集上的性能。与基线模型比较。观察是否有系数变为 0。
+
+4.  **记录与分析:**
+    *   在项目 Notebook 中记录所有尝试的模型及其在**测试集**上的性能 (RMSE, R²)。
+    *   比较不同模型的效果，哪个模型目前表现最好？
+    *   多项式回归或正则化是否带来了改进？正则化模型（特别是 Lasso）是否减少了特征的数量？
+
+**完成本周练习，你将对线性模型及其扩展有更深入的掌握，并为项目二打下良好基础！**

@@ -1,0 +1,146 @@
+---
+title: "第三周：课堂练习与实验"
+subtitle: "逻辑回归、SVM 与分类模型评估"
+---
+
+本周我们将动手实践第一个分类算法——逻辑回归和支持向量机 (SVM)，并学习如何全面地评估分类模型的性能。
+
+## 准备工作
+
+确保导入本周所需的库：
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.metrics import (accuracy_score, confusion_matrix, classification_report,
+                             precision_score, recall_score, f1_score,
+                             roc_curve, auc, precision_recall_curve, average_precision_score)
+from sklearn.datasets import make_classification, make_moons # 用于生成示例数据
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+```
+
+## 练习 1: 逻辑回归实践
+
+**目标:** 训练逻辑回归模型并理解其预测。
+
+1.  **生成并准备数据:**
+    *   使用 `make_classification` 生成一个简单的二分类数据集，设置 `n_samples=500`, `n_features=2`, `n_redundant=0`, `n_informative=2`, `n_clusters_per_class=1`, `random_state=42`。将返回的特征和标签分别赋值给 `X_cls`, `y_cls`。
+    *   将数据划分为训练集 (`X_train_lr`, `X_test_lr`, `y_train_lr`, `y_test_lr`) 和测试集，测试集比例为 30%，记得设置 `random_state=42` 和 `stratify=y_cls`。
+    *   初始化一个 `StandardScaler`。
+    *   使用训练集 `X_train_lr` 来 `fit_transform` 标准化器，得到 `X_train_scaled`。
+    *   使用**同一个**标准化器对测试集 `X_test_lr` 进行 `transform`，得到 `X_test_scaled`。
+
+2.  **训练逻辑回归模型:**
+    *   创建一个 `LogisticRegression` 模型实例 (`random_state=42`)。
+    *   使用标准化后的训练数据 `X_train_scaled` 和 `y_train_lr` 训练模型。
+
+3.  **进行预测:**
+    *   使用训练好的模型对标准化后的测试数据 `X_test_scaled` 进行预测，得到预测类别 `y_pred_lr`。
+    *   使用 `predict_proba()` 方法获取模型对测试集样本属于每个类别（特别是正类，通常是索引为 1 的列）的预测概率 `y_pred_proba_lr`。
+    *   打印出测试集前 10 个样本的真实标签、预测标签和预测为正类的概率。
+
+## 练习 2: 分类模型评估指标计算与解读
+
+**目标:** 熟练计算和理解各种分类评估指标。
+
+**使用练习 1 中得到的 `y_test_lr` (真实标签) 和 `y_pred_lr` (预测标签)。**
+
+1.  **准确率 (Accuracy):**
+    *   使用 `accuracy_score()` 计算模型的准确率。
+    *   思考：如果数据极度不平衡（例如 95% 是负类，5% 是正类），高准确率是否还能完全代表模型的好坏？为什么？（在 Markdown 单元格中写下你的思考）。
+
+2.  **混淆矩阵 (Confusion Matrix):**
+    *   使用 `confusion_matrix()` 计算混淆矩阵。
+    *   手动从混淆矩阵中识别 TP, TN, FP, FN 的值（可以在代码注释中写明）。
+    *   使用 `seaborn.heatmap()` 将混淆矩阵可视化，确保添加标签 (annot=True, fmt='d') 和颜色条 (cmap='Blues')，并设置 x 轴和 y 轴的标签为 'Predicted Label' 和 'True Label'。
+
+3.  **精确率 (Precision):**
+    *   使用 `precision_score()` 计算正类 (通常 `pos_label=1`) 的精确率。
+    *   在 Markdown 单元格中解释该精确率数值的含义（“在所有被模型预测为正类的样本中...”）。
+
+4.  **召回率 (Recall):**
+    *   使用 `recall_score()` 计算正类的召回率。
+    *   在 Markdown 单元格中解释该召回率数值的含义（“在所有真实为正类的样本中...”）。
+
+5.  **F1 分数 (F1-Score):**
+    *   使用 `f1_score()` 计算正类的 F1 分数。
+    *   在 Markdown 单元格中解释 F1 分数综合了哪两个指标？在什么情况下 F1 分数会比较高？
+
+6.  **分类报告 (Classification Report):**
+    *   使用 `classification_report()` 生成完整的分类报告，并打印出来。
+    *   在 Markdown 单元格中解释报告中 `macro avg` 和 `weighted avg` 的主要区别。
+
+## 练习 3: 支持向量机 (SVM) 实践
+
+**目标:** 训练 SVM 分类器，并尝试不同的核函数和参数。
+
+**继续使用练习 1 中准备好的标准化数据 (`X_train_scaled`, `y_train_lr`, `X_test_scaled`, `y_test_lr`)。**
+
+1.  **训练线性 SVM:**
+    *   创建一个 `SVC` 模型实例，设置 `kernel='linear'`, `probability=True`, `random_state=42`。
+    *   训练模型。
+    *   进行预测 (`y_pred_svm_linear`) 和概率预测 (`y_pred_proba_svm_linear`)。
+    *   评估模型性能（打印准确率和分类报告）。
+
+2.  **训练 RBF 核 SVM:**
+    *   创建一个 `SVC` 模型实例，设置 `kernel='rbf'` (默认)，`C=1.0` (默认), `gamma='scale'` (默认), `probability=True`, `random_state=42`。
+    *   训练模型。
+    *   进行预测 (`y_pred_svm_rbf`) 和概率预测 (`y_pred_proba_svm_rbf`)。
+    *   评估模型性能（打印准确率和分类报告）。
+
+3.  **(可选) 尝试不同的 C 和 gamma 值:**
+    *   保持 `kernel='rbf'`，尝试增大 `C` 值 (例如 `C=10`) 或减小 `C` 值 (例如 `C=0.1`)，训练模型并评估，观察对模型性能的影响。
+    *   保持 `kernel='rbf'` 和 `C=1.0`，尝试增大 `gamma` 值 (例如 `gamma=1`) 或减小 `gamma` 值 (例如 `gamma=0.1`)，训练模型并评估，观察对模型性能的影响。（`gamma` 控制单个样本的影响范围，值越大影响范围越小，模型可能更复杂）。
+    *   在 Markdown 单元格中简单记录不同参数组合下的测试集准确率或 F1 分数，并简述你的观察。
+
+## 练习 4: ROC 曲线与 AUC
+
+**目标:** 理解 ROC 曲线和 AUC 的计算与含义。
+
+**使用练习 1 和练习 3 中得到的 `y_test_lr` (真实标签) 以及 `y_pred_proba_lr` (逻辑回归正类概率) 和 `y_pred_proba_svm_rbf` (RBF 核 SVM 正类概率)。**
+
+1.  **计算 ROC 曲线数据:**
+    *   使用 `roc_curve()` 分别计算逻辑回归和 RBF 核 SVM 的 FPR (False Positive Rate) 和 TPR (True Positive Rate)。
+
+2.  **计算 AUC 值:**
+    *   使用 `auc()` 函数，根据上一步得到的 FPR 和 TPR 计算两个模型的 AUC 值。
+
+3.  **绘制 ROC 曲线:**
+    *   使用 `matplotlib.pyplot` 绘制 ROC 曲线。
+    *   将逻辑回归和 SVM 的 ROC 曲线绘制在**同一张图**上。
+    *   添加一条表示随机猜测的对角线 (从 [0,0] 到 [1,1])，用 `linestyle='--'` 表示。
+    *   在图例 (`plt.legend()`) 中清晰地显示每个模型的名称及其 AUC 值 (使用 f-string 格式化，例如 `f'Logistic Regression (AUC = {roc_auc_lr:.2f})'`)。
+    *   添加 x 轴标签 ("False Positive Rate (FPR)")，y 轴标签 ("True Positive Rate (TPR)") 和图标题 ("ROC Curve Comparison")。
+    *   显示网格 (`plt.grid(True)`)。
+    *   调用 `plt.show()` 显示图像。
+
+4.  **解读:**
+    *   在 Markdown 单元格中回答：哪个模型的 AUC 值更高？这通常意味着什么？观察 ROC 曲线，哪个模型更接近左上角？
+
+## 练习 5: 项目一 - 模型构建与评估
+
+**目标:** 将本周所学应用于你的项目一（电商用户行为数据）。
+
+1.  **加载预处理数据:** 加载你上周完成预处理的项目一数据集。确保特征已缩放，标签已准备好。
+2.  **划分数据:** 使用 `train_test_split` 划分训练集和测试集 (`stratify=y`)。
+3.  **训练与评估 LR:**
+    *   训练逻辑回归模型。
+    *   在测试集上评估，计算准确率、混淆矩阵、分类报告、AUC。绘制 ROC 曲线。
+4.  **训练与评估 SVM:**
+    *   训练 SVM 模型 (可以先尝试 `kernel='rbf'` 和默认参数，记得设置 `probability=True`)。
+    *   在测试集上评估，计算准确率、混淆矩阵、分类报告、AUC。绘制 ROC 曲线（可以和 LR 绘制在同一张图上）。
+5.  **结果分析与记录:**
+    *   在你的项目 Notebook 中，清晰地记录每个模型的训练过程、评估结果和可视化图表。
+    *   在 Markdown 单元格中，比较 LR 和 SVM 在你的数据集上的表现（结合多个指标）。
+    *   根据混淆矩阵分析模型的错误类型，并结合你的业务场景（预测用户是否会购买/点击/流失等）进行解读，讨论哪种错误代价更大。
+    *   记录你对模型表现的初步看法和可能的改进方向。
+
+**认真完成这些练习，你将对分类模型的训练、评估和比较有更深入的理解！**

@@ -1,0 +1,329 @@
+---
+title: "第四周：决策树与随机森林 - 模型优化初探"
+subtitle: "学习基于树的模型，掌握集成学习思想与自动化调优"
+---
+
+上周我们学习了逻辑回归和 SVM。本周我们将探索另一类非常流行且直观的分类算法：**决策树 (Decision Tree)**。在此基础上，我们将进一步学习强大的**集成学习 (Ensemble Learning)** 方法——**随机森林 (Random Forest)**。同时，我们还会介绍模型优化的关键技术：**交叉验证 (Cross-Validation)** 和**网格搜索 (Grid Search)**，并将它们应用于项目一的模型优化。
+
+::: {.callout-info title="项目一模型构建"}
+请确保你已经提交了使用 LR 和 SVM 构建的项目一模型及评估结果。本周我们将在此基础上进行优化。
+:::
+
+## 1. 决策树 (Decision Tree)
+
+决策树是一种模仿人类决策过程的算法。它通过一系列的“是/否”问题（基于特征的判断）来对数据进行划分，最终将样本归入不同的类别。
+
+### 1.1 原理简介 (直观理解)
+
+想象一下判断一个西瓜是不是好瓜的过程：
+
+1.  先看颜色，是不是青绿色？
+    *   是：再看根蒂，是不是蜷缩？
+        *   是：再听声音，是不是浊响？
+            *   是：好瓜！
+            *   否：坏瓜。
+        *   否：坏瓜。
+    *   否：坏瓜。
+
+这就是一个简单的决策树。它包含：
+
+*   **根节点 (Root Node):** 第一个问题/判断（如“颜色是青绿吗？”）。
+*   **内部节点 (Internal Node):** 中间的判断节点。
+*   **分支 (Branch):** 代表一个判断的结果。
+*   **叶节点 (Leaf Node):** 最终的决策结果（类别标签，如“好瓜”或“坏瓜”）。
+
+**决策树如何构建？**
+
+核心在于如何选择**最优的特征**在每个节点进行划分。目标是使得每次划分后，各个分支下的样本尽可能属于**同一类别**（即“纯度”尽可能高）。常用的衡量纯度的指标有：
+
+*   **信息熵 (Entropy):** 度量系统的不确定性或混乱程度。熵越小，纯度越高。决策树倾向于选择能最大程度**减少熵**（即信息增益最大）的特征进行划分。
+*   **基尼不纯度 (Gini Impurity):** 另一种度量纯度的指标。基尼指数越小，纯度越高。CART (Classification and Regression Trees) 算法常用基尼指数。
+
+决策树会**递归地**选择最优特征进行分裂，直到满足停止条件（例如：节点样本已足够纯净、达到最大深度、节点样本数过少等）。
+
+### 1.2 使用 Scikit-learn 实现
+
+Scikit-learn 提供了 `DecisionTreeClassifier` 类。
+
+```python
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+# --- 假设已有 X_train, X_test, y_train, y_test (来自上周) ---
+# 如果没有，需要重新加载数据并划分
+# 创建一些示例数据 (实际项目中应使用你的项目数据)
+np.random.seed(42)
+X_example = np.random.rand(100, 2) * 10 # 100个样本，2个特征
+y_example = (X_example[:, 0] + X_example[:, 1] > 10).astype(int)
+X_train, X_test, y_train, y_test = train_test_split(
+    X_example, y_example, test_size=0.3, random_state=42, stratify=y_example
+)
+feature_names_example = ['Feature 1', 'Feature 2'] # 示例特征名
+
+# --- 训练决策树模型 ---
+# 1. 创建模型实例
+# criterion: 'gini' 或 'entropy'，选择划分标准
+# max_depth: 树的最大深度，限制树的复杂度，防止过拟合
+# min_samples_split: 节点最少需要多少样本才能继续划分
+# min_samples_leaf: 叶节点最少需要包含多少样本
+# random_state: 保证结果可复现
+dt_clf = DecisionTreeClassifier(criterion='gini', max_depth=5, random_state=42)
+
+# 2. 拟合模型
+dt_clf.fit(X_train, y_train)
+
+# --- 预测与评估 ---
+y_pred_dt = dt_clf.predict(X_test)
+
+print("\n--- 决策树评估 ---")
+accuracy_dt = accuracy_score(y_test, y_pred_dt)
+print(f"决策树准确率: {accuracy_dt:.4f}")
+
+cm_dt = confusion_matrix(y_test, y_pred_dt)
+print("决策树混淆矩阵:\n", cm_dt)
+
+report_dt = classification_report(y_test, y_pred_dt, target_names=['Class 0', 'Class 1'])
+print("决策树分类报告:\n", report_dt)
+
+# --- 可视化决策树 ---
+plt.figure(figsize=(20, 10)) # 可以调整图像大小
+plot_tree(dt_clf,
+          filled=True, # 用颜色填充节点以表示纯度
+          rounded=True, # 节点边框使用圆角
+          class_names=['Class 0', 'Class 1'], # 显示类别名称
+          feature_names=feature_names_example) # 显示特征名称 (替换为你的实际特征名)
+# plt.show() # 在 Notebook 中取消注释以显示图像
+```
+
+### 1.3 优缺点
+
+*   **优点:**
+    *   **直观易懂:** 模型结果容易解释和可视化。
+    *   **对数据预处理要求低:** 通常不需要进行特征缩放。
+    *   **能处理数值和类别特征:** (Scikit-learn 实现主要支持数值，类别需预处理)。
+    *   **能捕捉非线性关系。**
+*   **缺点:**
+    *   **容易过拟合 (Overfitting):** 决策树倾向于生成非常复杂的树来完美拟合训练数据，导致在测试数据上表现不佳。需要通过剪枝（限制树的生长，如 `max_depth`, `min_samples_leaf`）来缓解。
+    *   **对数据微小变化敏感:** 数据微小的变动可能导致生成完全不同的树。
+    *   **倾向于偏向拥有更多取值的特征。**
+
+## 2. 集成学习 (Ensemble Learning) - 随机森林
+
+单个决策树容易过拟合，表现可能不稳定。**集成学习**通过构建并结合多个学习器（通常是同种类型的，如多个决策树）来获得比单个学习器更好的性能。所谓“三个臭皮匠，顶个诸葛亮”。
+
+**随机森林 (Random Forest)** 就是一种非常强大的、基于决策树的集成学习算法。
+
+### 2.1 Bagging 思想
+
+随机森林主要运用了 **Bagging (Bootstrap Aggregating)** 的思想：
+
+1.  **自助采样 (Bootstrap):** 从原始训练数据集中**有放回地**随机抽取样本，构成一个新的训练子集。重复这个过程多次（例如 100 次），得到多个不同的训练子集。每个子集的大小通常与原始数据集相同，但由于是有放回抽样，某些样本可能出现多次，某些样本可能一次都不出现。
+2.  **独立训练:** 在每个训练子集上独立地训练一个基学习器（在随机森林中就是决策树）。
+3.  **聚合 (Aggregating):**
+    *   对于**分类**问题：让所有训练好的决策树进行投票，得票最多的类别作为最终预测结果。
+    *   对于**回归**问题：取所有决策树预测值的平均值作为最终预测结果。
+
+Bagging 通过引入样本随机性，降低了模型的方差，提高了模型的稳定性和泛化能力。
+
+### 2.2 随机森林的“随机”
+
+随机森林在 Bagging 的基础上，进一步引入了**特征随机性**:
+
+*   在构建每棵决策树时，进行节点分裂选择特征时，**不是从所有特征中选择最优特征，而是从随机抽取的一部分特征中选择最优特征**。
+
+这种双重的随机性（样本随机 + 特征随机）使得森林中的每棵树都具有多样性，进一步减少了过拟合的风险，提高了模型的鲁棒性。
+
+### 2.3 使用 Scikit-learn 实现
+
+Scikit-learn 提供了 `RandomForestClassifier` 类。
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+import seaborn as sns # 用于绘图
+
+# --- 训练随机森林模型 ---
+# 1. 创建模型实例
+# n_estimators: 森林中树的数量 (基学习器的数量)
+# criterion, max_depth, min_samples_split, min_samples_leaf: 与 DecisionTreeClassifier 类似，控制单棵树的生长
+# n_jobs: 并行运行的任务数 (-1 表示使用所有可用的 CPU 核心)
+# random_state: 保证结果可复现
+rf_clf = RandomForestClassifier(n_estimators=100, # 通常选择 100 或更多
+                                criterion='gini',
+                                max_depth=10,     # 可以适当增加深度
+                                n_jobs=-1,
+                                random_state=42)
+
+# 2. 拟合模型
+rf_clf.fit(X_train, y_train)
+
+# --- 预测与评估 ---
+y_pred_rf = rf_clf.predict(X_test)
+
+print("\n--- 随机森林评估 ---")
+accuracy_rf = accuracy_score(y_test, y_pred_rf)
+print(f"随机森林准确率: {accuracy_rf:.4f}")
+
+cm_rf = confusion_matrix(y_test, y_pred_rf)
+print("随机森林混淆矩阵:\n", cm_rf)
+
+report_rf = classification_report(y_test, y_pred_rf, target_names=['Class 0', 'Class 1'])
+print("随机森林分类报告:\n", report_rf)
+
+# (可选) 查看特征重要性
+importances = rf_clf.feature_importances_
+# 将重要性与特征名对应起来
+# feature_names = ['Feature 1', 'Feature 2'] # 替换为你的实际特征名
+feature_importance_df = pd.DataFrame({'Feature': feature_names_example, 'Importance': importances})
+feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
+print("\n特征重要性:\n", feature_importance_df)
+
+# 可视化特征重要性
+plt.figure(figsize=(10, 6))
+sns.barplot(x='Importance', y='Feature', data=feature_importance_df)
+plt.title('Feature Importance (Random Forest)')
+# plt.show()
+```
+
+### 2.4 随机森林优点
+
+*   **性能强大:** 通常比单个决策树表现更好，是目前最常用的机器学习算法之一。
+*   **抗过拟合能力强:** 双重随机性使其不容易过拟合。
+*   **能处理高维数据:** 特征随机性使其在高维数据上表现良好。
+*   **能评估特征重要性:** 可以了解哪些特征对预测贡献更大。
+*   **对数据预处理要求相对较低:** 通常不需要特征缩放。
+*   **易于并行化:** 每棵树可以独立训练。
+
+## 3. 模型优化：交叉验证与网格搜索
+
+我们之前训练模型时，只将数据划分了一次训练集和测试集。这种方式得到的模型评估结果可能具有偶然性，受单次划分的影响较大。同时，像 SVM 的 `C`, `gamma` 或随机森林的 `n_estimators`, `max_depth` 等**超参数 (Hyperparameters)** 的选择也会显著影响模型性能，手动尝试不同的组合效率低下。
+
+### 3.1 交叉验证 (Cross-Validation, CV)
+
+交叉验证是一种更可靠的模型评估方法。它将训练数据进一步划分为多个**折 (Fold)**，多次训练和评估模型，最后取平均结果。最常用的是 **K 折交叉验证 (K-Fold Cross-Validation)**:
+
+1.  将**训练集**随机划分为 K 个大小相似的互斥子集（折）。
+2.  进行 K 次迭代：
+    *   在第 i 次迭代中，将第 i 个折作为**验证集 (Validation Set)**，其余 K-1 个折合并作为**训练集**。
+    *   在该训练集上训练模型。
+    *   在验证集上评估模型性能。
+3.  将 K 次迭代得到的评估指标（如准确率、F1 分数）取平均值，作为最终的模型性能评估结果。
+
+**优点:**
+
+*   更充分地利用了数据。
+*   评估结果更稳定、更可靠，减少了单次划分带来的偶然性。
+
+Scikit-learn 提供了 `cross_val_score` 函数来方便地执行交叉验证。
+
+```python
+from sklearn.model_selection import cross_val_score
+
+# 使用 K 折交叉验证评估随机森林模型 (在整个训练集 X_train 上)
+# cv=5 表示 5 折交叉验证
+# scoring='accuracy' 指定评估指标，也可以是 'f1', 'precision', 'recall', 'roc_auc' 等
+# 注意：这里我们用之前创建的 rf_clf 实例进行评估
+scores = cross_val_score(rf_clf, X_train, y_train, cv=5, scoring='accuracy', n_jobs=-1)
+
+print(f"\n随机森林 5 折交叉验证准确率: {scores}")
+print(f"平均准确率: {scores.mean():.4f} (+/- {scores.std() * 2:.4f})") # 通常报告均值和两倍标准差范围
+```
+
+::: {.callout-note title="Stratified K-Fold"}
+对于分类问题，尤其是不平衡数据，推荐使用 **Stratified K-Fold**。它在划分折时会保持每个折中类别比例与原始数据集一致。`cross_val_score` 在处理分类问题时通常默认使用 Stratified K-Fold。
+:::
+
+### 3.2 网格搜索 (Grid Search)
+
+网格搜索是一种自动化的**超参数调优 (Hyperparameter Tuning)** 方法。它会尝试你指定的所有超参数组合，并通过交叉验证来评估每种组合的性能，最终找到最优的超参数组合。
+
+1.  **定义参数网格:** 指定你想要尝试的超参数及其候选值。
+2.  **遍历组合:** 网格搜索会尝试参数网格中所有可能的超参数组合。
+3.  **交叉验证评估:** 对于每一种超参数组合，使用交叉验证来评估模型性能。
+4.  **选择最优参数:** 选择在交叉验证中表现最好的那组超参数。
+5.  **重新训练:** 使用找到的最优超参数，在**整个训练集**上重新训练最终的模型。
+
+Scikit-learn 提供了 `GridSearchCV` 类。
+
+```python
+from sklearn.model_selection import GridSearchCV
+
+# 1. 定义参数网格 (以 RandomForest 为例)
+param_grid = {
+    'n_estimators': [50, 100, 200],       # 尝试不同的树数量
+    'max_depth': [5, 10, 15, None],     # 尝试不同的最大深度 (None 表示不限制)
+    'min_samples_split': [2, 5, 10],    # 尝试不同的节点最小分裂样本数
+    'min_samples_leaf': [1, 3, 5]       # 尝试不同的叶节点最小样本数
+    # 'criterion': ['gini', 'entropy'] # 也可以加入划分标准
+}
+
+# 2. 创建 GridSearchCV 实例
+# estimator: 要调优的模型实例
+# param_grid: 参数网格
+# cv: 交叉验证折数
+# scoring: 评估指标
+# n_jobs: 并行任务数
+# verbose: 控制运行时输出信息的详细程度 (值越大越详细)
+grid_search = GridSearchCV(estimator=RandomForestClassifier(random_state=42, n_jobs=-1),
+                           param_grid=param_grid,
+                           cv=3, # 使用 3 折 CV 加快速度 (实际可设为 5 或 10)
+                           scoring='accuracy',
+                           verbose=1)
+
+# 3. 在训练集上执行网格搜索 (这可能需要一些时间)
+grid_search.fit(X_train, y_train)
+
+# 4. 查看最优参数和最优分数
+print("\n--- 网格搜索结果 ---")
+print("找到的最优超参数:", grid_search.best_params_)
+print(f"最优交叉验证准确率: {grid_search.best_score_:.4f}")
+
+# 5. 获取最优模型
+best_rf_clf = grid_search.best_estimator_
+
+# --- 使用最优模型进行预测和评估 ---
+y_pred_best_rf = best_rf_clf.predict(X_test)
+
+print("\n--- 最优随机森林评估 ---")
+accuracy_best_rf = accuracy_score(y_test, y_pred_best_rf)
+print(f"最优随机森林在测试集上的准确率: {accuracy_best_rf:.4f}")
+
+report_best_rf = classification_report(y_test, y_pred_best_rf, target_names=['Class 0', 'Class 1'])
+print("最优随机森林分类报告:\n", report_best_rf)
+```
+
+::: {.callout-tip title="AI 辅助理解 CV 与 GridSearch"}
+*   "解释 K 折交叉验证的步骤及其相比简单划分训练/测试集的优势。"
+*   "什么是超参数？它和模型参数有什么区别？"
+*   "GridSearchCV 是如何工作的？它的 `cv` 和 `scoring` 参数分别是什么意思？"
+*   "除了 GridSearchCV，还有哪些常用的超参数调优方法？（例如 RandomizedSearchCV）"
+*   "帮我为 SVM 的 `C` 和 `gamma` 参数写一个 `param_grid` 用于 GridSearchCV。"
+:::
+
+## 4. 小组项目一：模型优化与最终报告
+
+本周是项目一的最后阶段！你需要使用随机森林优化你的分类模型，并利用网格搜索寻找最佳超参数。
+
+*   **任务:**
+    1.  **训练随机森林:** 在你的预处理数据上训练一个 `RandomForestClassifier` 模型（可以使用默认参数或基于决策树表现初步选择参数）。
+    2.  **评估随机森林:** 使用交叉验证 (`cross_val_score`) 评估其性能，并与之前的 LR 和 SVM 模型进行比较。
+    3.  **定义参数网格:** 为 `RandomForestClassifier` 定义一个合适的 `param_grid`，包含你认为重要的超参数（如 `n_estimators`, `max_depth`, `min_samples_split`, `min_samples_leaf`）及其候选值。
+    4.  **执行网格搜索:** 使用 `GridSearchCV` 寻找随机森林的最佳超参数组合（使用交叉验证，例如 `cv=5`）。
+    5.  **评估最优模型:** 使用网格搜索找到的最佳模型 (`best_estimator_`) 对**测试集**进行预测，并计算最终的评估指标（准确率、混淆矩阵、分类报告、ROC AUC）。记得与之前的模型结果进行对比。
+    6.  **对比与分析:**
+        *   比较调优后的随机森林与之前所有模型（LR, SVM, 初始 RF）的性能。调优是否带来了提升？哪个模型最终表现最好？
+        *   分析最优随机森林的特征重要性 (`feature_importances_`)，哪些特征对预测用户行为最重要？这符合你的预期吗？（需要将特征重要性与你的实际特征名对应起来）。
+        *   总结项目一的整个流程、遇到的挑战、解决方法以及最终模型的表现和业务解读（例如，根据模型结果，可以为电商平台提供哪些建议？）。
+*   **提交:**
+    *   最终的 Jupyter Notebook (`.ipynb`)，包含所有步骤的代码、结果和分析。确保代码清晰、注释充分，结果可视化。
+    *   一份简洁的项目报告 (`.md` 或 `.pdf` 格式)，总结项目目标、数据描述、预处理步骤、模型选择与调优过程、最终模型评估结果、特征重要性分析、结论与业务建议。
+*   **DDL:** 第五周第一次课前。
+
+## 5. 本周总结
+
+本周我们学习了决策树和强大的集成算法随机森林。我们理解了 Bagging 和特征随机性的原理，并掌握了如何在 Scikit-learn 中使用它们。我们还学习了通过交叉验证进行更可靠的模型评估，以及利用网格搜索自动化超参数调优的关键技术。最后，我们将这些优化方法应用到了项目一中。
+
+**下周我们将转向另一类重要的监督学习问题——回归，并学习线性回归及其变种！**

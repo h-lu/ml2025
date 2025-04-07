@@ -1,0 +1,282 @@
+---
+title: "第六周：课堂练习与实验"
+subtitle: "XGBoost 回归与参数调优"
+---
+
+本周我们将重点实践强大的 XGBoost 算法用于回归任务，并学习如何使用网格搜索等方法对其进行参数调优。同时，我们将完成项目二（房价预测）的模型优化和报告撰写。
+
+## 准备工作
+
+确保导入本周所需的库，并准备好上周使用的房价数据集（或示例数据）。
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+# 检查 xgboost 是否已安装，如果需要安装，取消下一行注释
+# !pip install xgboost
+try:
+    import xgboost as xgb
+except ImportError:
+    print("XGBoost not installed. Please install it using: pip install xgboost")
+    xgb = None # Set to None if import fails
+
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from scipy.stats import uniform, randint # 用于 RandomizedSearchCV
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+
+# --- 加载或生成数据 (复用上周项目二的数据准备) ---
+# 假设 X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h 已经从上周的练习中加载并准备好
+# 如果没有，需要重新执行 week5_exercise.qmd 中的数据加载和预处理步骤
+# 例如，加载 California Housing 数据并处理：
+data_loaded = False
+X_h, y_h = None, None # Initialize to None
+X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = None, None, None, None
+
+try:
+    from sklearn.datasets import fetch_california_housing
+    housing = fetch_california_housing(as_frame=True)
+    df_housing = housing.frame
+    X_h = df_housing[housing.feature_names]
+    y_h = df_housing[housing.target_names[0]] # 目标：房价中位数 (单位：10万美元)
+
+    # 简单处理缺失值 (用中位数填充)
+    if X_h.isnull().sum().any(): # 检查是否有任何缺失值
+         X_h = X_h.fillna(X_h.median()) # 使用 fillna 并重新赋值
+
+    # 特征缩放
+    scaler_h = StandardScaler()
+    X_h_scaled = scaler_h.fit_transform(X_h)
+
+    # 划分训练/测试集
+    X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = train_test_split(
+        X_h_scaled, y_h, test_size=0.2, random_state=42
+    )
+    print("数据准备完成。")
+    print("训练集形状:", X_train_h_scaled.shape)
+    print("测试集形状:", X_test_h_scaled.shape)
+    data_loaded = True
+except ImportError:
+    print("无法加载 California Housing 数据集。请确保 scikit-learn 已安装或使用其他数据集。")
+except Exception as e:
+    print(f"加载或处理数据时出错: {e}")
+
+if not data_loaded:
+     print("将使用简单生成数据进行后续练习。")
+     # Fallback to generated data if loading failed
+     def generate_linear_data(n_samples=500, noise=5, random_state=42):
+         np.random.seed(random_state)
+         X = 10 * np.random.rand(n_samples, 3) # 3 features
+         y = 5 + 2*X[:,0] + 0.5*X[:,1] - 1.5*X[:,2] + np.random.randn(n_samples) * noise
+         return X, y
+     X_h, y_h = generate_linear_data()
+     scaler_h = StandardScaler()
+     X_h_scaled = scaler_h.fit_transform(X_h)
+     X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = train_test_split(
+        X_h_scaled, y_h, test_size=0.2, random_state=42
+     )
+     data_loaded = True # Mark as loaded for subsequent steps
+
+```
+
+## 练习 1: XGBoost 回归基础
+
+**目标:** 训练一个基础的 XGBoost 回归模型，并与线性回归进行比较。
+
+**使用项目二准备好的训练集和测试集 (`X_train_h_scaled`, `y_train_h`, `X_test_h_scaled`, `y_test_h`)。**
+
+*前置条件检查：确保上一步数据加载和预处理成功，并且 `xgboost` 库已安装。*
+
+```python
+if data_loaded and xgb:
+    # 1. 训练 XGBoost 模型
+    print("训练基础 XGBoost 模型...")
+    xgb_reg_base = xgb.XGBRegressor(objective='reg:squarederror',
+                                    n_estimators=100,
+                                    learning_rate=0.1,
+                                    max_depth=5,
+                                    subsample=0.8,
+                                    colsample_bytree=0.8,
+                                    random_state=42,
+                                    n_jobs=-1) # 使用所有 CPU 核心
+
+    eval_set = [(X_test_h_scaled, y_test_h)] # 使用测试集作为评估集
+    xgb_reg_base.fit(X_train_h_scaled, y_train_h,
+                     eval_set=eval_set,
+                     eval_metric='rmse', # 监控 RMSE
+                     early_stopping_rounds=10, # 如果 10 轮内 RMSE 没有改善则停止
+                     verbose=False) # 设置为 True 可以看到每一轮的评估结果
+
+    # 2. 预测与评估
+    y_pred_xgb_base = xgb_reg_base.predict(X_test_h_scaled)
+    rmse_xgb_base = np.sqrt(mean_squared_error(y_test_h, y_pred_xgb_base))
+    r2_xgb_base = r2_score(y_test_h, y_pred_xgb_base)
+    mae_xgb_base = mean_absolute_error(y_test_h, y_pred_xgb_base)
+    print("\n--- 基础 XGBoost 评估 ---")
+    print(f"XGBoost RMSE: {rmse_xgb_base:.4f}")
+    print(f"XGBoost MAE: {mae_xgb_base:.4f}")
+    print(f"XGBoost R²: {r2_xgb_base:.4f}")
+
+    # 3. 对比线性回归 (假设 lin_reg 已在上周练习中训练好)
+    # 如果没有，需要重新训练
+    try:
+        # 尝试加载上周训练的线性回归模型或结果
+        # 如果没有保存模型，需要重新训练
+        lin_reg = LinearRegression()
+        lin_reg.fit(X_train_h_scaled, y_train_h)
+        y_pred_lin = lin_reg.predict(X_test_h_scaled)
+        rmse_lin = np.sqrt(mean_squared_error(y_test_h, y_pred_lin))
+        r2_lin = r2_score(y_test_h, y_pred_lin)
+        mae_lin = mean_absolute_error(y_test_h, y_pred_lin)
+        print("\n--- 线性回归评估 (对比) ---")
+        print(f"线性回归 RMSE: {rmse_lin:.4f}")
+        print(f"线性回归 MAE: {mae_lin:.4f}")
+        print(f"线性回归 R²: {r2_lin:.4f}")
+    except NameError:
+        print("\n线性回归模型未找到，请先运行上周练习或重新训练。")
+
+    print("\n对比完成。请在 Markdown 单元格中分析 XGBoost 是否比线性回归有显著提升。")
+elif not xgb:
+    print("XGBoost 库未安装，请先安装： pip install xgboost")
+else:
+    print("数据未加载，无法执行练习 1。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中比较基础 XGBoost 和线性回归的性能 (RMSE, MAE, R²)。XGBoost 是否有显著提升？
+
+## 练习 2: XGBoost 参数调优 (Grid Search 或 Randomized Search)
+
+**目标:** 使用自动化工具寻找 XGBoost 的更优超参数组合。
+
+**继续使用项目二的数据。**
+
+*前置条件检查：确保上一步数据加载和预处理成功，并且 `xgboost` 库已安装。*
+
+```python
+if data_loaded and xgb:
+    # 1. 选择调优方法 (这里以 RandomizedSearchCV 为例，计算量相对较小)
+    print("\n开始 RandomizedSearchCV 调优 (可能需要几分钟)...")
+
+    # 2. 定义参数空间
+    param_dist = {
+        'n_estimators': randint(100, 600),        # 树的数量范围
+        'learning_rate': uniform(0.01, 0.29),     # 学习率范围 (0.01 到 0.3)
+        'max_depth': randint(3, 11),              # 树的最大深度 (3 到 10)
+        'subsample': uniform(0.6, 0.4),           # 样本采样比例 (0.6 到 1.0)
+        'colsample_bytree': uniform(0.6, 0.4),    # 特征采样比例 (0.6 到 1.0)
+        'gamma': [0, 0.1, 0.5, 1, 1.5, 2],        # 尝试几个 gamma 值
+        'reg_alpha': [0, 0.001, 0.01, 0.1, 1],     # L1 正则化系数
+        'reg_lambda': [0.5, 1, 1.5, 2, 5]         # L2 正则化系数
+    }
+
+    # 3. 创建搜索对象
+    xgb_reg_tune = xgb.XGBRegressor(objective='reg:squarederror', random_state=42, n_jobs=-1)
+
+    # n_iter 控制抽样次数，cv 控制交叉验证折数
+    # 增加 n_iter 和 cv 会提高找到更好参数的可能性，但也会增加时间
+    random_search_xgb = RandomizedSearchCV(estimator=xgb_reg_tune,
+                                           param_distributions=param_dist,
+                                           n_iter=30, # 尝试 30 组随机参数组合 (可根据时间和计算资源调整)
+                                           scoring='neg_root_mean_squared_error', # 使用负 RMSE
+                                           cv=3, # 3 折交叉验证
+                                           verbose=1,
+                                           random_state=42,
+                                           n_jobs=-1) # 使用所有可用 CPU
+
+    # 4. 执行搜索
+    random_search_xgb.fit(X_train_h_scaled, y_train_h)
+
+    # 5. 查看结果
+    print("\n--- RandomizedSearchCV 结果 ---")
+    print("找到的最优超参数:", random_search_xgb.best_params_)
+    print(f"最优交叉验证 RMSE: {-random_search_xgb.best_score_:.4f}") # 注意取负号
+
+    # 6. 评估最优模型
+    best_xgb = random_search_xgb.best_estimator_
+    y_pred_best_xgb = best_xgb.predict(X_test_h_scaled)
+    rmse_best_xgb = np.sqrt(mean_squared_error(y_test_h, y_pred_best_xgb))
+    mae_best_xgb = mean_absolute_error(y_test_h, y_pred_best_xgb)
+    r2_best_xgb = r2_score(y_test_h, y_pred_best_xgb)
+
+    print("\n--- 最优 XGBoost 评估 (测试集) ---")
+    print(f"最优 XGBoost RMSE: {rmse_best_xgb:.4f}")
+    print(f"最优 XGBoost MAE: {mae_best_xgb:.4f}")
+    print(f"最优 XGBoost R²: {r2_best_xgb:.4f}")
+
+    print("\n调优完成。请在 Markdown 单元格中比较调优后的性能。")
+
+elif not xgb:
+    print("XGBoost 库未安装，无法执行练习 2。")
+else:
+    print("数据未加载，无法执行练习 2。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中比较调优后的 XGBoost 模型与练习 1 中的基础 XGBoost 模型以及线性回归模型的性能 (RMSE, MAE, R²)。调优是否带来了显著提升？
+
+## 练习 3: 项目二 - 模型优化与最终报告
+
+**目标:** 完成项目二的 XGBoost 优化和报告撰写。
+
+1.  **应用 XGBoost:** 将练习 1 和 2 中的 XGBoost 训练和调优过程整合到你的项目二 Notebook 中。确保使用了你的项目数据。
+2.  **模型对比:** 在 Notebook 中创建一个表格或清晰的列表，总结你为项目二尝试的所有模型（线性回归、多项式回归、Ridge、Lasso、基础 XGBoost、调优后 XGBoost）在**测试集**上的关键评估指标（RMSE, R², MAE）。
+3.  **最终模型选择:** 根据评估结果，在 Markdown 单元格中明确指出你选择哪个模型作为最终模型，并解释原因（例如，哪个模型在关键指标上表现最好，或者在性能和复杂度之间取得了较好的平衡）。
+4.  **(可选) 特征重要性分析:** 如果最终选择了 XGBoost，分析并可视化其特征重要性。
+    ```python
+    # 示例：获取并可视化 XGBoost 特征重要性
+    if data_loaded and xgb and 'best_xgb' in locals(): # 检查 best_xgb 是否已定义
+        try:
+            importances_xgb = best_xgb.feature_importances_
+            # 确保 X_h 是 DataFrame 以获取列名，如果不是，需要手动提供 feature_names
+            if 'X_h' in locals() and isinstance(X_h, pd.DataFrame):
+                 feature_names_h = X_h.columns
+            elif 'feature_names' in locals(): # 如果从 make_classification 生成
+                 feature_names_h = feature_names
+            else:
+                 # 如果 X_h 不是 DataFrame 或来自其他来源，需要手动提供特征名称列表
+                 feature_names_h = [f'feature_{i}' for i in range(X_train_h_scaled.shape[1])] # 备用名称
+
+            feature_importance_xgb_df = pd.DataFrame({'Feature': feature_names_h, 'Importance': importances_xgb})
+            feature_importance_xgb_df = feature_importance_xgb_df.sort_values(by='Importance', ascending=False)
+
+            plt.figure(figsize=(10, max(6, len(feature_names_h) * 0.4))) # 调整大小以适应特征数量
+            sns.barplot(x='Importance', y='Feature', data=feature_importance_xgb_df)
+            plt.title('Feature Importance (Best XGBoost)')
+            plt.tight_layout() # 调整布局防止标签重叠
+            # plt.show()
+            print("\n最优 XGBoost 模型特征重要性:\n", feature_importance_xgb_df)
+        except Exception as e:
+            print(f"计算或绘制特征重要性时出错: {e}")
+    else:
+        print("\n无法计算特征重要性，数据未加载、XGBoost未安装或最优模型未训练。")
+    ```
+    在 Markdown 单元格中解释哪些特征对房价预测最重要，这是否符合你的直觉或领域知识？
+5.  **撰写报告:**
+    *   完成项目二的最终报告（`.md` 或 `.pdf`）。
+    *   **结构建议:**
+        *   **引言:** 项目目标（预测房价），数据集描述。
+        *   **数据探索与预处理:** 主要的 EDA 发现，缺失值处理，特征工程（如缩放、编码、多项式特征），训练/测试集划分。
+        *   **模型构建与选择:**
+            *   介绍尝试过的模型（线性回归、正则化、XGBoost 等）。
+            *   描述模型评估方法（指标、交叉验证、调优过程 - 包括参数范围和选择方法）。
+            *   清晰展示和比较各模型在测试集上的性能（建议使用表格）。
+            *   说明最终选择的模型及其理由。
+        *   **(可选) 特征重要性分析:** 如果适用，展示并解释特征重要性结果。
+        *   **结论与讨论:** 总结模型性能，讨论模型的优点和局限性，以及未来可能的改进方向（例如，尝试其他模型、更复杂的特征工程、收集更多数据等）。
+        *   **附录:** (可选) 包含关键代码片段或额外的详细图表。
+    *   确保报告逻辑清晰，图表规范，结论明确。
+
+**提交项目二的最终 Notebook 和报告。**
+
+**下周我们将进入无监督学习，探索如何从未标记数据中发现模式！**

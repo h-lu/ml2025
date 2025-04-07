@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第三周：分类算法初探 - 逻辑回归与支持向量机 – 机器学习Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week4_lecture.html" rel="next">
+<link href="./week2_lecture.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles/custom.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week3_lecture.html"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习Python</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">讲义</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_lecture.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：决策树与随机森林 - 模型优化初探</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：回归算法启程 - 线性回归与多项式回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：回归算法进阶 - XGBoost 与模型优化</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">实验</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：课堂练习与实验</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#分类问题概述" id="toc-分类问题概述" class="nav-link active" data-scroll-target="#分类问题概述">1. 分类问题概述</a></li>
+  <li><a href="#逻辑回归-logistic-regression" id="toc-逻辑回归-logistic-regression" class="nav-link" data-scroll-target="#逻辑回归-logistic-regression">2. 逻辑回归 (Logistic Regression)</a>
+  <ul class="collapse">
+  <li><a href="#原理简介-直观理解" id="toc-原理简介-直观理解" class="nav-link" data-scroll-target="#原理简介-直观理解">2.1 原理简介 (直观理解)</a></li>
+  <li><a href="#使用-scikit-learn-实现" id="toc-使用-scikit-learn-实现" class="nav-link" data-scroll-target="#使用-scikit-learn-实现">2.2 使用 Scikit-learn 实现</a></li>
+  <li><a href="#模型评估指标-分类" id="toc-模型评估指标-分类" class="nav-link" data-scroll-target="#模型评估指标-分类">2.3 模型评估指标 (分类)</a></li>
+  <li><a href="#实践简单数据集训练评估-lr" id="toc-实践简单数据集训练评估-lr" class="nav-link" data-scroll-target="#实践简单数据集训练评估-lr">2.4 实践：简单数据集训练评估 LR</a></li>
+  </ul></li>
+  <li><a href="#支持向量机-support-vector-machine-svm" id="toc-支持向量机-support-vector-machine-svm" class="nav-link" data-scroll-target="#支持向量机-support-vector-machine-svm">3. 支持向量机 (Support Vector Machine, SVM)</a>
+  <ul class="collapse">
+  <li><a href="#原理简介-直观理解-1" id="toc-原理简介-直观理解-1" class="nav-link" data-scroll-target="#原理简介-直观理解-1">3.1 原理简介 (直观理解)</a></li>
+  <li><a href="#使用-scikit-learn-实现-1" id="toc-使用-scikit-learn-实现-1" class="nav-link" data-scroll-target="#使用-scikit-learn-实现-1">3.2 使用 Scikit-learn 实现</a></li>
+  <li><a href="#roc-曲线与-auc-值" id="toc-roc-曲线与-auc-值" class="nav-link" data-scroll-target="#roc-曲线与-auc-值">3.3 ROC 曲线与 AUC 值</a></li>
+  </ul></li>
+  <li><a href="#小组项目一模型构建与评估" id="toc-小组项目一模型构建与评估" class="nav-link" data-scroll-target="#小组项目一模型构建与评估">4. 小组项目一：模型构建与评估</a></li>
+  <li><a href="#本周总结" id="toc-本周总结" class="nav-link" data-scroll-target="#本周总结">5. 本周总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week3_lecture.html"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></h1>
+<p class="subtitle lead">学习第一个分类模型，理解关键评估指标，并应用于项目</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>经过前两周的基础准备，我们终于要开始接触真正的机器学习算法了！本周我们将学习两种非常经典的<strong>分类 (Classification)</strong> 算法：逻辑回归 (Logistic Regression) 和支持向量机 (Support Vector Machine, SVM)。同时，我们也会深入学习如何评估分类模型的效果，并将这些知识应用到我们的小组项目一中。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="项目一检查点">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+项目一检查点
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>请确保你的小组已经完成了项目一的数据预处理工作，并准备好在本周应用分类模型。<strong>DDL: 本周第一次课前提交预处理部分。</strong></p>
+</div>
+</div>
+<section id="分类问题概述" class="level2">
+<h2 class="anchored" data-anchor-id="分类问题概述">1. 分类问题概述</h2>
+<p>分类是监督学习中的一类重要问题，其目标是预测一个样本属于哪个预定义的<strong>类别 (Class)</strong>。</p>
+<ul>
+<li><strong>二分类 (Binary Classification):</strong> 只有两个类别（例如：是/否，垃圾邮件/非垃圾邮件，流失/未流失）。这是最常见的情况。</li>
+<li><strong>多分类 (Multiclass Classification):</strong> 有三个或更多类别（例如：新闻分类（体育、娱乐、科技），图像识别（猫、狗、鸟））。</li>
+</ul>
+<p>我们首先从二分类问题入手。</p>
+</section>
+<section id="逻辑回归-logistic-regression" class="level2">
+<h2 class="anchored" data-anchor-id="逻辑回归-logistic-regression">2. 逻辑回归 (Logistic Regression)</h2>
+<p>虽然名字里有“回归”，但逻辑回归实际上是一种用于<strong>分类</strong>的算法，尤其擅长处理二分类问题。</p>
+<section id="原理简介-直观理解" class="level3">
+<h3 class="anchored" data-anchor-id="原理简介-直观理解">2.1 原理简介 (直观理解)</h3>
+<p>逻辑回归的核心思想是：</p>
+<ol type="1">
+<li><strong>线性组合:</strong> 像线性回归一样，首先计算输入特征的加权和（加上一个偏置项）。 <code>z = w1*x1 + w2*x2 + ... + wn*xn + b</code></li>
+<li><strong>Sigmoid 函数:</strong> 将这个线性组合的结果 <code>z</code> 输入到一个称为 <strong>Sigmoid (或 Logistic) 函数</strong> 的特殊函数中。 <code>p = sigmoid(z) = 1 / (1 + exp(-z))</code></li>
+<li><strong>概率输出:</strong> Sigmoid 函数的输出值 <code>p</code> 介于 0 和 1 之间，可以被解释为样本属于<strong>正类别</strong>（通常用 1 表示）的<strong>概率</strong>。</li>
+<li><strong>决策边界:</strong> 设定一个阈值（通常是 0.5）。如果计算出的概率 <code>p</code> 大于阈值，则预测为正类别 (1)；否则预测为负类别 (0)。</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled" title="Sigmoid 函数">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Sigmoid 函数
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sigmoid 函数的形状像一个 “S” 型曲线，它能将任意实数映射到 (0, 1) 区间，非常适合用来表示概率。 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Logistic-curve.svg/600px-Logistic-curve.svg.png" class="img-fluid" style="width:50.0%" alt="Sigmoid Function"></p>
+</div>
+</div>
+<p>逻辑回归通过学习合适的权重 <code>w</code> 和偏置 <code>b</code>，找到一个<strong>决策边界</strong>（在高维空间中是一个超平面），将不同类别的样本分开。</p>
+</section>
+<section id="使用-scikit-learn-实现" class="level3">
+<h3 class="anchored" data-anchor-id="使用-scikit-learn-实现">2.2 使用 Scikit-learn 实现</h3>
+<p>Scikit-learn 提供了 <code>LogisticRegression</code> 类来实现逻辑回归。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 导入必要的库</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score, confusion_matrix, classification_report, roc_curve, auc</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 假设我们已经有了预处理好的特征 X (DataFrame 或 Numpy Array)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 和对应的标签 y (Series 或 Numpy Array, 包含 0 和 1)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 例如:</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># X = df_processed[['feature1', 'feature2', ...]]</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># y = df_processed['target_class']</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 准备数据 (示例) ---</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建一些示例数据 (实际项目中应使用你的项目数据)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>X_example <span class="op">=</span> np.random.rand(<span class="dv">100</span>, <span class="dv">2</span>) <span class="op">*</span> <span class="dv">10</span> <span class="co"># 100个样本，2个特征</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 设定一个简单的线性边界: feature1 + feature2 &gt; 10</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>y_example <span class="op">=</span> (X_example[:, <span class="dv">0</span>] <span class="op">+</span> X_example[:, <span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">10</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 划分训练集和测试集 ---</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 将数据分为训练集 (用于模型学习) 和测试集 (用于评估模型在未见过数据上的表现)</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># test_size=0.3 表示 30% 的数据作为测试集</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># random_state 保证每次划分结果一致，便于复现</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    X_example, y_example, test_size<span class="op">=</span><span class="fl">0.3</span>, random_state<span class="op">=</span><span class="dv">42</span>, stratify<span class="op">=</span>y_example</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># stratify=y 保证训练集和测试集中类别比例与原始数据一致，对不平衡数据尤其重要</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"训练集大小:"</span>, X_train.shape, y_train.shape)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"测试集大小:"</span>, X_test.shape, y_test.shape)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 训练逻辑回归模型 ---</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 创建模型实例</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>log_reg <span class="op">=</span> LogisticRegression(random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 使用训练数据拟合 (训练) 模型</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>log_reg.fit(X_train, y_train)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 进行预测 ---</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="co"># 对测试集进行预测</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>y_pred_lr <span class="op">=</span> log_reg.predict(X_test)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- 逻辑回归评估 ---"</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"测试集上的预测结果 (前10个):"</span>, y_pred_lr[:<span class="dv">10</span>])</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"测试集上的真实结果 (前10个):"</span>, y_test[:<span class="dv">10</span>])</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="co"># (可选) 预测概率 (用于 ROC 曲线)</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>y_pred_proba_lr <span class="op">=</span> log_reg.predict_proba(X_test)[:, <span class="dv">1</span>] <span class="co"># 获取属于正类(1)的概率</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">测试集上的预测概率 (正类, 前5个):"</span>, y_pred_proba_lr[:<span class="dv">5</span>])</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 评估模型 ---</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>accuracy_lr <span class="op">=</span> accuracy_score(y_test, y_pred_lr)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">逻辑回归准确率 (Accuracy): </span><span class="sc">{</span>accuracy_lr<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="模型评估指标-分类" class="level3">
+<h3 class="anchored" data-anchor-id="模型评估指标-分类">2.3 模型评估指标 (分类)</h3>
+<p>仅仅看准确率 (Accuracy) 往往是不够的，尤其是在处理<strong>不平衡数据</strong>（一个类别的样本远多于另一个类别）时。我们需要更全面的评估指标。</p>
+<section id="混淆矩阵-confusion-matrix" class="level4">
+<h4 class="anchored" data-anchor-id="混淆矩阵-confusion-matrix">2.3.1 混淆矩阵 (Confusion Matrix)</h4>
+<p>混淆矩阵是一个表格，总结了分类模型预测结果与真实结果的对比情况。对于二分类问题，它通常是 2x2 的：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">预测为负类 (0)</th>
+<th style="text-align: center;">预测为正类 (1)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>真实为负类 (0)</strong></td>
+<td style="text-align: center;">TN</td>
+<td style="text-align: center;">FP</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>真实为正类 (1)</strong></td>
+<td style="text-align: center;">FN</td>
+<td style="text-align: center;">TP</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>TP (True Positive):</strong> 真实为正，预测也为正 (预测正确)</li>
+<li><strong>TN (True Negative):</strong> 真实为负，预测也为负 (预测正确)</li>
+<li><strong>FP (False Positive):</strong> 真实为负，预测为正 (预测错误，<strong>第一类错误 Type I Error</strong>)</li>
+<li><strong>FN (False Negative):</strong> 真实为正，预测为负 (预测错误，<strong>第二类错误 Type II Error</strong>)</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算混淆矩阵</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>cm_lr <span class="op">=</span> confusion_matrix(y_test, y_pred_lr)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">逻辑回归混淆矩阵:</span><span class="ch">\n</span><span class="st">"</span>, cm_lr)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 可视化混淆矩阵 (可选，但推荐)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">4</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>sns.heatmap(cm_lr, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">'d'</span>, cmap<span class="op">=</span><span class="st">'Blues'</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            xticklabels<span class="op">=</span>[<span class="st">'Predicted 0'</span>, <span class="st">'Predicted 1'</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            yticklabels<span class="op">=</span>[<span class="st">'Actual 0'</span>, <span class="st">'Actual 1'</span>])</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Predicted Label'</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'True Label'</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Confusion Matrix (Logistic Regression)'</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show() # 在 Notebook 中取消注释以显示图像</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="精确率-precision" class="level4">
+<h4 class="anchored" data-anchor-id="精确率-precision">2.3.2 精确率 (Precision)</h4>
+<p><strong>Precision = TP / (TP + FP)</strong></p>
+<p>含义：在所有<strong>预测为正类</strong>的样本中，有多少<strong>真正是正类</strong>的比例。</p>
+<ul>
+<li><strong>商业场景解读:</strong>
+<ul>
+<li><strong>垃圾邮件检测:</strong> Precision 高表示，被模型标记为垃圾邮件的邮件中，确实是垃圾邮件的比例很高（减少误判正常邮件）。</li>
+<li><strong>产品推荐:</strong> Precision 高表示，推荐给用户的产品中，用户确实感兴趣的比例很高（提高推荐效率）。</li>
+<li><strong>高 Precision 意味着模型预测正类时比较“谨慎”，宁可漏掉一些正类，也要保证预测为正类的尽可能准确。</strong></li>
+</ul></li>
+</ul>
+</section>
+<section id="召回率-recall-敏感度-sensitivity" class="level4">
+<h4 class="anchored" data-anchor-id="召回率-recall-敏感度-sensitivity">2.3.3 召回率 (Recall) / 敏感度 (Sensitivity)</h4>
+<p><strong>Recall = TP / (TP + FN)</strong></p>
+<p>含义：在所有<strong>真正是正类</strong>的样本中，有多少被模型<strong>成功预测出来</strong>的比例。</p>
+<ul>
+<li><strong>商业场景解读:</strong>
+<ul>
+<li><strong>欺诈检测:</strong> Recall 高表示，模型能找出尽可能多的真实欺诈交易（减少漏报）。</li>
+<li><strong>疾病诊断:</strong> Recall 高表示，模型能识别出尽可能多的真正患病的病人（减少漏诊）。</li>
+<li><strong>高 Recall 意味着模型尽可能地找出所有正类样本，即使可能会误判一些负类。</strong></li>
+</ul></li>
+</ul>
+</section>
+<section id="f1-分数-f1-score" class="level4">
+<h4 class="anchored" data-anchor-id="f1-分数-f1-score">2.3.4 F1 分数 (F1-Score)</h4>
+<p><strong>F1 = 2 * (Precision * Recall) / (Precision + Recall)</strong></p>
+<p>含义：Precision 和 Recall 的<strong>调和平均数</strong>。它试图平衡这两个指标，当两者都较高时，F1 分数也会较高。</p>
+<ul>
+<li><strong>使用场景:</strong> 当 Precision 和 Recall 都很重要，或者你不确定哪个更重要时，F1 是一个很好的综合评估指标。</li>
+</ul>
+</section>
+<section id="scikit-learn-报告" class="level4">
+<h4 class="anchored" data-anchor-id="scikit-learn-报告">2.3.5 Scikit-learn 报告</h4>
+<p><code>classification_report</code> 函数可以方便地输出包含 Precision, Recall, F1-Score 的报告。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>report_lr <span class="op">=</span> classification_report(y_test, y_pred_lr, target_names<span class="op">=</span>[<span class="st">'Class 0'</span>, <span class="st">'Class 1'</span>]) <span class="co"># target_names 可选</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">逻辑回归分类报告:</span><span class="ch">\n</span><span class="st">"</span>, report_lr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled" title="AI 辅助理解评估指标">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+AI 辅助理解评估指标
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“解释混淆矩阵中 FP 和 FN 的区别，并分别举一个商业例子说明其影响。”</li>
+<li>“在什么商业场景下，我们会更关注召回率而不是精确率？为什么？”</li>
+<li>“F1 分数是如何计算的？它为什么使用调和平均数而不是算术平均数？”</li>
+<li>“帮我生成一段 Python 代码，使用 scikit-learn 计算一个二分类问题的精确率、召回率和 F1 分数。”</li>
+<li>“解释 scikit-learn 中 <code>classification_report</code> 输出结果的每一项含义。”</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="实践简单数据集训练评估-lr" class="level3">
+<h3 class="anchored" data-anchor-id="实践简单数据集训练评估-lr">2.4 实践：简单数据集训练评估 LR</h3>
+<p>请使用你选择的简单数据集（或老师提供的数据集），完成以下步骤：</p>
+<ol type="1">
+<li>加载数据。</li>
+<li>进行必要的预处理（如果上周没做完）。</li>
+<li>划分训练集和测试集 (<code>train_test_split</code>)。</li>
+<li>训练逻辑回归模型 (<code>LogisticRegression</code>)。</li>
+<li>在测试集上进行预测。</li>
+<li>计算并打印准确率、混淆矩阵、分类报告 (Precision, Recall, F1)。</li>
+<li><strong>思考:</strong> 根据你的业务场景（假设一个），这些指标意味着什么？模型表现如何？</li>
+</ol>
+</section>
+</section>
+<section id="支持向量机-support-vector-machine-svm" class="level2">
+<h2 class="anchored" data-anchor-id="支持向量机-support-vector-machine-svm">3. 支持向量机 (Support Vector Machine, SVM)</h2>
+<p>SVM 是另一种强大的、广泛应用的分类算法（也可用于回归）。它的核心思想是找到一个<strong>最优的超平面 (Hyperplane)</strong>，使得不同类别之间的<strong>间隔 (Margin)</strong> 最大化。</p>
+<section id="原理简介-直观理解-1" class="level3">
+<h3 class="anchored" data-anchor-id="原理简介-直观理解-1">3.1 原理简介 (直观理解)</h3>
+<ul>
+<li><strong>超平面:</strong> 在二维空间中是一条直线，在三维空间中是一个平面，在更高维空间中是一个超平面。它用来分隔不同的类别。</li>
+<li><strong>间隔 (Margin):</strong> 超平面与离它最近的任何一个类别的数据点之间的距离。SVM 的目标是找到具有最大间隔的那个超平面。</li>
+<li><strong>支持向量 (Support Vectors):</strong> 那些离超平面最近的数据点，它们“支撑”着这个最大间隔超平面。如果移动支持向量，超平面也会随之改变；移动其他点则不会影响超平面。</li>
+<li><strong>核函数 (Kernel Trick):</strong> 对于线性不可分的数据（即无法用一条直线或一个平面完美分开），SVM 使用<strong>核函数</strong>将数据映射到更高维的空间，使得在高维空间中数据变得线性可分。常用的核函数有：
+<ul>
+<li><strong>线性核 (Linear):</strong> 不进行映射，适用于线性可分数据。</li>
+<li><strong>多项式核 (Poly):</strong> 将数据映射到多项式空间。</li>
+<li><strong>径向基函数核 (RBF / Gaussian):</strong> 最常用，能处理复杂的非线性关系。</li>
+<li><strong>Sigmoid 核:</strong> 效果类似逻辑回归。</li>
+</ul></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/SVM_margin.png/400px-SVM_margin.png" class="img-fluid figure-img" style="width:60.0%" alt="SVM Margin"></p>
+<figcaption>SVM Margin</figcaption>
+</figure>
+</div>
+</section>
+<section id="使用-scikit-learn-实现-1" class="level3">
+<h3 class="anchored" data-anchor-id="使用-scikit-learn-实现-1">3.2 使用 Scikit-learn 实现</h3>
+<p>Scikit-learn 提供了 <code>SVC</code> (Support Vector Classification) 类。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 训练 SVM 模型 ---</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 创建模型实例</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># C 是正则化参数，控制对误分类的惩罚程度。C 越小，间隔越大，容忍更多误分类 (软间隔)；C 越大，间隔越小，尽量减少误分类。</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># kernel 指定核函数，常用 'rbf', 'linear', 'poly'</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># gamma 是 'rbf', 'poly', 'sigmoid' 核的参数，影响单个训练样本的影响范围。gamma 越大，影响范围越小，模型越复杂，可能过拟合。</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 'scale' 是 gamma 的一个常用默认值: 1 / (n_features * X.var())</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># probability=True 使得可以调用 predict_proba，但会增加训练时间</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>svm_clf <span class="op">=</span> SVC(kernel<span class="op">=</span><span class="st">'rbf'</span>, C<span class="op">=</span><span class="fl">1.0</span>, gamma<span class="op">=</span><span class="st">'scale'</span>, probability<span class="op">=</span><span class="va">True</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 使用训练数据拟合模型 (使用之前划分好的 X_train, y_train)</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>svm_clf.fit(X_train, y_train)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 进行预测 ---</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>y_pred_svm <span class="op">=</span> svm_clf.predict(X_test)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>y_pred_proba_svm <span class="op">=</span> svm_clf.predict_proba(X_test)[:, <span class="dv">1</span>] <span class="co"># 获取属于正类的概率</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 评估模型 ---</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- SVM 评估 ---"</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>accuracy_svm <span class="op">=</span> accuracy_score(y_test, y_pred_svm)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"SVM 准确率: </span><span class="sc">{</span>accuracy_svm<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>cm_svm <span class="op">=</span> confusion_matrix(y_test, y_pred_svm)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"SVM 混淆矩阵:</span><span class="ch">\n</span><span class="st">"</span>, cm_svm)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>report_svm <span class="op">=</span> classification_report(y_test, y_pred_svm, target_names<span class="op">=</span>[<span class="st">'Class 0'</span>, <span class="st">'Class 1'</span>])</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"SVM 分类报告:</span><span class="ch">\n</span><span class="st">"</span>, report_svm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="roc-曲线与-auc-值" class="level3">
+<h3 class="anchored" data-anchor-id="roc-曲线与-auc-值">3.3 ROC 曲线与 AUC 值</h3>
+<p><strong>ROC 曲线 (Receiver Operating Characteristic Curve)</strong> 是评估二分类模型性能的另一个重要工具，尤其在类别不平衡时。</p>
+<ul>
+<li><strong>横坐标 (FPR - False Positive Rate):</strong> FPR = FP / (FP + TN)。在所有真实为负类的样本中，被错误预测为正类的比例。 (越小越好)</li>
+<li><strong>纵坐标 (TPR - True Positive Rate):</strong> TPR = TP / (TP + FN)，就是<strong>召回率 (Recall)</strong>。在所有真实为正类的样本中，被正确预测为正类的比例。(越大越好)</li>
+</ul>
+<p>ROC 曲线描绘了在<strong>不同分类阈值</strong>下，TPR 与 FPR 的关系。理想的模型是 TPR 尽可能高，FPR 尽可能低，即曲线尽量靠近左上角。</p>
+<p><strong>AUC (Area Under the Curve)</strong> 是 ROC 曲线下的面积。</p>
+<ul>
+<li>AUC 值介于 0 和 1 之间。</li>
+<li>AUC = 1 表示完美分类器。</li>
+<li>AUC = 0.5 表示模型的预测效果等同于随机猜测。</li>
+<li>AUC &lt; 0.5 表示模型的效果比随机猜测还差（可能需要检查模型或数据）。</li>
+<li><strong>AUC 值可以看作是模型将随机选择的正样本排在随机选择的负样本前面的概率。</strong> 它提供了一个不依赖于特定阈值的整体性能度量。</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 计算并绘制 ROC 曲线 ---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算 LR 的 FPR, TPR</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>fpr_lr, tpr_lr, thresholds_lr <span class="op">=</span> roc_curve(y_test, y_pred_proba_lr)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>roc_auc_lr <span class="op">=</span> auc(fpr_lr, tpr_lr)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算 SVM 的 FPR, TPR</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>fpr_svm, tpr_svm, thresholds_svm <span class="op">=</span> roc_curve(y_test, y_pred_proba_svm)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>roc_auc_svm <span class="op">=</span> auc(fpr_svm, tpr_svm)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制 ROC 曲线</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>plt.plot(fpr_lr, tpr_lr, color<span class="op">=</span><span class="st">'darkorange'</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f'Logistic Regression (AUC = </span><span class="sc">{</span>roc_auc_lr<span class="sc">:.2f}</span><span class="ss">)'</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>plt.plot(fpr_svm, tpr_svm, color<span class="op">=</span><span class="st">'cornflowerblue'</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f'SVM (AUC = </span><span class="sc">{</span>roc_auc_svm<span class="sc">:.2f}</span><span class="ss">)'</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>plt.plot([<span class="dv">0</span>, <span class="dv">1</span>], [<span class="dv">0</span>, <span class="dv">1</span>], color<span class="op">=</span><span class="st">'navy'</span>, lw<span class="op">=</span><span class="dv">2</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, label<span class="op">=</span><span class="st">'Random Guess'</span>) <span class="co"># 对角线</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>plt.xlim([<span class="fl">0.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>plt.ylim([<span class="fl">0.0</span>, <span class="fl">1.05</span>])</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'False Positive Rate (FPR)'</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'True Positive Rate (TPR)'</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Receiver Operating Characteristic (ROC) Curve'</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>plt.legend(loc<span class="op">=</span><span class="st">"lower right"</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show() # 在 Notebook 中取消注释以显示图像</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout-info" title="如何选择 C 和 gamma？">
+<p><code>C</code> 和 <code>gamma</code> 是 SVM 的重要超参数。选择合适的值对模型性能至关重要。我们将在下周学习如何使用<strong>交叉验证 (Cross-Validation)</strong> 和<strong>网格搜索 (Grid Search)</strong> 来系统地寻找最优超参数组合。</p>
+</div>
+</section>
+</section>
+<section id="小组项目一模型构建与评估" class="level2">
+<h2 class="anchored" data-anchor-id="小组项目一模型构建与评估">4. 小组项目一：模型构建与评估</h2>
+<p>现在，将本周学习的逻辑回归和 SVM 应用到你的电商用户行为数据项目中！</p>
+<ul>
+<li><strong>任务:</strong>
+<ol type="1">
+<li><strong>加载预处理数据:</strong> 加载上周完成预处理的数据集。确保特征是数值类型，标签是 0 或 1。</li>
+<li><strong>划分训练/测试集:</strong> 使用 <code>train_test_split</code> 将数据划分为训练集和测试集 (例如 70% 训练，30% 测试)。记得设置 <code>random_state</code> 并使用 <code>stratify=y</code>。</li>
+<li><strong>训练模型:</strong>
+<ul>
+<li>训练一个逻辑回归模型 (<code>LogisticRegression</code>)。</li>
+<li>训练一个支持向量机模型 (<code>SVC</code>)。可以先使用默认参数 (<code>kernel='rbf'</code>, <code>C=1.0</code>, <code>gamma='scale'</code>)。记得设置 <code>probability=True</code> 以便计算 ROC AUC。</li>
+</ul></li>
+<li><strong>预测:</strong> 使用训练好的模型分别对<strong>测试集</strong>进行预测 (包括类别预测 <code>predict</code> 和概率预测 <code>predict_proba</code>)。</li>
+<li><strong>评估:</strong>
+<ul>
+<li>对于每个模型，计算并打印：准确率、混淆矩阵、分类报告 (Precision, Recall, F1)。</li>
+<li>计算并绘制两个模型的 ROC 曲线，并计算 AUC 值，将它们绘制在同一张图上进行比较。</li>
+</ul></li>
+<li><strong>结果分析:</strong>
+<ul>
+<li>比较逻辑回归和 SVM 在你的数据集上的表现。哪个模型效果更好？依据是什么指标？(结合准确率、F1、AUC 等)</li>
+<li>结合混淆矩阵，分析模型的错误类型（FP 和 FN）。在你的业务场景下（例如预测用户是否会购买），哪种错误更严重？为什么？</li>
+<li>初步思考：模型表现是否达到预期？有没有可以改进的地方？（例如，尝试不同的 SVM 核函数或 C 值？）</li>
+</ul></li>
+</ol></li>
+<li><strong>提交:</strong> 更新后的 Jupyter Notebook (<code>.ipynb</code>)，包含：
+<ul>
+<li>清晰的代码和注释。</li>
+<li>模型训练和预测过程。</li>
+<li>所有必要的评估指标计算和可视化结果 (混淆矩阵图、ROC 曲线图)。</li>
+<li>对评估结果的详细分析和思考。</li>
+</ul></li>
+<li><strong>DDL:</strong> 第四周第一次课前。</li>
+</ul>
+</section>
+<section id="本周总结" class="level2">
+<h2 class="anchored" data-anchor-id="本周总结">5. 本周总结</h2>
+<p>本周我们深入学习了两种基础且强大的分类算法：逻辑回归和支持向量机。我们不仅理解了它们的基本原理，还学会了如何使用 Scikit-learn 来实现、训练和预测。更重要的是，我们学习了一套全面的分类模型评估指标（混淆矩阵、精确率、召回率、F1 分数、ROC 曲线、AUC 值），并理解了它们在不同商业场景下的含义。最后，我们将这些知识应用到了项目一中，开始了模型构建和评估的实践。</p>
+<p><strong>下周我们将学习基于树的分类算法——决策树和随机森林，并探索模型优化的方法！</strong></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./week2_lecture.html" class="pagination-link" aria-label="第二周：数据处理利器 Numpy &amp; Pandas 与项目启动">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./week4_lecture.html" class="pagination-link" aria-label="第四周：决策树与随机森林 - 模型优化初探">
+        <span class="nav-page-text"><span class="chapter-title">第四周：决策树与随机森林 - 模型优化初探</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

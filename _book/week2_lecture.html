@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第二周：数据处理利器 Numpy &amp; Pandas 与项目启动 – 机器学习Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week3_lecture.html" rel="next">
+<link href="./week1_lecture.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles/custom.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week2_lecture.html"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习Python</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">讲义</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_lecture.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：决策树与随机森林 - 模型优化初探</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：回归算法启程 - 线性回归与多项式回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：回归算法进阶 - XGBoost 与模型优化</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">实验</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：课堂练习与实验</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#numpy-python-科学计算的基石" id="toc-numpy-python-科学计算的基石" class="nav-link active" data-scroll-target="#numpy-python-科学计算的基石">1. Numpy: Python 科学计算的基石</a>
+  <ul class="collapse">
+  <li><a href="#ndarraynumpy-的核心" id="toc-ndarraynumpy-的核心" class="nav-link" data-scroll-target="#ndarraynumpy-的核心">1.1 <code>ndarray</code>：Numpy 的核心</a></li>
+  <li><a href="#向量化运算" id="toc-向量化运算" class="nav-link" data-scroll-target="#向量化运算">1.2 向量化运算</a></li>
+  <li><a href="#常用函数" id="toc-常用函数" class="nav-link" data-scroll-target="#常用函数">1.3 常用函数</a></li>
+  <li><a href="#索引与切片" id="toc-索引与切片" class="nav-link" data-scroll-target="#索引与切片">1.4 索引与切片</a></li>
+  </ul></li>
+  <li><a href="#pandas-数据分析与处理的瑞士军刀" id="toc-pandas-数据分析与处理的瑞士军刀" class="nav-link" data-scroll-target="#pandas-数据分析与处理的瑞士军刀">2. Pandas: 数据分析与处理的瑞士军刀</a>
+  <ul class="collapse">
+  <li><a href="#核心数据结构series-和-dataframe" id="toc-核心数据结构series-和-dataframe" class="nav-link" data-scroll-target="#核心数据结构series-和-dataframe">2.1 核心数据结构：Series 和 DataFrame</a></li>
+  <li><a href="#数据读写" id="toc-数据读写" class="nav-link" data-scroll-target="#数据读写">2.2 数据读写</a></li>
+  <li><a href="#数据查看与探索" id="toc-数据查看与探索" class="nav-link" data-scroll-target="#数据查看与探索">2.3 数据查看与探索</a></li>
+  <li><a href="#数据选择与索引" id="toc-数据选择与索引" class="nav-link" data-scroll-target="#数据选择与索引">2.4 数据选择与索引</a></li>
+  </ul></li>
+  <li><a href="#数据预处理入门" id="toc-数据预处理入门" class="nav-link" data-scroll-target="#数据预处理入门">3. 数据预处理入门</a>
+  <ul class="collapse">
+  <li><a href="#处理缺失值-missing-values" id="toc-处理缺失值-missing-values" class="nav-link" data-scroll-target="#处理缺失值-missing-values">3.1 处理缺失值 (Missing Values)</a></li>
+  <li><a href="#处理重复值-duplicate-values" id="toc-处理重复值-duplicate-values" class="nav-link" data-scroll-target="#处理重复值-duplicate-values">3.2 处理重复值 (Duplicate Values)</a></li>
+  </ul></li>
+  <li><a href="#特征工程基础-feature-engineering" id="toc-特征工程基础-feature-engineering" class="nav-link" data-scroll-target="#特征工程基础-feature-engineering">4. 特征工程基础 (Feature Engineering)</a>
+  <ul class="collapse">
+  <li><a href="#数值特征缩放-scaling" id="toc-数值特征缩放-scaling" class="nav-link" data-scroll-target="#数值特征缩放-scaling">4.1 数值特征缩放 (Scaling)</a></li>
+  <li><a href="#类别特征编码-encoding" id="toc-类别特征编码-encoding" class="nav-link" data-scroll-target="#类别特征编码-encoding">4.2 类别特征编码 (Encoding)</a></li>
+  </ul></li>
+  <li><a href="#小组项目一电商用户行为数据探索与预处理" id="toc-小组项目一电商用户行为数据探索与预处理" class="nav-link" data-scroll-target="#小组项目一电商用户行为数据探索与预处理">5. 小组项目一：电商用户行为数据探索与预处理</a></li>
+  <li><a href="#本周总结" id="toc-本周总结" class="nav-link" data-scroll-target="#本周总结">6. 本周总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week2_lecture.html"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></h1>
+<p class="subtitle lead">掌握数据处理核心库，开启第一个机器学习项目</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>上周我们了解了机器学习的基本概念并搭建了环境。从本周开始，我们将深入学习数据处理的核心工具：Numpy 和 Pandas。它们是进行数据分析和机器学习的基石。同时，我们也将启动第一个实践项目！</p>
+<section id="numpy-python-科学计算的基石" class="level2">
+<h2 class="anchored" data-anchor-id="numpy-python-科学计算的基石">1. Numpy: Python 科学计算的基石</h2>
+<p>Numpy (Numerical Python) 是 Python 中用于处理数值计算，特别是数组运算的基础库。它提供了高效的多维数组对象 (<code>ndarray</code>) 以及对这些数组进行操作的函数。</p>
+<section id="ndarraynumpy-的核心" class="level3">
+<h3 class="anchored" data-anchor-id="ndarraynumpy-的核心">1.1 <code>ndarray</code>：Numpy 的核心</h3>
+<p><code>ndarray</code> 是一个多维数组对象，与 Python 的列表 (list) 相比，它具有以下优势：</p>
+<ul>
+<li><strong>更紧凑:</strong> 存储相同类型的数据，内存占用更小。</li>
+<li><strong>更快速:</strong> 底层由 C 语言实现，运算速度更快，尤其对于大规模数据。</li>
+<li><strong>更方便:</strong> 支持向量化运算，可以对整个数组执行操作，代码更简洁。</li>
+</ul>
+<p><strong>创建数组:</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 从列表创建</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>list_data <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>arr1d <span class="op">=</span> np.array(list_data)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr1d)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr1d.shape) <span class="co"># 查看数组形状 (维度)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr1d.dtype) <span class="co"># 查看数据类型</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>list_2d <span class="op">=</span> [[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>]]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>arr2d <span class="op">=</span> np.array(list_2d)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr2d)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr2d.shape)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用内置函数创建</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>zeros_arr <span class="op">=</span> np.zeros((<span class="dv">2</span>, <span class="dv">3</span>)) <span class="co"># 创建全 0 数组</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(zeros_arr)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ones_arr <span class="op">=</span> np.ones((<span class="dv">3</span>, <span class="dv">2</span>))  <span class="co"># 创建全 1 数组</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ones_arr)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>range_arr <span class="op">=</span> np.arange(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">2</span>) <span class="co">#类似 Python range，创建序列数组</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(range_arr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="向量化运算" class="level3">
+<h3 class="anchored" data-anchor-id="向量化运算">1.2 向量化运算</h3>
+<p>Numpy 允许你直接对整个数组进行数学运算，无需编写循环。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>])</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 算术运算</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr <span class="op">*</span> <span class="dv">2</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr <span class="op">+</span> <span class="dv">5</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr <span class="op">**</span> <span class="dv">2</span>) <span class="co"># 平方</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 数组间运算 (需要形状兼容)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>arr_b <span class="op">=</span> np.array([<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>])</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr <span class="op">+</span> arr_b)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr <span class="op">*</span> arr_b)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 通用函数 (ufunc)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.sqrt(arr)) <span class="co"># 开方</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.sin(arr))  <span class="co"># 三角函数</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="常用函数" class="level3">
+<h3 class="anchored" data-anchor-id="常用函数">1.3 常用函数</h3>
+<p>Numpy 提供了丰富的数学和统计函数。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">3</span>], [<span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">6</span>]])</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(arr))          <span class="co"># 计算所有元素的和</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(arr, axis<span class="op">=</span><span class="dv">0</span>))  <span class="co"># 按列求和 (沿第一个轴)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(arr, axis<span class="op">=</span><span class="dv">1</span>))  <span class="co"># 按行求和 (沿第二个轴)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.mean(arr))         <span class="co"># 平均值</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.std(arr))          <span class="co"># 标准差</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">min</span>(arr))          <span class="co"># 最小值</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">max</span>(arr, axis<span class="op">=</span><span class="dv">1</span>))  <span class="co"># 每行的最大值</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.argmin(arr))       <span class="co"># 最小值的索引 (扁平化后)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.argmax(arr, axis<span class="op">=</span><span class="dv">0</span>)) <span class="co"># 每列最大值的索引</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="索引与切片" class="level3">
+<h3 class="anchored" data-anchor-id="索引与切片">1.4 索引与切片</h3>
+<p>Numpy 的索引和切片与 Python 列表类似，但功能更强大，支持多维度操作。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>arr <span class="op">=</span> np.arange(<span class="dv">10</span>) <span class="co"># [0 1 2 3 4 5 6 7 8 9]</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr[<span class="dv">5</span>])      <span class="co"># 获取单个元素</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr[<span class="dv">2</span>:<span class="dv">5</span>])    <span class="co"># 切片 [2 3 4]</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>arr[<span class="dv">0</span>:<span class="dv">3</span>] <span class="op">=</span> <span class="dv">100</span>   <span class="co"># 切片赋值</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>arr2d <span class="op">=</span> np.array([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>], [<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>]])</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr2d[<span class="dv">1</span>])      <span class="co"># 获取第二行 [4 5 6]</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr2d[<span class="dv">1</span>, <span class="dv">2</span>])   <span class="co"># 获取第二行第三列的元素 (6)</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr2d[<span class="dv">1</span>][<span class="dv">2</span>])   <span class="co"># 同上</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 多维切片</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(arr2d[:<span class="dv">2</span>, <span class="dv">1</span>:]) <span class="co"># 获取前两行，第二列及之后 [[2 3] [5 6]]</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 布尔索引 (非常常用!)</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>names <span class="op">=</span> np.array([<span class="st">'Bob'</span>, <span class="st">'Joe'</span>, <span class="st">'Will'</span>, <span class="st">'Bob'</span>, <span class="st">'Will'</span>, <span class="st">'Joe'</span>, <span class="st">'Joe'</span>])</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.random.randn(<span class="dv">7</span>, <span class="dv">4</span>) <span class="co"># 生成 7x4 的随机数据</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(names <span class="op">==</span> <span class="st">'Bob'</span>) <span class="co"># 返回布尔数组 [ True False False  True False False False]</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data[names <span class="op">==</span> <span class="st">'Bob'</span>]) <span class="co"># 选择 data 中对应 'Bob' 的行</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data[names <span class="op">==</span> <span class="st">'Bob'</span>, <span class="dv">2</span>:]) <span class="co"># 选择 'Bob' 行的后两列</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data[<span class="op">~</span>(names <span class="op">==</span> <span class="st">'Bob'</span>)]) <span class="co"># 选择不是 'Bob' 的行 (使用 ~ 取反)</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data[(names <span class="op">==</span> <span class="st">'Bob'</span>) <span class="op">|</span> (names <span class="op">==</span> <span class="st">'Will'</span>)]) <span class="co"># 选择 'Bob' 或 'Will' 的行</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>data[data <span class="op">&lt;</span> <span class="dv">0</span>] <span class="op">=</span> <span class="dv">0</span> <span class="co"># 将 data 中所有负数设为 0</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled" title="AI 辅助 Numpy 学习">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+AI 辅助 Numpy 学习
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“用 Numpy 创建一个 3x4 的随机整数数组，范围在 10 到 20 之间”</li>
+<li>“解释 Numpy 中 <code>axis</code> 参数的作用”</li>
+<li>“如何用 Numpy 计算一个数组中大于 5 的元素的个数？”</li>
+<li>“给我一些 Numpy 数组索引和切片的练习题”</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="pandas-数据分析与处理的瑞士军刀" class="level2">
+<h2 class="anchored" data-anchor-id="pandas-数据分析与处理的瑞士军刀">2. Pandas: 数据分析与处理的瑞士军刀</h2>
+<p>Pandas 是建立在 Numpy 之上的库，提供了更高级的数据结构和数据分析工具，特别适合处理表格型（二维）数据。</p>
+<section id="核心数据结构series-和-dataframe" class="level3">
+<h3 class="anchored" data-anchor-id="核心数据结构series-和-dataframe">2.1 核心数据结构：Series 和 DataFrame</h3>
+<ul>
+<li><p><strong>Series:</strong> 一维带标签的数组，可以看作是带索引的 Numpy 数组或特殊的字典。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> pd.Series([<span class="dv">4</span>, <span class="dv">7</span>, <span class="op">-</span><span class="dv">5</span>, <span class="dv">3</span>])</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s.values) <span class="co"># 底层 Numpy 数组</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s.index)  <span class="co"># 索引</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> pd.Series([<span class="dv">4</span>, <span class="dv">7</span>, <span class="op">-</span><span class="dv">5</span>, <span class="dv">3</span>], index<span class="op">=</span>[<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>, <span class="st">'d'</span>]) <span class="co"># 自定义索引</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s2)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s2[<span class="st">'b'</span>]) <span class="co"># 通过索引访问</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s2[s2 <span class="op">&gt;</span> <span class="dv">0</span>]) <span class="co"># 布尔索引</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'b'</span> <span class="kw">in</span> s2) <span class="co"># 检查索引是否存在</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 从字典创建</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>sdata <span class="op">=</span> {<span class="st">'Ohio'</span>: <span class="dv">35000</span>, <span class="st">'Texas'</span>: <span class="dv">71000</span>, <span class="st">'Oregon'</span>: <span class="dv">16000</span>, <span class="st">'Utah'</span>: <span class="dv">5000</span>}</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>s3 <span class="op">=</span> pd.Series(sdata)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>DataFrame:</strong> 二维带标签的数据结构，可以看作是共享相同索引的 Series 的集合，类似于 Excel 表格或 SQL 表。它是 Pandas 中最常用的数据结构。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> {<span class="st">'state'</span>: [<span class="st">'Ohio'</span>, <span class="st">'Ohio'</span>, <span class="st">'Ohio'</span>, <span class="st">'Nevada'</span>, <span class="st">'Nevada'</span>, <span class="st">'Nevada'</span>],</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="st">'year'</span>: [<span class="dv">2000</span>, <span class="dv">2001</span>, <span class="dv">2002</span>, <span class="dv">2001</span>, <span class="dv">2002</span>, <span class="dv">2003</span>],</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">'pop'</span>: [<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">3.6</span>, <span class="fl">2.4</span>, <span class="fl">2.9</span>, <span class="fl">3.2</span>]}</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 指定列顺序和索引</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>df2 <span class="op">=</span> pd.DataFrame(data, columns<span class="op">=</span>[<span class="st">'year'</span>, <span class="st">'state'</span>, <span class="st">'pop'</span>],</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                   index<span class="op">=</span>[<span class="st">'one'</span>, <span class="st">'two'</span>, <span class="st">'three'</span>, <span class="st">'four'</span>, <span class="st">'five'</span>, <span class="st">'six'</span>])</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df2)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df2[<span class="st">'state'</span>]) <span class="co"># 获取一列 (Series)</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df2.year)    <span class="co"># 同上 (属性访问，仅限合法标识符列名)</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df2[[<span class="st">'year'</span>, <span class="st">'pop'</span>]]) <span class="co"># 获取多列 (DataFrame)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</section>
+<section id="数据读写" class="level3">
+<h3 class="anchored" data-anchor-id="数据读写">2.2 数据读写</h3>
+<p>Pandas 可以方便地读取和写入多种格式的数据文件，最常用的是 CSV 文件。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 假设当前目录下有 data.csv 文件</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.read_csv('data.csv')</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 写入 CSV 文件</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># df.to_csv('output.csv', index=False) # index=False 表示不将索引写入文件</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled" title="文件路径">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+文件路径
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>read_csv</code> 和 <code>to_csv</code> 中的路径可以是相对路径（相对于你的代码文件或工作目录）或绝对路径。</p>
+</div>
+</div>
+</section>
+<section id="数据查看与探索" class="level3">
+<h3 class="anchored" data-anchor-id="数据查看与探索">2.3 数据查看与探索</h3>
+<p>拿到数据后，首先要了解它的基本情况。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 假设 df 是一个已加载的 DataFrame</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())    <span class="co"># 查看前 5 行数据 (可指定行数 df.head(10))</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.tail())    <span class="co"># 查看后 5 行数据</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.shape)     <span class="co"># 查看 DataFrame 的形状 (行数, 列数)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.columns)   <span class="co"># 查看所有列名</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.index)     <span class="co"># 查看索引</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.info())    <span class="co"># 查看 DataFrame 的简要信息 (列名、非空值数量、数据类型、内存占用)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.describe())<span class="co"># 查看数值列的描述性统计信息 (计数、均值、标准差、最小值、分位数、最大值)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="数据选择与索引" class="level3">
+<h3 class="anchored" data-anchor-id="数据选择与索引">2.4 数据选择与索引</h3>
+<p>Pandas 提供了多种方式来选择数据的子集。</p>
+<ul>
+<li><strong>选择列:</strong> 如前所述 <code>df['col_name']</code> 或 <code>df[['col1', 'col2']]</code>。</li>
+<li><strong>选择行 (切片):</strong> <code>df[0:3]</code> 选择前 3 行 (基于位置，不推荐单独使用)。</li>
+<li><strong>基于标签的索引 (<code>.loc</code>):</strong> 使用行索引标签和列标签进行选择。<strong>推荐使用！</strong> <code>python     print(df2.loc['three']) # 选择索引为 'three' 的行 (Series)     print(df2.loc[['two', 'four']]) # 选择多行 (DataFrame)     print(df2.loc['two', ['year', 'pop']]) # 选择 'two' 行的 'year' 和 'pop' 列     print(df2.loc[:'three', 'state']) # 选择从开始到 'three' 行的 'state' 列</code></li>
+<li><strong>基于整数位置的索引 (<code>.iloc</code>):</strong> 使用整数位置进行选择 (类似 Numpy)。<strong>推荐使用！</strong> <code>python     print(df.iloc[2]) # 选择第三行 (Series)     print(df.iloc[[1, 3, 5]]) # 选择第 2, 4, 6 行 (DataFrame)     print(df.iloc[1, [0, 2]]) # 选择第 2 行的第 1 和第 3 列     print(df.iloc[:3, 1:]) # 选择前 3 行，第 2 列及之后</code></li>
+<li><strong>布尔索引:</strong> 类似 Numpy，非常强大。 <code>python     print(df[df['pop'] &gt; 2.0]) # 选择 'pop' 列大于 2.0 的所有行     print(df[df['state'] == 'Ohio']) # 选择 'state' 列为 'Ohio' 的所有行     print(df[(df['year'] &gt; 2001) &amp; (df['pop'] &lt; 3.0)]) # 组合条件 (使用 &amp; | ~)</code></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled" title="AI 辅助 Pandas 学习">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+AI 辅助 Pandas 学习
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“用 Pandas 读取名为 ‘sales.csv’ 的文件，并将 ‘Date’ 列设为索引”</li>
+<li>“如何用 Pandas 查看 DataFrame ‘df’ 中 ‘Category’ 列的所有唯一值？”</li>
+<li>“解释 Pandas 中 <code>.loc</code> 和 <code>.iloc</code> 的区别”</li>
+<li>“给我一个 Pandas DataFrame，包含学生姓名、科目和分数，然后筛选出数学成绩大于 80 分的学生”</li>
+<li>“如何用 Pandas 计算 DataFrame ‘df’ 中 ‘Age’ 列的平均值？”</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="数据预处理入门" class="level2">
+<h2 class="anchored" data-anchor-id="数据预处理入门">3. 数据预处理入门</h2>
+<p>真实世界的数据往往是不完美的，存在缺失、重复或格式不一致等问题。数据预处理是机器学习流程中至关重要的一步，目的是清洗和转换数据，使其适用于模型训练。</p>
+<section id="处理缺失值-missing-values" class="level3">
+<h3 class="anchored" data-anchor-id="处理缺失值-missing-values">3.1 处理缺失值 (Missing Values)</h3>
+<p>缺失值通常在 Pandas 中表示为 <code>NaN</code> (Not a Number)。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 假设 df 中存在缺失值</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.isnull()) <span class="co"># 返回一个布尔型的 DataFrame，True 表示缺失</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.isnull().<span class="bu">sum</span>()) <span class="co"># 统计每列的缺失值数量</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 处理方式：</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 删除包含缺失值的行或列</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>df_dropped_rows <span class="op">=</span> df.dropna() <span class="co"># 删除任何包含 NaN 的行</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>df_dropped_cols <span class="op">=</span> df.dropna(axis<span class="op">=</span><span class="dv">1</span>) <span class="co"># 删除任何包含 NaN 的列</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>df_dropped_thresh <span class="op">=</span> df.dropna(thresh<span class="op">=</span><span class="dv">2</span>) <span class="co"># 删除 NaN 数量达到阈值的行</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 填充缺失值</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>df_filled_zero <span class="op">=</span> df.fillna(<span class="dv">0</span>) <span class="co"># 用 0 填充所有 NaN</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>df_filled_mean <span class="op">=</span> df.fillna(df.mean(numeric_only<span class="op">=</span><span class="va">True</span>)) <span class="co"># 用每列的均值填充 (仅对数值列)</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 也可以用中位数 df.median() 或指定值填充特定列</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'col_name'</span>].fillna(<span class="st">'Unknown'</span>, inplace<span class="op">=</span><span class="va">True</span>) <span class="co"># inplace=True 直接修改原 DataFrame</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="处理重复值-duplicate-values" class="level3">
+<h3 class="anchored" data-anchor-id="处理重复值-duplicate-values">3.2 处理重复值 (Duplicate Values)</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 检查重复行</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.duplicated()) <span class="co"># 返回布尔 Series，True 表示该行是重复的 (首次出现除外)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.duplicated().<span class="bu">sum</span>()) <span class="co"># 统计重复行数量</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 删除重复行 (默认保留第一个出现的)</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df_no_duplicates <span class="op">=</span> df.drop_duplicates()</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 基于特定列查找和删除重复项</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>df_no_dup_subset <span class="op">=</span> df.drop_duplicates([<span class="st">'col1'</span>, <span class="st">'col2'</span>]) <span class="co"># 基于 col1 和 col2 的组合判断重复</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="特征工程基础-feature-engineering" class="level2">
+<h2 class="anchored" data-anchor-id="特征工程基础-feature-engineering">4. 特征工程基础 (Feature Engineering)</h2>
+<p>特征工程是指从原始数据中提取或创建更有用的特征，以提高模型性能的过程。</p>
+<section id="数值特征缩放-scaling" class="level3">
+<h3 class="anchored" data-anchor-id="数值特征缩放-scaling">4.1 数值特征缩放 (Scaling)</h3>
+<p>许多机器学习算法对特征的尺度（大小范围）很敏感。如果不同特征的尺度差异很大，可能会导致某些特征对模型的影响过大。特征缩放将数值特征转换到相似的尺度。</p>
+<ul>
+<li><strong>标准化 (Standardization):</strong> 将数据转换为均值为 0，标准差为 1 的分布。适用于数据近似高斯分布的情况。使用 <code>sklearn.preprocessing.StandardScaler</code>。</li>
+<li><strong>归一化 (Normalization):</strong> 将数据缩放到一个特定的范围，通常是 [0, 1] 或 [-1, 1]。适用于不了解数据分布或数据分布不规则的情况。使用 <code>sklearn.preprocessing.MinMaxScaler</code>。</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler, MinMaxScaler</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 示例数据</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({<span class="st">'Age'</span>: [<span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>],</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                     <span class="st">'Salary'</span>: [<span class="dv">50000</span>, <span class="dv">60000</span>, <span class="dv">75000</span>, <span class="dv">90000</span>, <span class="dv">110000</span>]})</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 标准化</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>scaler_std <span class="op">=</span> StandardScaler()</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>data_scaled_std <span class="op">=</span> scaler_std.fit_transform(data) <span class="co"># fit_transform 计算并应用转换</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Standardized Data:</span><span class="ch">\n</span><span class="st">"</span>, data_scaled_std)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># data_scaled_std 是一个 Numpy 数组，可以转换回 DataFrame</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># data_scaled_std_df = pd.DataFrame(data_scaled_std, columns=data.columns)</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 归一化 (到 [0, 1])</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>scaler_minmax <span class="op">=</span> MinMaxScaler()</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>data_scaled_minmax <span class="op">=</span> scaler_minmax.fit_transform(data)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Normalized Data (0-1):</span><span class="ch">\n</span><span class="st">"</span>, data_scaled_minmax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="类别特征编码-encoding" class="level3">
+<h3 class="anchored" data-anchor-id="类别特征编码-encoding">4.2 类别特征编码 (Encoding)</h3>
+<p>机器学习模型通常只能处理数值数据。类别特征（如“性别”、“城市”、“产品类别”）需要转换为数值表示。</p>
+<ul>
+<li><strong>标签编码 (Label Encoding):</strong> 将每个类别映射到一个整数。例如，“北京”-&gt;0，“上海”-&gt;1，“广州”-&gt;2。适用于类别间存在<strong>有序关系</strong>的情况（如“低”、“中”、“高”）。使用 <code>sklearn.preprocessing.LabelEncoder</code>。 <strong>注意：</strong> 对于无序类别，直接使用标签编码可能会误导模型，让模型认为类别间存在大小关系。</li>
+<li><strong>独热编码 (One-Hot Encoding):</strong> 为每个类别创建一个新的二元（0 或 1）特征列。如果一个样本属于某个类别，则对应的列为 1，其他类别列为 0。适用于类别间<strong>无序关系</strong>的情况。这是最常用的类别编码方式。使用 <code>sklearn.preprocessing.OneHotEncoder</code> 或 <code>pandas.get_dummies()</code>。</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder, OneHotEncoder</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 示例数据</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.DataFrame({<span class="st">'City'</span>: [<span class="st">'Beijing'</span>, <span class="st">'Shanghai'</span>, <span class="st">'Guangzhou'</span>, <span class="st">'Beijing'</span>, <span class="st">'Shanghai'</span>],</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                     <span class="st">'Size'</span>: [<span class="st">'M'</span>, <span class="st">'L'</span>, <span class="st">'S'</span>, <span class="st">'M'</span>, <span class="st">'L'</span>]}) <span class="co"># Size 有序</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 标签编码 (适用于有序 Size 列)</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>label_encoder <span class="op">=</span> LabelEncoder()</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'Size_Encoded'</span>] <span class="op">=</span> label_encoder.fit_transform(data[<span class="st">'Size'</span>])</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Label Encoded Data:</span><span class="ch">\n</span><span class="st">"</span>, data)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 独热编码 (适用于无序 City 列)</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 方法一: sklearn OneHotEncoder</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>onehot_encoder <span class="op">=</span> OneHotEncoder(sparse_output<span class="op">=</span><span class="va">False</span>) <span class="co"># sparse=False 返回密集数组</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>city_onehot <span class="op">=</span> onehot_encoder.fit_transform(data[[<span class="st">'City'</span>]]) <span class="co"># 需要二维输入</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 获取新列名</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>city_categories <span class="op">=</span> onehot_encoder.categories_[<span class="dv">0</span>]</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>city_onehot_df <span class="op">=</span> pd.DataFrame(city_onehot, columns<span class="op">=</span>[<span class="ss">f'City_</span><span class="sc">{</span>cat<span class="sc">}</span><span class="ss">'</span> <span class="cf">for</span> cat <span class="kw">in</span> city_categories])</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">OneHot Encoded City (sklearn):</span><span class="ch">\n</span><span class="st">"</span>, city_onehot_df)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 合并回原 DataFrame</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.concat([data, city_onehot_df], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Combined DataFrame:</span><span class="ch">\n</span><span class="st">"</span>, data)</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 方法二: pandas get_dummies (更简洁)</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>data_dummies <span class="op">=</span> pd.get_dummies(data, columns<span class="op">=</span>[<span class="st">'City'</span>], prefix<span class="op">=</span><span class="st">'City'</span>) <span class="co"># 直接在 DataFrame 上操作</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">OneHot Encoded City (pandas get_dummies):</span><span class="ch">\n</span><span class="st">"</span>, data_dummies)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-tip callout-titled" title="AI 辅助预处理与特征工程">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+AI 辅助预处理与特征工程
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“如何用 Pandas 检查 DataFrame ‘df’ 中 ‘Age’ 列是否有缺失值？”</li>
+<li>“用 scikit-learn 的 StandardScaler 对 DataFrame ‘numeric_df’ 进行标准化”</li>
+<li>“解释 One-Hot Encoding 和 Label Encoding 的区别和适用场景”</li>
+<li>“给我一段 Python 代码，使用 pandas.get_dummies 对 ‘df’ 中的 ‘Color’ 列进行独热编码”</li>
+<li>“如何用 scikit-learn 填充 DataFrame ‘df’ 中 ‘Income’ 列的缺失值，使用中位数？”</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="小组项目一电商用户行为数据探索与预处理" class="level2">
+<h2 class="anchored" data-anchor-id="小组项目一电商用户行为数据探索与预处理">5. 小组项目一：电商用户行为数据探索与预处理</h2>
+<p>现在，我们将理论付诸实践！</p>
+<ul>
+<li><strong>主题:</strong> 电商用户行为数据探索与预处理</li>
+<li><strong>目标:</strong> 熟悉真实数据的处理流程，为后续的建模打下基础。运用本周所学的 Numpy, Pandas 以及数据预处理技术。</li>
+<li><strong>任务:</strong>
+<ol type="1">
+<li><strong>分组与选数据集:</strong> (课堂上完成) 选择一个电商用户行为相关的数据集（老师可能提供，或自行寻找公开数据集，如淘宝用户行为数据、天猫用户行为数据等）。</li>
+<li><strong>数据加载与探索 (EDA - Exploratory Data Analysis):</strong>
+<ul>
+<li>使用 Pandas 加载数据。</li>
+<li>查看数据基本信息 (<code>head</code>, <code>info</code>, <code>describe</code>)。</li>
+<li>探索数据类型，识别数值和类别特征。</li>
+<li>(可选) 进行初步的可视化，了解数据分布（我们后面会专门学可视化）。</li>
+</ul></li>
+<li><strong>数据预处理:</strong>
+<ul>
+<li>处理缺失值（选择合适的填充或删除策略）。</li>
+<li>处理重复值。</li>
+<li>对必要的特征进行类型转换（例如，时间字符串转为 datetime 对象）。</li>
+<li>对数值特征进行缩放（选择标准化或归一化）。</li>
+<li>对类别特征进行编码（选择标签编码或独热编码）。</li>
+</ul></li>
+</ol></li>
+<li><strong>提交:</strong>
+<ul>
+<li>预处理后的数据集 (<code>.csv</code> 格式)。</li>
+<li>包含完整数据加载、探索、预处理步骤和代码解释的 Jupyter Notebook (<code>.ipynb</code> 格式)。</li>
+</ul></li>
+<li><strong>DDL:</strong> 第三周第一次课前。</li>
+</ul>
+<div class="callout-info" title="AI 辅助项目实践">
+<p>在项目过程中，积极使用 AI 编程助手！ * 让 AI 帮你生成读取特定格式数据的代码。 * 询问 AI 如何检查或处理某种数据问题（如“Pandas 如何将时间戳字符串转换为日期对象？”）。 * 让 AI 帮你生成数据探索性分析的代码片段（如“用 Pandas 计算 ‘df’ 中 ‘category’ 列各个类别的数量”）。 * 让 AI 解释 scikit-learn 中预处理函数的参数。</p>
+</div>
+</section>
+<section id="本周总结" class="level2">
+<h2 class="anchored" data-anchor-id="本周总结">6. 本周总结</h2>
+<p>本周我们学习了 Numpy 和 Pandas 这两个 Python 数据科学的核心库，掌握了它们的基本操作，包括数组运算、数据结构、索引、数据读写和探索。我们还初步接触了数据预处理和特征工程的基本技术，如处理缺失值、重复值，以及数值缩放和类别编码。最后，我们启动了第一个实践项目。</p>
+<p><strong>下周我们将学习第一个经典的监督学习算法——逻辑回归，并开始构建分类模型！</strong></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./week1_lecture.html" class="pagination-link" aria-label="第一周：机器学习世界初探与工具准备">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./week3_lecture.html" class="pagination-link" aria-label="第三周：分类算法初探 - 逻辑回归与支持向量机">
+        <span class="nav-page-text"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

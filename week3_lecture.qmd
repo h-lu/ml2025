@@ -1,0 +1,326 @@
+---
+title: "第三周：分类算法初探 - 逻辑回归与支持向量机"
+subtitle: "学习第一个分类模型，理解关键评估指标，并应用于项目"
+---
+
+
+经过前两周的基础准备，我们终于要开始接触真正的机器学习算法了！本周我们将学习两种非常经典的**分类 (Classification)** 算法：逻辑回归 (Logistic Regression) 和支持向量机 (Support Vector Machine, SVM)。同时，我们也会深入学习如何评估分类模型的效果，并将这些知识应用到我们的小组项目一中。
+
+::: {.callout-warning title="项目一检查点"}
+请确保你的小组已经完成了项目一的数据预处理工作，并准备好在本周应用分类模型。**DDL: 本周第一次课前提交预处理部分。**
+:::
+
+## 1. 分类问题概述
+
+分类是监督学习中的一类重要问题，其目标是预测一个样本属于哪个预定义的**类别 (Class)**。
+
+*   **二分类 (Binary Classification):** 只有两个类别（例如：是/否，垃圾邮件/非垃圾邮件，流失/未流失）。这是最常见的情况。
+*   **多分类 (Multiclass Classification):** 有三个或更多类别（例如：新闻分类（体育、娱乐、科技），图像识别（猫、狗、鸟））。
+
+我们首先从二分类问题入手。
+
+## 2. 逻辑回归 (Logistic Regression)
+
+虽然名字里有“回归”，但逻辑回归实际上是一种用于**分类**的算法，尤其擅长处理二分类问题。
+
+### 2.1 原理简介 (直观理解)
+
+逻辑回归的核心思想是：
+
+1.  **线性组合:** 像线性回归一样，首先计算输入特征的加权和（加上一个偏置项）。
+    `z = w1*x1 + w2*x2 + ... + wn*xn + b`
+2.  **Sigmoid 函数:** 将这个线性组合的结果 `z` 输入到一个称为 **Sigmoid (或 Logistic) 函数** 的特殊函数中。
+    `p = sigmoid(z) = 1 / (1 + exp(-z))`
+3.  **概率输出:** Sigmoid 函数的输出值 `p` 介于 0 和 1 之间，可以被解释为样本属于**正类别**（通常用 1 表示）的**概率**。
+4.  **决策边界:** 设定一个阈值（通常是 0.5）。如果计算出的概率 `p` 大于阈值，则预测为正类别 (1)；否则预测为负类别 (0)。
+
+::: {.callout-note title="Sigmoid 函数"}
+Sigmoid 函数的形状像一个 "S" 型曲线，它能将任意实数映射到 (0, 1) 区间，非常适合用来表示概率。
+![Sigmoid Function](https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Logistic-curve.svg/600px-Logistic-curve.svg.png){fig-alt="Sigmoid Function" width=50%}
+:::
+
+逻辑回归通过学习合适的权重 `w` 和偏置 `b`，找到一个**决策边界**（在高维空间中是一个超平面），将不同类别的样本分开。
+
+### 2.2 使用 Scikit-learn 实现
+
+Scikit-learn 提供了 `LogisticRegression` 类来实现逻辑回归。
+
+```python
+# 导入必要的库
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_curve, auc
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 假设我们已经有了预处理好的特征 X (DataFrame 或 Numpy Array)
+# 和对应的标签 y (Series 或 Numpy Array, 包含 0 和 1)
+# 例如:
+# X = df_processed[['feature1', 'feature2', ...]]
+# y = df_processed['target_class']
+
+# --- 准备数据 (示例) ---
+# 创建一些示例数据 (实际项目中应使用你的项目数据)
+np.random.seed(42)
+X_example = np.random.rand(100, 2) * 10 # 100个样本，2个特征
+# 设定一个简单的线性边界: feature1 + feature2 > 10
+y_example = (X_example[:, 0] + X_example[:, 1] > 10).astype(int)
+
+# --- 划分训练集和测试集 ---
+# 将数据分为训练集 (用于模型学习) 和测试集 (用于评估模型在未见过数据上的表现)
+# test_size=0.3 表示 30% 的数据作为测试集
+# random_state 保证每次划分结果一致，便于复现
+X_train, X_test, y_train, y_test = train_test_split(
+    X_example, y_example, test_size=0.3, random_state=42, stratify=y_example
+)
+# stratify=y 保证训练集和测试集中类别比例与原始数据一致，对不平衡数据尤其重要
+
+print("训练集大小:", X_train.shape, y_train.shape)
+print("测试集大小:", X_test.shape, y_test.shape)
+
+# --- 训练逻辑回归模型 ---
+# 1. 创建模型实例
+log_reg = LogisticRegression(random_state=42)
+
+# 2. 使用训练数据拟合 (训练) 模型
+log_reg.fit(X_train, y_train)
+
+# --- 进行预测 ---
+# 对测试集进行预测
+y_pred_lr = log_reg.predict(X_test)
+print("\n--- 逻辑回归评估 ---")
+print("测试集上的预测结果 (前10个):", y_pred_lr[:10])
+print("测试集上的真实结果 (前10个):", y_test[:10])
+
+# (可选) 预测概率 (用于 ROC 曲线)
+y_pred_proba_lr = log_reg.predict_proba(X_test)[:, 1] # 获取属于正类(1)的概率
+print("\n测试集上的预测概率 (正类, 前5个):", y_pred_proba_lr[:5])
+
+# --- 评估模型 ---
+accuracy_lr = accuracy_score(y_test, y_pred_lr)
+print(f"\n逻辑回归准确率 (Accuracy): {accuracy_lr:.4f}")
+```
+
+### 2.3 模型评估指标 (分类)
+
+仅仅看准确率 (Accuracy) 往往是不够的，尤其是在处理**不平衡数据**（一个类别的样本远多于另一个类别）时。我们需要更全面的评估指标。
+
+#### 2.3.1 混淆矩阵 (Confusion Matrix)
+
+混淆矩阵是一个表格，总结了分类模型预测结果与真实结果的对比情况。对于二分类问题，它通常是 2x2 的：
+
+|                    | 预测为负类 (0) | 预测为正类 (1) |
+| :----------------- | :-------------: | :-------------: |
+| **真实为负类 (0)** |       TN        |       FP        |
+| **真实为正类 (1)** |       FN        |       TP        |
+
+*   **TP (True Positive):** 真实为正，预测也为正 (预测正确)
+*   **TN (True Negative):** 真实为负，预测也为负 (预测正确)
+*   **FP (False Positive):** 真实为负，预测为正 (预测错误，**第一类错误 Type I Error**)
+*   **FN (False Negative):** 真实为正，预测为负 (预测错误，**第二类错误 Type II Error**)
+
+```python
+# 计算混淆矩阵
+cm_lr = confusion_matrix(y_test, y_pred_lr)
+print("\n逻辑回归混淆矩阵:\n", cm_lr)
+
+# 可视化混淆矩阵 (可选，但推荐)
+plt.figure(figsize=(6, 4))
+sns.heatmap(cm_lr, annot=True, fmt='d', cmap='Blues',
+            xticklabels=['Predicted 0', 'Predicted 1'],
+            yticklabels=['Actual 0', 'Actual 1'])
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+plt.title('Confusion Matrix (Logistic Regression)')
+# plt.show() # 在 Notebook 中取消注释以显示图像
+```
+
+#### 2.3.2 精确率 (Precision)
+
+**Precision = TP / (TP + FP)**
+
+含义：在所有**预测为正类**的样本中，有多少**真正是正类**的比例。
+
+*   **商业场景解读:**
+    *   **垃圾邮件检测:** Precision 高表示，被模型标记为垃圾邮件的邮件中，确实是垃圾邮件的比例很高（减少误判正常邮件）。
+    *   **产品推荐:** Precision 高表示，推荐给用户的产品中，用户确实感兴趣的比例很高（提高推荐效率）。
+    *   **高 Precision 意味着模型预测正类时比较“谨慎”，宁可漏掉一些正类，也要保证预测为正类的尽可能准确。**
+
+#### 2.3.3 召回率 (Recall) / 敏感度 (Sensitivity)
+
+**Recall = TP / (TP + FN)**
+
+含义：在所有**真正是正类**的样本中，有多少被模型**成功预测出来**的比例。
+
+*   **商业场景解读:**
+    *   **欺诈检测:** Recall 高表示，模型能找出尽可能多的真实欺诈交易（减少漏报）。
+    *   **疾病诊断:** Recall 高表示，模型能识别出尽可能多的真正患病的病人（减少漏诊）。
+    *   **高 Recall 意味着模型尽可能地找出所有正类样本，即使可能会误判一些负类。**
+
+#### 2.3.4 F1 分数 (F1-Score)
+
+**F1 = 2 * (Precision * Recall) / (Precision + Recall)**
+
+含义：Precision 和 Recall 的**调和平均数**。它试图平衡这两个指标，当两者都较高时，F1 分数也会较高。
+
+*   **使用场景:** 当 Precision 和 Recall 都很重要，或者你不确定哪个更重要时，F1 是一个很好的综合评估指标。
+
+#### 2.3.5 Scikit-learn 报告
+
+`classification_report` 函数可以方便地输出包含 Precision, Recall, F1-Score 的报告。
+
+```python
+report_lr = classification_report(y_test, y_pred_lr, target_names=['Class 0', 'Class 1']) # target_names 可选
+print("\n逻辑回归分类报告:\n", report_lr)
+```
+
+::: {.callout-tip title="AI 辅助理解评估指标"}
+*   "解释混淆矩阵中 FP 和 FN 的区别，并分别举一个商业例子说明其影响。"
+*   "在什么商业场景下，我们会更关注召回率而不是精确率？为什么？"
+*   "F1 分数是如何计算的？它为什么使用调和平均数而不是算术平均数？"
+*   "帮我生成一段 Python 代码，使用 scikit-learn 计算一个二分类问题的精确率、召回率和 F1 分数。"
+*   "解释 scikit-learn 中 `classification_report` 输出结果的每一项含义。"
+:::
+
+### 2.4 实践：简单数据集训练评估 LR
+
+请使用你选择的简单数据集（或老师提供的数据集），完成以下步骤：
+
+1.  加载数据。
+2.  进行必要的预处理（如果上周没做完）。
+3.  划分训练集和测试集 (`train_test_split`)。
+4.  训练逻辑回归模型 (`LogisticRegression`)。
+5.  在测试集上进行预测。
+6.  计算并打印准确率、混淆矩阵、分类报告 (Precision, Recall, F1)。
+7.  **思考:** 根据你的业务场景（假设一个），这些指标意味着什么？模型表现如何？
+
+## 3. 支持向量机 (Support Vector Machine, SVM)
+
+SVM 是另一种强大的、广泛应用的分类算法（也可用于回归）。它的核心思想是找到一个**最优的超平面 (Hyperplane)**，使得不同类别之间的**间隔 (Margin)** 最大化。
+
+### 3.1 原理简介 (直观理解)
+
+*   **超平面:** 在二维空间中是一条直线，在三维空间中是一个平面，在更高维空间中是一个超平面。它用来分隔不同的类别。
+*   **间隔 (Margin):** 超平面与离它最近的任何一个类别的数据点之间的距离。SVM 的目标是找到具有最大间隔的那个超平面。
+*   **支持向量 (Support Vectors):** 那些离超平面最近的数据点，它们“支撑”着这个最大间隔超平面。如果移动支持向量，超平面也会随之改变；移动其他点则不会影响超平面。
+*   **核函数 (Kernel Trick):** 对于线性不可分的数据（即无法用一条直线或一个平面完美分开），SVM 使用**核函数**将数据映射到更高维的空间，使得在高维空间中数据变得线性可分。常用的核函数有：
+    *   **线性核 (Linear):** 不进行映射，适用于线性可分数据。
+    *   **多项式核 (Poly):** 将数据映射到多项式空间。
+    *   **径向基函数核 (RBF / Gaussian):** 最常用，能处理复杂的非线性关系。
+    *   **Sigmoid 核:** 效果类似逻辑回归。
+
+![SVM Margin](https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/SVM_margin.png/400px-SVM_margin.png){fig-alt="SVM Margin" width=60%}
+
+### 3.2 使用 Scikit-learn 实现
+
+Scikit-learn 提供了 `SVC` (Support Vector Classification) 类。
+
+```python
+from sklearn.svm import SVC
+
+# --- 训练 SVM 模型 ---
+# 1. 创建模型实例
+# C 是正则化参数，控制对误分类的惩罚程度。C 越小，间隔越大，容忍更多误分类 (软间隔)；C 越大，间隔越小，尽量减少误分类。
+# kernel 指定核函数，常用 'rbf', 'linear', 'poly'
+# gamma 是 'rbf', 'poly', 'sigmoid' 核的参数，影响单个训练样本的影响范围。gamma 越大，影响范围越小，模型越复杂，可能过拟合。
+# 'scale' 是 gamma 的一个常用默认值: 1 / (n_features * X.var())
+# probability=True 使得可以调用 predict_proba，但会增加训练时间
+svm_clf = SVC(kernel='rbf', C=1.0, gamma='scale', probability=True, random_state=42)
+
+# 2. 使用训练数据拟合模型 (使用之前划分好的 X_train, y_train)
+svm_clf.fit(X_train, y_train)
+
+# --- 进行预测 ---
+y_pred_svm = svm_clf.predict(X_test)
+y_pred_proba_svm = svm_clf.predict_proba(X_test)[:, 1] # 获取属于正类的概率
+
+# --- 评估模型 ---
+print("\n--- SVM 评估 ---")
+accuracy_svm = accuracy_score(y_test, y_pred_svm)
+print(f"SVM 准确率: {accuracy_svm:.4f}")
+
+cm_svm = confusion_matrix(y_test, y_pred_svm)
+print("SVM 混淆矩阵:\n", cm_svm)
+
+report_svm = classification_report(y_test, y_pred_svm, target_names=['Class 0', 'Class 1'])
+print("SVM 分类报告:\n", report_svm)
+```
+
+### 3.3 ROC 曲线与 AUC 值
+
+**ROC 曲线 (Receiver Operating Characteristic Curve)** 是评估二分类模型性能的另一个重要工具，尤其在类别不平衡时。
+
+*   **横坐标 (FPR - False Positive Rate):** FPR = FP / (FP + TN)。在所有真实为负类的样本中，被错误预测为正类的比例。 (越小越好)
+*   **纵坐标 (TPR - True Positive Rate):** TPR = TP / (TP + FN)，就是**召回率 (Recall)**。在所有真实为正类的样本中，被正确预测为正类的比例。(越大越好)
+
+ROC 曲线描绘了在**不同分类阈值**下，TPR 与 FPR 的关系。理想的模型是 TPR 尽可能高，FPR 尽可能低，即曲线尽量靠近左上角。
+
+**AUC (Area Under the Curve)** 是 ROC 曲线下的面积。
+
+*   AUC 值介于 0 和 1 之间。
+*   AUC = 1 表示完美分类器。
+*   AUC = 0.5 表示模型的预测效果等同于随机猜测。
+*   AUC < 0.5 表示模型的效果比随机猜测还差（可能需要检查模型或数据）。
+*   **AUC 值可以看作是模型将随机选择的正样本排在随机选择的负样本前面的概率。** 它提供了一个不依赖于特定阈值的整体性能度量。
+
+```python
+# --- 计算并绘制 ROC 曲线 ---
+# 计算 LR 的 FPR, TPR
+fpr_lr, tpr_lr, thresholds_lr = roc_curve(y_test, y_pred_proba_lr)
+roc_auc_lr = auc(fpr_lr, tpr_lr)
+
+# 计算 SVM 的 FPR, TPR
+fpr_svm, tpr_svm, thresholds_svm = roc_curve(y_test, y_pred_proba_svm)
+roc_auc_svm = auc(fpr_svm, tpr_svm)
+
+# 绘制 ROC 曲线
+plt.figure(figsize=(8, 6))
+plt.plot(fpr_lr, tpr_lr, color='darkorange', lw=2, label=f'Logistic Regression (AUC = {roc_auc_lr:.2f})')
+plt.plot(fpr_svm, tpr_svm, color='cornflowerblue', lw=2, label=f'SVM (AUC = {roc_auc_svm:.2f})')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Guess') # 对角线
+
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate (FPR)')
+plt.ylabel('True Positive Rate (TPR)')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc="lower right")
+# plt.show() # 在 Notebook 中取消注释以显示图像
+```
+
+::: {.callout-info title="如何选择 C 和 gamma？"}
+`C` 和 `gamma` 是 SVM 的重要超参数。选择合适的值对模型性能至关重要。我们将在下周学习如何使用**交叉验证 (Cross-Validation)** 和**网格搜索 (Grid Search)** 来系统地寻找最优超参数组合。
+:::
+
+## 4. 小组项目一：模型构建与评估
+
+现在，将本周学习的逻辑回归和 SVM 应用到你的电商用户行为数据项目中！
+
+*   **任务:**
+    1.  **加载预处理数据:** 加载上周完成预处理的数据集。确保特征是数值类型，标签是 0 或 1。
+    2.  **划分训练/测试集:** 使用 `train_test_split` 将数据划分为训练集和测试集 (例如 70% 训练，30% 测试)。记得设置 `random_state` 并使用 `stratify=y`。
+    3.  **训练模型:**
+        *   训练一个逻辑回归模型 (`LogisticRegression`)。
+        *   训练一个支持向量机模型 (`SVC`)。可以先使用默认参数 (`kernel='rbf'`, `C=1.0`, `gamma='scale'`)。记得设置 `probability=True` 以便计算 ROC AUC。
+    4.  **预测:** 使用训练好的模型分别对**测试集**进行预测 (包括类别预测 `predict` 和概率预测 `predict_proba`)。
+    5.  **评估:**
+        *   对于每个模型，计算并打印：准确率、混淆矩阵、分类报告 (Precision, Recall, F1)。
+        *   计算并绘制两个模型的 ROC 曲线，并计算 AUC 值，将它们绘制在同一张图上进行比较。
+    6.  **结果分析:**
+        *   比较逻辑回归和 SVM 在你的数据集上的表现。哪个模型效果更好？依据是什么指标？(结合准确率、F1、AUC 等)
+        *   结合混淆矩阵，分析模型的错误类型（FP 和 FN）。在你的业务场景下（例如预测用户是否会购买），哪种错误更严重？为什么？
+        *   初步思考：模型表现是否达到预期？有没有可以改进的地方？（例如，尝试不同的 SVM 核函数或 C 值？）
+*   **提交:** 更新后的 Jupyter Notebook (`.ipynb`)，包含：
+    *   清晰的代码和注释。
+    *   模型训练和预测过程。
+    *   所有必要的评估指标计算和可视化结果 (混淆矩阵图、ROC 曲线图)。
+    *   对评估结果的详细分析和思考。
+*   **DDL:** 第四周第一次课前。
+
+## 5. 本周总结
+
+本周我们深入学习了两种基础且强大的分类算法：逻辑回归和支持向量机。我们不仅理解了它们的基本原理，还学会了如何使用 Scikit-learn 来实现、训练和预测。更重要的是，我们学习了一套全面的分类模型评估指标（混淆矩阵、精确率、召回率、F1 分数、ROC 曲线、AUC 值），并理解了它们在不同商业场景下的含义。最后，我们将这些知识应用到了项目一中，开始了模型构建和评估的实践。
+
+**下周我们将学习基于树的分类算法——决策树和随机森林，并探索模型优化的方法！**

@@ -1,0 +1,321 @@
+---
+title: "第五周：回归算法启程 - 线性回归与多项式回归"
+subtitle: "探索预测连续值的方法，理解回归评估指标，启动房价预测项目"
+---
+
+
+前几周我们聚焦于分类问题，即预测样本属于哪个类别。本周，我们将转向监督学习的另一大类问题——**回归 (Regression)**，其目标是预测一个**连续的数值**。我们将从最基础也是最重要的回归算法——**线性回归 (Linear Regression)** 开始，并学习如何评估回归模型的效果。我们还将接触到处理非线性关系的**多项式回归 (Polynomial Regression)** 以及缓解过拟合的技术——**正则化 (Regularization)**。同时，我们将启动第二个实践项目：房价预测！
+
+::: {.callout-success title="项目一提交提醒"}
+请确保你已经按时提交了项目一的最终 Notebook 和报告。
+:::
+
+## 1. 回归问题概述与应用
+
+回归分析旨在理解和量化**自变量 (Independent Variables / Features)** 与**因变量 (Dependent Variable / Target)** 之间的关系，并利用这种关系来预测因变量的数值。
+
+*   **目标:** 预测一个连续值。
+*   **例子:**
+    *   **房价预测:** 根据房屋面积、地段、房龄等特征预测房价。
+    *   **销售额预测:** 根据广告投入、季节、促销活动等预测商品销售额。
+    *   **股票价格预测:** 根据历史价格、市场指数、公司财报等预测股票价格（非常困难！）。
+    *   **学生成绩预测:** 根据学习时间、出勤率、历史成绩等预测考试成绩。
+
+## 2. 线性回归 (Linear Regression)
+
+线性回归是最简单、最基础的回归算法。它假设自变量和因变量之间存在**线性关系**。
+
+### 2.1 原理简介 (直观理解)
+
+对于只有一个自变量（特征）的情况（简单线性回归），线性回归试图找到一条**最佳拟合直线** `y = w*x + b` 来描述 `x` 和 `y` 之间的关系。
+
+*   `w`: 斜率 (Slope)，表示 `x` 每增加一个单位，`y` 平均变化多少。
+*   `b`: 截距 (Intercept)，表示当 `x` 为 0 时，`y` 的预测值。
+
+对于有多个自变量（特征）的情况（多元线性回归），线性回归试图找到一个**最佳拟合超平面**:
+`y = w1*x1 + w2*x2 + ... + wn*xn + b`
+
+**如何找到“最佳”拟合线/超平面？**
+
+最常用的方法是**最小二乘法 (Least Squares)**：找到一组参数 `w` 和 `b`，使得所有样本的**真实值 `y`** 与模型的**预测值 `ŷ`** 之间的**平方误差之和**最小。
+Minimize: Σ(yᵢ - ŷᵢ)² = Σ(yᵢ - (w*xᵢ + b))²
+
+![Linear Regression](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Linear_regression.svg/500px-Linear_regression.svg.png){fig-alt="Linear Regression" width=60%}
+
+### 2.2 使用 Scikit-learn 实现
+
+Scikit-learn 提供了 `LinearRegression` 类。
+
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# --- 准备数据 (示例：简单线性回归) ---
+# 创建一些近似线性的示例数据
+np.random.seed(0)
+X_lin = 2 * np.random.rand(100, 1) # 100个样本，1个特征
+y_lin = 4 + 3 * X_lin + np.random.randn(100, 1) # y = 4 + 3x + 噪声
+
+# 可视化数据
+# plt.scatter(X_lin, y_lin)
+# plt.xlabel("Feature (x)")
+# plt.ylabel("Target (y)")
+# plt.title("Sample Linear Data")
+# plt.show()
+
+# --- 划分训练集和测试集 ---
+X_train_lin, X_test_lin, y_train_lin, y_test_lin = train_test_split(
+    X_lin, y_lin, test_size=0.2, random_state=42
+)
+
+# --- 训练线性回归模型 ---
+lin_reg = LinearRegression()
+lin_reg.fit(X_train_lin, y_train_lin)
+
+# 查看学习到的参数
+print(f"学习到的截距 (b): {lin_reg.intercept_[0]:.4f}") # 应该是接近 4
+print(f"学习到的系数 (w): {lin_reg.coef_[0][0]:.4f}")   # 应该是接近 3
+
+# --- 进行预测 ---
+y_pred_lin = lin_reg.predict(X_test_lin)
+
+# --- 可视化拟合结果 ---
+# plt.scatter(X_test_lin, y_test_lin, color='blue', label='Actual Data')
+# plt.plot(X_test_lin, y_pred_lin, color='red', linewidth=2, label='Linear Regression Fit')
+# plt.xlabel("Feature (x)")
+# plt.ylabel("Target (y)")
+# plt.title("Linear Regression Fit")
+# plt.legend()
+# plt.show()
+```
+
+### 2.3 回归模型评估指标
+
+与分类问题不同，回归问题预测的是连续值，我们需要不同的指标来评估模型的好坏。
+
+#### 2.3.1 均方误差 (Mean Squared Error, MSE)
+
+**MSE = (1/n) * Σ(yᵢ - ŷᵢ)²**
+
+含义：预测值与真实值之差的平方的平均值。
+
+*   **特点:** 对较大的误差给予更高的权重（因为平方）。单位是目标变量单位的平方（例如，如果预测房价，单位是“万元平方”），不太直观。
+*   **越小越好。**
+
+#### 2.3.2 均方根误差 (Root Mean Squared Error, RMSE)
+
+**RMSE = sqrt(MSE) = sqrt[(1/n) * Σ(yᵢ - ŷᵢ)²]**
+
+含义：MSE 的平方根。
+
+*   **特点:** 单位与目标变量相同（例如“万元”），更易于解释。RMSE 表示了模型预测值与真实值之间的平均偏离程度。
+*   **越小越好。**
+
+#### 2.3.3 平均绝对误差 (Mean Absolute Error, MAE)
+
+**MAE = (1/n) * Σ|yᵢ - ŷᵢ|**
+
+含义：预测值与真实值之差的绝对值的平均值。
+
+*   **特点:** 单位与目标变量相同，易于解释。相比 RMSE，MAE 对异常值（离群点）不那么敏感。它表示了模型预测的平均绝对误差大小。
+*   **越小越好。**
+
+#### 2.3.4 R 方 (R-squared / Coefficient of Determination)
+
+**R² = 1 - (Σ(yᵢ - ŷᵢ)² / Σ(yᵢ - ȳ)²) = 1 - (MSE / Var(y))**
+
+含义：模型解释的因变量方差的比例。或者说，模型拟合得比简单地预测平均值好多少。
+
+*   **取值范围:** 通常在 0 到 1 之间（也可能为负，表示模型比预测平均值还差）。
+    *   R² = 1: 模型完美拟合数据。
+    *   R² = 0: 模型效果等同于预测平均值。
+    *   R² 越接近 1，表示模型对数据的拟合程度越好。
+*   **解读:** 例如，R² = 0.75 表示模型解释了因变量 75% 的变异性。
+
+```python
+# --- 评估线性回归模型 ---
+mse = mean_squared_error(y_test_lin, y_pred_lin)
+rmse = np.sqrt(mse) # 或者 mean_squared_error(y_test_lin, y_pred_lin, squared=False)
+mae = mean_absolute_error(y_test_lin, y_pred_lin)
+r2 = r2_score(y_test_lin, y_pred_lin)
+
+print("\n--- 线性回归评估 ---")
+print(f"均方误差 (MSE): {mse:.4f}")
+print(f"均方根误差 (RMSE): {rmse:.4f}")
+print(f"平均绝对误差 (MAE): {mae:.4f}")
+print(f"R 方 (R-squared): {r2:.4f}")
+```
+
+::: {.callout-tip title="AI 辅助理解回归指标"}
+*   "解释 RMSE 和 MAE 的区别，以及它们各自对异常值的敏感度。"
+*   "R-squared 的值可能为负吗？在什么情况下会发生？"
+*   "如果一个模型的 R-squared 是 0.6，这意味着什么？"
+*   "帮我生成 Python 代码，使用 scikit-learn 计算一个回归模型的 MSE, RMSE, MAE 和 R2。"
+:::
+
+## 3. 小组项目二 (阶段一)：房价预测 - 数据预处理与基础模型
+
+现在，启动我们的第二个项目！
+
+*   **主题:** 房价预测模型构建
+*   **目标:** 掌握回归问题的完整流程，包括数据处理、模型选择、评估和优化。
+*   **数据集:** (老师提供或推荐，例如波士顿房价数据集、Ames 房价数据集等公开数据)
+*   **任务 (阶段一):**
+    1.  **数据加载与探索 (EDA):**
+        *   加载房价数据集。
+        *   理解各个特征的含义（数值型？类别型？）。
+        *   查看目标变量（房价）的分布（例如，使用直方图）。
+        *   探索特征与房价之间的关系（例如，绘制散点图）。
+    2.  **数据预处理:**
+        *   处理缺失值。
+        *   处理类别特征（独热编码等）。
+        *   (可选) 处理异常值。
+        *   (重要) 对数值特征进行缩放 (StandardScaler 或 MinMaxScaler)。线性模型对特征缩放敏感。
+    3.  **划分训练/测试集:** 将预处理后的数据划分为训练集和测试集。
+    4.  **构建基础模型:** 使用**线性回归 (`LinearRegression`)** 在训练集上训练模型。
+    5.  **评估基础模型:** 在测试集上进行预测，并计算评估指标 (MSE, RMSE, MAE, R²)。
+*   **提交:** 包含上述所有步骤的 Jupyter Notebook (`.ipynb`)。
+*   **DDL:** 第六周第一次课前。
+
+## 4. 多项式回归 (Polynomial Regression)
+
+线性回归假设特征和目标之间是直线关系。但如果它们的关系是曲线呢？这时就需要多项式回归。
+
+### 4.1 线性回归的局限
+
+如果数据的真实关系是非线性的，线性回归模型可能无法很好地拟合数据，导致**欠拟合 (Underfitting)**。
+
+### 4.2 原理与实现
+
+多项式回归通过**创建特征的多项式组合**（例如平方项、立方项、特征之间的交互项），然后将这些新的“组合特征”输入到**线性回归**模型中。
+
+例如，对于单个特征 `x`，我们可以创建二次多项式特征 `x²`。然后，模型就变成了 `y = w1*x + w2*x² + b`，这实际上是一个关于 `x` 和 `x²` 的线性回归模型，但它能拟合关于 `x` 的二次曲线关系。
+
+Scikit-learn 提供了 `PolynomialFeatures` 转换器来生成这些多项式特征。
+
+```python
+from sklearn.preprocessing import PolynomialFeatures
+
+# --- 创建非线性数据示例 ---
+np.random.seed(1)
+m = 100
+X_poly = 6 * np.random.rand(m, 1) - 3
+y_poly = 0.5 * X_poly**2 + X_poly + 2 + np.random.randn(m, 1) # y = 0.5x^2 + x + 2 + noise
+
+# plt.scatter(X_poly, y_poly)
+# plt.title("Sample Non-linear Data")
+# plt.show()
+
+# --- 使用多项式特征 ---
+# degree=2 表示创建最高二次项特征 (包括 x, x^2 以及常数项)
+# include_bias=False 表示不添加常数列 (因为 LinearRegression 会自动处理截距)
+poly_features = PolynomialFeatures(degree=2, include_bias=False)
+X_poly_transformed = poly_features.fit_transform(X_poly)
+
+print("原始特征形状:", X_poly.shape)
+print("二次多项式特征形状:", X_poly_transformed.shape) # 包含 x 和 x^2 两列
+print("转换后的前 5 行:\n", X_poly_transformed[:5])
+
+# --- 训练线性回归模型 (使用转换后的特征) ---
+lin_reg_poly = LinearRegression()
+lin_reg_poly.fit(X_poly_transformed, y_poly)
+
+# --- 可视化拟合结果 ---
+# X_new = np.linspace(-3, 3, 100).reshape(100, 1) # 创建用于绘图的新数据点
+# X_new_poly = poly_features.transform(X_new)
+# y_new_poly = lin_reg_poly.predict(X_new_poly)
+
+# plt.scatter(X_poly, y_poly, label='Actual Data')
+# plt.plot(X_new, y_new_poly, "r-", linewidth=2, label="Polynomial Regression Fit (degree=2)")
+# plt.xlabel("Feature (x)")
+# plt.ylabel("Target (y)")
+# plt.legend()
+# plt.title("Polynomial Regression Fit")
+# plt.show()
+```
+
+### 4.3 过拟合 (Overfitting)
+
+如果多项式的**次数 (degree)** 选择得过高，模型可能会过于复杂，完美地拟合了训练数据中的每一个点（包括噪声），但在未见过的测试数据上表现很差。这种情况称为**过拟合**。
+
+::: {.callout-danger title="过拟合风险"}
+多项式次数越高，模型越灵活，但也越容易过拟合。选择合适的次数非常重要。可以通过观察训练集和验证集（或测试集）上的性能差异来判断是否过拟合。
+:::
+
+## 5. 正则化 (Regularization)
+
+正则化是一种用于**防止过拟合**的技术，它通过在模型的损失函数中添加一个**惩罚项 (Penalty Term)** 来限制模型的复杂度。这个惩罚项与模型**系数 (权重 `w`) 的大小**有关。
+
+目标是找到一组既能很好地拟合数据，又能使系数尽可能小的参数。
+
+### 5.1 L2 正则化 (Ridge Regression / 岭回归)
+
+*   **惩罚项:** 系数平方和的一半 (λ/2) * Σ(wᵢ²)。
+*   **效果:** 倾向于使所有系数都**接近于 0 但不完全等于 0**。它会“收缩”(shrink) 系数。
+*   **超参数:** `alpha` (对应公式中的 λ)，控制正则化的强度。`alpha` 越大，正则化越强，系数越接近 0。
+*   **实现:** `sklearn.linear_model.Ridge`
+
+```python
+from sklearn.linear_model import Ridge
+
+# alpha 控制正则化强度，需要调优
+ridge_reg = Ridge(alpha=1.0, solver="cholesky", random_state=42) # solver 可以选择不同的求解器
+ridge_reg.fit(X_train_lin, y_train_lin) # 使用之前的线性数据示例
+print("\nRidge Regression Coef:", ridge_reg.coef_)
+# 比较 ridge_reg.coef_ 和 lin_reg.coef_，Ridge 的系数通常更小
+```
+
+### 5.2 L1 正则化 (Lasso Regression)
+
+*   **惩罚项:** 系数绝对值之和 λ * Σ|wᵢ|。
+*   **效果:** 倾向于将**不重要特征的系数完全压缩为 0**。因此，Lasso 也可以用于**特征选择 (Feature Selection)**。
+*   **超参数:** `alpha` (对应公式中的 λ)，控制正则化的强度。`alpha` 越大，正则化越强，越多系数变为 0。
+*   **实现:** `sklearn.linear_model.Lasso`
+
+```python
+from sklearn.linear_model import Lasso
+
+# alpha 控制正则化强度
+lasso_reg = Lasso(alpha=0.1, random_state=42)
+lasso_reg.fit(X_train_lin, y_train_lin)
+print("\nLasso Regression Coef:", lasso_reg.coef_)
+# 观察是否有系数变为 0
+```
+
+### 5.3 如何选择 Alpha？
+
+`alpha` 是一个重要的超参数，需要通过交叉验证等方法（如 `RidgeCV`, `LassoCV` 或结合 `GridSearchCV`）来选择最佳值。
+
+::: {.callout-note title="何时使用正则化？"}
+*   当特征数量很多时。
+*   当特征之间可能存在多重共线性时 (Ridge 更常用)。
+*   当怀疑模型可能过拟合时。
+*   当希望进行特征选择时 (Lasso)。
+*   **注意:** 正则化对特征缩放非常敏感，使用前务必进行特征缩放 (如 StandardScaler)。
+:::
+
+## 6. 小组项目二 (阶段一续)：尝试改进模型
+
+在完成了基础的线性回归模型后，尝试使用本周学习的技术来改进你的房价预测模型：
+
+*   **任务:**
+    1.  **尝试多项式回归:**
+        *   选择一个合适的（不要太高，例如 2 或 3）多项式次数。
+        *   使用 `PolynomialFeatures` 对训练集和测试集的**特征**进行转换。
+        *   在转换后的特征上训练**线性回归**模型。
+        *   评估模型性能，并与基础线性回归模型比较。是否有提升？是否存在过拟合迹象？
+    2.  **尝试正则化回归:**
+        *   在**经过缩放**的原始特征上（或缩放后的多项式特征上）分别训练 `Ridge` 和 `Lasso` 模型。
+        *   可以先尝试几个不同的 `alpha` 值（例如 0.1, 1, 10）。
+        *   评估模型性能，并与基础线性回归/多项式回归模型比较。正则化是否有帮助？Lasso 是否将某些特征的系数压缩为 0？
+*   **更新 Notebook:** 将这些尝试和结果添加到你的项目 Notebook 中，并进行分析。
+
+## 7. 本周总结
+
+本周我们正式进入了回归领域，学习了核心的线性回归算法、评估回归模型的关键指标 (MSE, RMSE, MAE, R²)。我们还探讨了如何使用多项式回归处理非线性关系，并了解了正则化（Ridge 和 Lasso）作为防止过拟合和进行特征选择的技术。同时，我们启动了第二个实战项目——房价预测。
+
+**下周我们将学习更强大的回归算法——XGBoost，并继续优化我们的房价预测模型！**

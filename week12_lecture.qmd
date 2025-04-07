@@ -1,0 +1,331 @@
+---
+title: "第十二周：时间序列预测模型 (统计) - ARIMA"
+subtitle: "学习基准模型，掌握 ARIMA 概念与实践"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+    number-sections: true
+---
+
+# 第十二周：时间序列预测模型 (统计) - ARIMA
+
+上周我们学习了时间序列的基础知识，包括其特性、处理方法以及平稳性的概念和检验。本周，我们将正式进入**时间序列预测**的领域，学习经典的统计预测模型。我们会先介绍几种简单的**基准模型 (Baseline Models)**，然后重点学习强大的 **ARIMA (Autoregressive Integrated Moving Average)** 模型，包括其基本概念、如何确定模型阶数以及如何使用 `statsmodels` 库进行拟合和预测。
+
+::: {.callout-info title="项目四进展"}
+请确保你已经完成了项目四（时间序列预测）的 EDA、数据处理和平稳性检验部分。本周我们将在此基础上构建预测模型。
+:::
+
+## 1. 时间序列预测概述与基准模型
+
+**时间序列预测**的目标是利用历史数据来预测未来的值。在构建复杂模型之前，建立一些简单的**基准模型**非常重要，它们可以作为我们评估更复杂模型性能的底线。
+
+常用的基准模型包括：
+
+*   **平均值模型 (Mean Model):** 预测未来的所有值都等于历史数据的**平均值**。适用于没有明显趋势和季节性的平稳数据。
+*   **朴素模型 (Naive Model):** 预测未来的值等于**最后一个观测值**。`y_t+h = y_t`。适用于随机游走类型的数据。
+*   **季节性朴素模型 (Seasonal Naive Model):** 预测未来的值等于**上一个季节（周期）同一时期**的观测值。`y_t+h = y_{t+h-m}` (m 是季节周期长度)。适用于具有明显季节性的数据。
+
+**评估指标:** 时间序列预测通常使用与回归问题类似的评估指标，如：
+
+*   **RMSE (Root Mean Squared Error)**
+*   **MAE (Mean Absolute Error)**
+*   **MAPE (Mean Absolute Percentage Error):** `(1/n) * Σ(|(yᵢ - ŷᵢ) / yᵢ|) * 100%`。表示平均预测误差占真实值的百分比，易于理解，但当真实值接近 0 时可能出现问题。
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+import matplotlib.pyplot as plt
+# 检查 statsmodels 是否已安装，如果需要安装，取消下一行注释
+# !pip install statsmodels
+# 检查 pmdarima 是否已安装，如果需要安装，取消下一行注释
+# !pip install pmdarima
+import statsmodels.api as sm # 用于 ACF/PACF
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.arima.model import ARIMA
+import pmdarima as pm
+import warnings
+warnings.filterwarnings("ignore") # 忽略拟合过程中的一些警告
+
+
+# --- 假设已有处理好的时间序列数据 ts_data (Pandas Series) ---
+# 使用上周的季节性示例数据
+time = np.arange(1, 101)
+seasonal_data = 10 + time * 0.5 + 5 * np.sin(time * 2 * np.pi / 12) + np.random.randn(100) * 2
+ts_data = pd.Series(seasonal_data, index=pd.date_range(start='2020-01-01', periods=100, freq='M'))
+ts_seasonal_df = pd.DataFrame({'Value': ts_data}) # 用于后续 ACF/PACF 示例
+
+# --- 划分训练集和测试集 (时间序列划分不能随机！) ---
+train_size = int(len(ts_data) * 0.8) # 例如 80% 作为训练集
+train, test = ts_data[0:train_size], ts_data[train_size:]
+print(f"训练集大小: {len(train)}, 测试集大小: {len(test)}")
+
+# --- 定义 MAPE 函数 ---
+def mean_absolute_percentage_error(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    # 避免除以零
+    mask = y_true != 0
+    if not np.any(mask): # 如果所有真实值都是0
+        return 0.0
+    return np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100
+
+# --- 基准模型预测与评估 ---
+# 1. 平均值模型
+mean_pred = np.full(len(test), train.mean())
+rmse_mean = np.sqrt(mean_squared_error(test, mean_pred))
+mae_mean = mean_absolute_error(test, mean_pred)
+mape_mean = mean_absolute_percentage_error(test, mean_pred)
+print("\n--- 平均值模型 ---")
+print(f"RMSE: {rmse_mean:.4f}, MAE: {mae_mean:.4f}, MAPE: {mape_mean:.2f}%")
+
+# 2. 朴素模型
+naive_pred = np.full(len(test), train.iloc[-1]) # 预测值等于训练集最后一个值
+rmse_naive = np.sqrt(mean_squared_error(test, naive_pred))
+mae_naive = mean_absolute_error(test, naive_pred)
+mape_naive = mean_absolute_percentage_error(test, naive_pred)
+print("\n--- 朴素模型 ---")
+print(f"RMSE: {rmse_naive:.4f}, MAE: {mae_naive:.4f}, MAPE: {mape_naive:.2f}%")
+
+# 3. 季节性朴素模型 (假设季节周期 m=12)
+m = 12
+seasonal_naive_pred = []
+for i in range(len(test)):
+    # 找到训练集中上一个季节对应的值
+    train_idx = len(train) - m + i % m
+    if train_idx < 0: # 如果测试集长度超过一个周期
+        # 可以用更早周期的值，或者简单用第一个周期的值
+        train_idx = i % m
+        # 更鲁棒的处理：如果训练集不够长，用整个训练集的对应周期值
+        if train_idx >= len(train):
+             train_idx = len(train) - m + i % m
+             while train_idx < 0: train_idx += m # 确保索引非负
+             if train_idx >= len(train): train_idx = len(train) - m # 实在不行用倒数第m个
+
+    seasonal_naive_pred.append(train.iloc[train_idx])
+
+
+seasonal_naive_pred = np.array(seasonal_naive_pred)
+rmse_snaive = np.sqrt(mean_squared_error(test, seasonal_naive_pred))
+mae_snaive = mean_absolute_error(test, seasonal_naive_pred)
+mape_snaive = mean_absolute_percentage_error(test, seasonal_naive_pred)
+print("\n--- 季节性朴素模型 (m=12) ---")
+print(f"RMSE: {rmse_snaive:.4f}, MAE: {mae_snaive:.4f}, MAPE: {mape_snaive:.2f}%")
+
+# --- 可视化预测结果 ---
+plt.figure(figsize=(12, 6))
+plt.plot(train.index, train, label='Train')
+plt.plot(test.index, test, label='Test (Actual)')
+plt.plot(test.index, mean_pred, label=f'Mean (RMSE:{rmse_mean:.2f})')
+plt.plot(test.index, naive_pred, label=f'Naive (RMSE:{rmse_naive:.2f})')
+plt.plot(test.index, seasonal_naive_pred, label=f'Seasonal Naive (RMSE:{rmse_snaive:.2f})')
+plt.title('Baseline Model Forecasts')
+plt.legend()
+# plt.show()
+```
+
+任何更复杂的模型，其性能至少应该优于最合适的基准模型。
+
+## 2. ARIMA 模型概念
+
+ARIMA 是 **Autoregressive Integrated Moving Average** 的缩写，它是时间序列预测中最常用、最经典的统计模型之一。ARIMA 模型假设当前观测值可以表示为**过去观测值**和**过去预测误差**的线性组合。
+
+ARIMA 模型由三个部分组成：AR, I, MA，并由三个阶数 (p, d, q) 来定义：**ARIMA(p, d, q)**
+
+*   **AR (Autoregressive / 自回归) - p 阶:**
+    *   **含义:** 当前值与**过去 p 个**观测值相关。模型表示为 `y_t = c + φ₁*y_{t-1} + φ₂*y_{t-2} + ... + φ_p*y_{t-p} + ε_t`。
+    *   `p`: 自回归阶数，表示模型使用了过去多少个时刻的值。
+*   **I (Integrated / 差分整合) - d 阶:**
+    *   **含义:** 对非平稳时间序列进行**差分**操作，使其变得平稳。
+    *   `d`: 差分阶数，表示需要进行多少次差分才能使序列平稳。如果序列本身就是平稳的，则 d=0。
+*   **MA (Moving Average / 移动平均) - q 阶:**
+    *   **含义:** 当前值与**过去 q 个**预测误差（白噪声）相关。模型表示为 `y_t = c + ε_t + θ₁*ε_{t-1} + θ₂*ε_{t-2} + ... + θ_q*ε_{t-q}`。注意这里的“移动平均”与我们之前计算的滚动平均不同，它指的是**预测误差的移动平均**。
+    *   `q`: 移动平均阶数，表示模型考虑了过去多少个时刻的预测误差。
+
+**ARIMA(p, d, q)** 模型结合了这三个部分，适用于**非季节性**的平稳或可通过差分平稳化的时间序列。
+
+**季节性 ARIMA (SARIMA):** 对于具有明显季节性的时间序列，需要使用 ARIMA 的扩展版本——SARIMA 模型，表示为 **SARIMA(p, d, q)(P, D, Q)m**。其中 (p, d, q) 是非季节性部分的阶数，(P, D, Q) 是季节性部分的阶数，m 是季节性周期长度。我们本次课程主要关注非季节性 ARIMA。
+
+## 3. ACF 与 PACF 图辅助定阶 (p, q)
+
+确定 ARIMA 模型的阶数 (p, d, q) 是建模的关键步骤。
+
+*   **d (差分阶数):** 通常通过观察时间序列图和 ADF 检验来确定。如果序列非平稳，进行一阶差分；如果仍不平稳，再进行二阶差分（通常 d 不会超过 2）。
+*   **p (AR 阶数) 和 q (MA 阶数):** 可以通过观察**平稳化后**（即差分后）序列的**自相关函数 (ACF - Autocorrelation Function)** 图和**偏自相关函数 (PACF - Partial Autocorrelation Function)** 图来辅助确定。
+
+    *   **ACF 图:** 显示了序列与其**不同滞后阶数 (Lag)** 的值之间的**相关性**。例如，Lag=1 表示当前值与上一个时刻值的相关性，Lag=2 表示当前值与上两个时刻值的相关性，以此类推。
+    *   **PACF 图:** 显示了序列与其滞后 k 阶的值之间的**偏相关性**，即在**剔除了中间 k-1 个滞后项影响**后，当前值与滞后 k 阶值的**直接相关性**。
+
+    **定阶规则 (经验性，非绝对):**
+
+    | 模型类型      | ACF 图表现                     | PACF 图表现                    |
+    | :------------ | :----------------------------- | :----------------------------- |
+    | **AR(p)**     | 拖尾 (Tailing off) - 缓慢衰减  | **p 阶截尾 (Cuts off after lag p)** |
+    | **MA(q)**     | **q 阶截尾 (Cuts off after lag q)** | 拖尾 (Tailing off) - 缓慢衰减  |
+    | **ARMA(p, q)**| 拖尾 (Tailing off)             | 拖尾 (Tailing off)             |
+
+    *   **截尾 (Cuts off):** 指相关系数在某个滞后阶数后**突然**变为 0 或接近 0（落在置信区间内）。
+    *   **拖尾 (Tailing off):** 指相关系数缓慢地、呈指数或正弦衰减地趋向于 0。
+
+    **步骤:**
+    1.  对**平稳化后**的序列绘制 ACF 和 PACF 图。
+    2.  观察图形的截尾或拖尾模式。
+    3.  根据上表规则初步判断 p 和 q 的值。
+    4.  如果 ACF 和 PACF 都拖尾，可能需要尝试不同的 (p, q) 组合，并结合模型评估指标（如 AIC, BIC）来选择。
+
+```python
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.stattools import adfuller # 再次导入 ADF
+
+# --- 假设 ts_stationary 是已经平稳化的时间序列 (例如差分后的) ---
+# 使用上周差分后的示例数据
+ts_diff = ts_seasonal_df['Value'].diff().dropna()
+# 再次确认平稳性
+# test_stationarity(ts_diff) # 假设已确认平稳
+
+# --- 绘制 ACF 和 PACF 图 ---
+fig, axes = plt.subplots(1, 2, figsize=(16, 4))
+
+# ACF 图
+plot_acf(ts_diff, ax=axes[0], lags=40) # lags 指定最大滞后阶数
+axes[0].set_title('Autocorrelation Function (ACF)')
+
+# PACF 图
+plot_pacf(ts_diff, ax=axes[1], lags=40, method='ywm') # method='ols' 或 'ywm'
+axes[1].set_title('Partial Autocorrelation Function (PACF)')
+
+plt.tight_layout()
+# plt.show()
+```
+
+**解读:** 观察图中蓝色区域（置信区间），如果相关系数条超出该区域，则认为在统计上显著。根据 ACF 和 PACF 图中显著相关系数的截尾或拖尾情况来判断 p 和 q。例如，如果 PACF 在 lag=p 后截尾，ACF 拖尾，则模型可能是 AR(p)；如果 ACF 在 lag=q 后截尾，PACF 拖尾，则模型可能是 MA(q)。
+
+## 4. ARIMA 模型实践 (`statsmodels`)
+
+`statsmodels` 库提供了实现 ARIMA 模型的类 `statsmodels.tsa.arima.model.ARIMA`。
+
+```python
+from statsmodels.tsa.arima.model import ARIMA
+
+# --- 假设 train 是训练集时间序列 (原始，非差分) ---
+# --- 假设已通过 ACF/PACF 或其他方法确定了 p, d, q ---
+# 示例：假设我们确定 p=1, d=1, q=1 (根据上面示例数据的 ACF/PACF 图可能需要调整)
+p, d, q = 1, 1, 1
+
+# --- 拟合 ARIMA 模型 ---
+# 1. 创建模型实例
+# endog: 输入时间序列 (训练集)
+# order=(p, d, q): ARIMA 模型的阶数
+# freq: 时间序列的频率 (可选，如果索引是 DatetimeIndex 通常能自动推断)
+model = ARIMA(train, order=(p, d, q))
+
+# 2. 拟合模型
+# disp=False: 不打印收敛信息 (在新版 statsmodels 中已移除，默认不打印)
+model_fit = model.fit()
+
+# --- 查看模型摘要 ---
+print(f"\n--- ARIMA({p},{d},{q}) 模型摘要 ---")
+print(model_fit.summary())
+# 摘要信息包括：系数估计值、标准误、z统计量、p值、AIC、BIC 等
+
+# --- 模型诊断 (检查残差) ---
+# 好的模型的残差应该接近白噪声 (均值为0，方差恒定，无自相关)
+residuals = model_fit.resid
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+residuals.plot(title="Residuals", ax=ax[0])
+plot_acf(residuals, ax=ax[1], title="Residuals ACF")
+# plt.show()
+# 观察残差图是否像白噪声，ACF 图中是否没有显著的自相关性
+
+# --- 进行预测 ---
+# 预测测试集范围的值
+# start: 预测开始的索引位置 (相对于原始序列的开始)
+# end: 预测结束的索引位置
+# dynamic=False: 使用历史真实值进行一步预测 (更准确，但只能预测已知范围)
+# 也可以直接传入预测步数 steps=len(test)
+predictions = model_fit.predict(start=len(train), end=len(train) + len(test) - 1)
+# 或者使用 forecast
+forecast_values = model_fit.forecast(steps=len(test)) # forecast 更常用
+
+# --- 评估预测结果 ---
+rmse_arima = np.sqrt(mean_squared_error(test, forecast_values))
+mae_arima = mean_absolute_error(test, forecast_values)
+mape_arima = mean_absolute_percentage_error(test, forecast_values)
+print(f"\n--- ARIMA({p},{d},{q}) 预测评估 ---")
+print(f"RMSE: {rmse_arima:.4f}, MAE: {mae_arima:.4f}, MAPE: {mape_arima:.2f}%")
+
+# --- 可视化预测结果 ---
+plt.figure(figsize=(12, 6))
+plt.plot(train.index, train, label='Train')
+plt.plot(test.index, test, label='Test (Actual)')
+plt.plot(test.index, forecast_values, label=f'ARIMA({p},{d},{q}) Forecast (RMSE:{rmse_arima:.2f})')
+plt.title('ARIMA Model Forecast')
+plt.legend()
+# plt.show()
+```
+
+## 5. (可选) 自动定阶 (`auto_arima`)
+
+手动通过 ACF/PACF 定阶有时比较主观且困难。`pmdarima` 库（需要安装: `pip install pmdarima`) 提供了 `auto_arima` 函数，可以自动搜索最佳的 (p, d, q) 组合。
+
+```python
+import pmdarima as pm
+
+# --- 使用 auto_arima ---
+# stepwise=True: 使用逐步搜索策略，更快但可能不是全局最优
+# trace=True: 打印搜索过程
+# suppress_warnings=True: 忽略警告
+# seasonal=False: 只考虑非季节性 ARIMA
+# m: 季节周期 (如果 seasonal=True 需要指定)
+# D: 季节性差分阶数 (如果 seasonal=True)
+auto_model = pm.auto_arima(train,
+                           start_p=1, start_q=1,
+                           max_p=3, max_q=3, # 指定 p, q 的搜索范围
+                           d=None, # 让函数自动确定 d
+                           seasonal=False, # 假设非季节性，如果数据有季节性应设为 True 并指定 m, D 等
+                           stepwise=True, trace=True,
+                           suppress_warnings=True, error_action='ignore')
+
+print("\n--- auto_arima 结果 ---")
+print(auto_model.summary())
+
+# --- 使用 auto_arima 找到的模型进行预测 ---
+auto_predictions = auto_model.predict(n_periods=len(test))
+rmse_auto = np.sqrt(mean_squared_error(test, auto_predictions))
+mae_auto = mean_absolute_error(test, auto_predictions)
+mape_auto = mean_absolute_percentage_error(test, auto_predictions)
+print(f"\n--- Auto ARIMA 预测评估 ---")
+print(f"RMSE: {rmse_auto:.4f}, MAE: {mae_auto:.4f}, MAPE: {mape_auto:.2f}%")
+```
+
+`auto_arima` 通常能找到一个不错的模型，但建议还是理解手动定阶的过程，并将其结果作为参考。
+
+## 6. 小组项目四：ARIMA 模型构建与评估
+
+现在，将 ARIMA 模型应用到你的商业时间序列预测项目中。
+
+*   **任务:**
+    1.  **确定差分阶数 (d):** 根据上周的平稳性检验结果，确定使你的训练序列平稳所需的差分阶数 d。
+    2.  **确定 AR/MA 阶数 (p, q):**
+        *   对**平稳化后**的训练序列绘制 ACF 和 PACF 图。
+        *   根据图形的截尾或拖尾模式，初步判断 p 和 q 的值（可以尝试几组可能的组合）。
+        *   (可选) 使用 `auto_arima` 来获取建议的 (p, d, q) 阶数作为参考。
+    3.  **拟合 ARIMA 模型:**
+        *   选择一组或几组你认为合适的 (p, d, q) 阶数。
+        *   使用 `statsmodels.tsa.arima.model.ARIMA` 在**原始训练集**上拟合模型。
+        *   查看模型摘要 (`summary()`)，关注系数的显著性 (P>|z|) 和信息准则 (AIC, BIC - 值越小越好)。
+        *   进行模型诊断，检查残差是否接近白噪声。
+    4.  **预测与评估:**
+        *   使用拟合好的模型对测试集进行预测 (`predict` 或 `forecast`)。
+        *   计算预测结果的评估指标 (RMSE, MAE, MAPE)。
+        *   **与基准模型进行比较:** ARIMA 模型的性能是否优于你之前计算的基准模型（平均值、朴素、季节性朴素）？
+    5.  **(可选) 尝试不同阶数组合:** 如果初步选择的 (p, d, q) 效果不佳，可以尝试其他合理的组合，选择在测试集上表现最好的模型（可以基于 AIC/BIC 或测试集 RMSE/MAE）。
+*   **更新 Notebook:** 将 ACF/PACF 图、ARIMA 模型拟合过程（包括模型摘要和残差诊断）、预测结果、评估指标计算以及与基准模型的对比分析添加到你的项目 Notebook 中。
+
+## 7. 本周总结
+
+本周我们学习了时间序列预测的基础，包括基准模型的建立和评估。我们重点掌握了经典的 ARIMA 模型，理解了其 AR, I, MA 三个组成部分以及对应的阶数 (p, d, q)。我们学习了如何通过 ADF 检验确定差分阶数 d，以及如何利用 ACF 和 PACF 图来辅助判断 AR 阶数 p 和 MA 阶数 q。我们还实践了使用 `statsmodels` 库拟合 ARIMA 模型、进行诊断和预测，并了解了 `auto_arima` 作为自动定阶的工具。最后，我们将 ARIMA 应用到了项目四中。
+
+**下周我们将探讨模型可解释性 (XAI)，学习如何理解“黑箱”模型！**

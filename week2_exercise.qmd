@@ -1,0 +1,169 @@
+---
+title: "第二周：课堂练习与实验"
+subtitle: "Numpy & Pandas 实战与数据预处理入门"
+---
+
+本周的练习将帮助你熟练掌握 Numpy 和 Pandas 的核心操作，并初步体验数据预处理和特征工程的基本流程。请在 Jupyter Notebook (`.ipynb`) 文件中完成以下练习。
+
+## 准备工作
+
+在开始练习前，请确保导入必要的库：
+
+```python
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder
+```
+
+## 练习 1: Numpy 基础操作
+
+**目标:** 熟练使用 Numpy 创建数组、进行运算和索引。
+
+1.  **创建数组:**
+    *   创建一个包含整数 1 到 10 的一维 Numpy 数组 `arr1`。
+    *   创建一个 3x3 的二维 Numpy 数组 `arr2`，包含数字 1 到 9。
+    *   创建一个 2x4 的全零 Numpy 数组 `arr_zeros`。
+    *   创建一个 3x2 的值为 5 的 Numpy 数组 `arr_fives`。
+    *   使用 `np.arange()` 创建一个包含 0 到 10 之间所有偶数的一维数组 `arr_even`。
+    *   使用 `np.linspace()` 创建一个包含 5 个元素的数组 `arr_lin`，元素在 0 到 1 之间均匀分布。
+    *   打印出以上所有数组及其形状 (`shape`)。
+
+2.  **数组运算:**
+    *   将 `arr1` 中的每个元素乘以 3。
+    *   计算 `arr1` 中每个元素的平方。
+    *   创建一个与 `arr1` 形状相同，值为 10 的数组 `arr_ten`，计算 `arr1 + arr_ten`。
+    *   计算 `arr2` 中所有元素的和、平均值、最大值、最小值。
+    *   计算 `arr2` 每行的和以及每列的平均值。
+
+3.  **索引与切片:**
+    *   获取 `arr1` 的第 3 个元素（索引为 2）。
+    *   获取 `arr1` 的最后 3 个元素。
+    *   获取 `arr2` 的第二行。
+    *   获取 `arr2` 的第一列。
+    *   获取 `arr2` 中索引为 (1, 2) 的元素（第二行第三列）。
+    *   获取 `arr2` 的前两行、后两列组成的子数组。
+
+4.  **布尔索引:**
+    *   找出 `arr1` 中所有大于 5 的元素。
+    *   找出 `arr2` 中所有偶数元素，并将它们赋值为 0。
+    *   创建一个布尔数组，用于选择 `arr2` 中大于 3 且小于 7 的元素。
+
+## 练习 2: Pandas Series 操作
+
+**目标:** 掌握 Pandas Series 的创建和基本操作。
+
+1.  **创建 Series:**
+    *   使用一个 Python 列表 `[10, 20, 30, 40, 50]` 创建一个 Series `s1`。
+    *   创建一个 Series `s2`，包含 4 个城市名称作为值，并使用自定义索引 `['a', 'b', 'c', 'd']`。
+    *   使用一个 Python 字典 `{'apple': 5, 'banana': 8, 'orange': 3}` 创建一个 Series `s3`。
+    *   打印以上 Series。
+
+2.  **访问与操作:**
+    *   访问 `s1` 的第三个元素。
+    *   访问 `s2` 中索引为 'c' 的元素。
+    *   访问 `s3` 中值大于 4 的元素。
+    *   检查索引 'b' 是否在 `s2` 中。
+    *   计算 `s1` 中所有元素的和。
+
+## 练习 3: Pandas DataFrame 操作
+
+**目标:** 熟练使用 Pandas DataFrame 进行数据加载、探索和选择。
+
+1.  **创建 DataFrame:**
+    *   使用以下字典创建一个 DataFrame `df1`：
+        ```python
+        data = {'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+                'Age': [25, 30, 35, 40],
+                'City': ['New York', 'London', 'Paris', 'Tokyo']}
+        ```
+    *   打印 `df1`。
+
+2.  **数据探索 (假设你有一个 `sales.csv` 文件，包含 'Date', 'Product', 'Revenue', 'Quantity' 列):**
+    *   **(如果本地没有 `sales.csv`，可以先手动创建一个简单的 CSV 文件，或使用 AI 生成示例数据)**
+    *   使用 `pd.read_csv()` 读取 `sales.csv` 文件到 DataFrame `df_sales`。
+    *   显示 `df_sales` 的前 5 行和后 3 行。
+    *   查看 `df_sales` 的形状 (`shape`)。
+    *   查看 `df_sales` 的列名 (`columns`) 和索引 (`index`)。
+    *   使用 `info()` 查看每列的数据类型和非空值数量。
+    *   使用 `describe()` 查看数值列的描述性统计信息。
+    *   查看 'Product' 列有多少种不同的产品 (`unique()` 或 `value_counts()`)。
+
+3.  **数据选择:**
+    *   选择 `df_sales` 中的 'Revenue' 列。
+    *   选择 'Product' 和 'Quantity' 两列。
+    *   使用 `.loc` 选择索引为 10 到 20 (包含 20) 的行。
+    *   使用 `.iloc` 选择第 5 行到第 10 行（不包含 10）的数据。
+    *   使用 `.loc` 选择索引为 5，列为 'Product' 的值。
+    *   使用 `.iloc` 选择第 3 行、第 1 列的值。
+    *   选择 'Revenue' 大于 1000 的所有行。
+    *   选择 'Product' 为 'Laptop' 且 'Quantity' 大于 2 的所有行。
+
+## 练习 4: 数据预处理 - 缺失值与重复值
+
+**目标:** 练习处理数据中的常见问题。
+
+1.  **创建包含缺失值和重复值的 DataFrame:**
+    ```python
+    data_dirty = {'col1': [1, 2, np.nan, 4, 5, 2, 6, np.nan],
+                  'col2': ['A', 'B', 'A', 'C', 'B', 'B', 'D', 'A'],
+                  'col3': [10.5, 20.1, 15.3, 10.5, 8.8, 20.1, 12.0, 15.3]}
+    df_dirty = pd.DataFrame(data_dirty)
+    # 手动添加重复行
+    df_dirty = pd.concat([df_dirty, df_dirty.iloc[1:3]], ignore_index=True)
+    print("原始脏数据:\n", df_dirty)
+    ```
+2.  **处理缺失值:**
+    *   检查 `df_dirty` 中每列的缺失值数量。
+    *   删除所有包含缺失值的**行**，并将结果存储在 `df_dropped_rows` 中。
+    *   使用 `col1` 的**均值**填充 `col1` 中的缺失值。
+    *   使用字符串 'Unknown' 填充 `col2` 中的缺失值。
+    *   打印处理后的 DataFrame。
+3.  **处理重复值:**
+    *   检查 `df_dirty` 中是否存在完全重复的行。
+    *   删除所有完全重复的行，保留第一次出现的行，存储在 `df_no_duplicates` 中。
+    *   检查基于 'col1' 和 'col2' 两列是否存在重复行。
+    *   删除基于 'col1' 和 'col2' 的重复行，存储在 `df_no_dup_subset` 中。
+    *   打印处理后的 DataFrame。
+
+## 练习 5: 特征工程 - 缩放与编码
+
+**目标:** 练习对数值和类别特征进行转换。
+
+1.  **创建包含数值和类别特征的 DataFrame:**
+    ```python
+    data_feat = {'Score': [85, 92, 78, 88, 95, 72],
+                 'Age': [21, 23, 22, 24, 21, 22],
+                 'Gender': ['Male', 'Female', 'Female', 'Male', 'Female', 'Male'],
+                 'Grade': ['A', 'A', 'B', 'A', 'A', 'C']} # 假设 Grade 有序 C < B < A
+    df_feat = pd.DataFrame(data_feat)
+    print("原始特征数据:\n", df_feat)
+    ```
+2.  **数值特征缩放:**
+    *   选择 'Score' 和 'Age' 列。
+    *   使用 `StandardScaler` 对这两列进行标准化。
+    *   使用 `MinMaxScaler` 对这两列进行归一化 (缩放到 [0, 1])。
+    *   打印缩放后的结果 (它们将是 Numpy 数组)。
+
+3.  **类别特征编码:**
+    *   **标签编码:** 对有序特征 'Grade' 使用 `LabelEncoder` 进行编码。将编码后的结果作为新列 'Grade_Encoded' 添加回 `df_feat`。
+    *   **独热编码:** 对无序特征 'Gender' 使用 `pd.get_dummies()` 进行独热编码。
+    *   **独热编码 (sklearn):** (可选) 尝试使用 `OneHotEncoder` 对 'Gender' 列进行独热编码，并理解其用法（需要处理输出格式）。
+    *   打印包含编码后特征的 DataFrame。
+
+## 练习 6: 项目一 - 数据加载与初步探索
+
+**目标:** 开始你的第一个机器学习项目，应用本周所学知识。
+
+1.  **加载数据:** 使用 Pandas 加载你的小组为项目一选择的电商用户行为数据集。
+2.  **初步探索:**
+    *   使用 `head()`, `info()`, `describe()` 等函数初步了解数据。
+    *   识别数据中的数值特征和类别特征。
+    *   检查是否存在时间戳相关的列，如果需要，将其转换为 `datetime` 类型。
+3.  **识别预处理需求:**
+    *   检查每列是否存在缺失值 (`isnull().sum()`)。
+    *   检查是否存在明显的重复行 (`duplicated().sum()`)。
+    *   思考哪些数值特征可能需要缩放？
+    *   思考哪些类别特征需要编码？应该使用哪种编码方式？
+4.  **记录发现:** 在你的项目 Notebook 中，用 Markdown 记录下你对数据的初步观察和需要进行的预处理步骤。
+
+**完成这些练习将为你后续的模型构建打下坚实的基础！**

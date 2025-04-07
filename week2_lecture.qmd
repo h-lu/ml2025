@@ -1,0 +1,393 @@
+---
+title: "第二周：数据处理利器 Numpy & Pandas 与项目启动"
+subtitle: "掌握数据处理核心库，开启第一个机器学习项目"
+---
+
+
+上周我们了解了机器学习的基本概念并搭建了环境。从本周开始，我们将深入学习数据处理的核心工具：Numpy 和 Pandas。它们是进行数据分析和机器学习的基石。同时，我们也将启动第一个实践项目！
+
+## 1. Numpy: Python 科学计算的基石
+
+Numpy (Numerical Python) 是 Python 中用于处理数值计算，特别是数组运算的基础库。它提供了高效的多维数组对象 (`ndarray`) 以及对这些数组进行操作的函数。
+
+### 1.1 `ndarray`：Numpy 的核心
+
+`ndarray` 是一个多维数组对象，与 Python 的列表 (list) 相比，它具有以下优势：
+
+*   **更紧凑:** 存储相同类型的数据，内存占用更小。
+*   **更快速:** 底层由 C 语言实现，运算速度更快，尤其对于大规模数据。
+*   **更方便:** 支持向量化运算，可以对整个数组执行操作，代码更简洁。
+
+**创建数组:**
+
+```python
+import numpy as np
+
+# 从列表创建
+list_data = [1, 2, 3, 4, 5]
+arr1d = np.array(list_data)
+print(arr1d)
+print(arr1d.shape) # 查看数组形状 (维度)
+print(arr1d.dtype) # 查看数据类型
+
+list_2d = [[1, 2, 3], [4, 5, 6]]
+arr2d = np.array(list_2d)
+print(arr2d)
+print(arr2d.shape)
+
+# 使用内置函数创建
+zeros_arr = np.zeros((2, 3)) # 创建全 0 数组
+print(zeros_arr)
+ones_arr = np.ones((3, 2))  # 创建全 1 数组
+print(ones_arr)
+range_arr = np.arange(0, 10, 2) #类似 Python range，创建序列数组
+print(range_arr)
+```
+
+### 1.2 向量化运算
+
+Numpy 允许你直接对整个数组进行数学运算，无需编写循环。
+
+```python
+arr = np.array([1, 2, 3, 4])
+
+# 算术运算
+print(arr * 2)
+print(arr + 5)
+print(arr ** 2) # 平方
+
+# 数组间运算 (需要形状兼容)
+arr_b = np.array([10, 20, 30, 40])
+print(arr + arr_b)
+print(arr * arr_b)
+
+# 通用函数 (ufunc)
+print(np.sqrt(arr)) # 开方
+print(np.sin(arr))  # 三角函数
+```
+
+### 1.3 常用函数
+
+Numpy 提供了丰富的数学和统计函数。
+
+```python
+arr = np.array([[1, 5, 3], [4, 2, 6]])
+
+print(np.sum(arr))          # 计算所有元素的和
+print(np.sum(arr, axis=0))  # 按列求和 (沿第一个轴)
+print(np.sum(arr, axis=1))  # 按行求和 (沿第二个轴)
+
+print(np.mean(arr))         # 平均值
+print(np.std(arr))          # 标准差
+print(np.min(arr))          # 最小值
+print(np.max(arr, axis=1))  # 每行的最大值
+print(np.argmin(arr))       # 最小值的索引 (扁平化后)
+print(np.argmax(arr, axis=0)) # 每列最大值的索引
+```
+
+### 1.4 索引与切片
+
+Numpy 的索引和切片与 Python 列表类似，但功能更强大，支持多维度操作。
+
+```python
+arr = np.arange(10) # [0 1 2 3 4 5 6 7 8 9]
+print(arr[5])      # 获取单个元素
+print(arr[2:5])    # 切片 [2 3 4]
+arr[0:3] = 100   # 切片赋值
+print(arr)
+
+arr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+print(arr2d[1])      # 获取第二行 [4 5 6]
+print(arr2d[1, 2])   # 获取第二行第三列的元素 (6)
+print(arr2d[1][2])   # 同上
+
+# 多维切片
+print(arr2d[:2, 1:]) # 获取前两行，第二列及之后 [[2 3] [5 6]]
+
+# 布尔索引 (非常常用!)
+names = np.array(['Bob', 'Joe', 'Will', 'Bob', 'Will', 'Joe', 'Joe'])
+data = np.random.randn(7, 4) # 生成 7x4 的随机数据
+
+print(names == 'Bob') # 返回布尔数组 [ True False False  True False False False]
+print(data[names == 'Bob']) # 选择 data 中对应 'Bob' 的行
+print(data[names == 'Bob', 2:]) # 选择 'Bob' 行的后两列
+print(data[~(names == 'Bob')]) # 选择不是 'Bob' 的行 (使用 ~ 取反)
+print(data[(names == 'Bob') | (names == 'Will')]) # 选择 'Bob' 或 'Will' 的行
+
+data[data < 0] = 0 # 将 data 中所有负数设为 0
+print(data)
+```
+
+::: {.callout-tip title="AI 辅助 Numpy 学习"}
+*   "用 Numpy 创建一个 3x4 的随机整数数组，范围在 10 到 20 之间"
+*   "解释 Numpy 中 `axis` 参数的作用"
+*   "如何用 Numpy 计算一个数组中大于 5 的元素的个数？"
+*   "给我一些 Numpy 数组索引和切片的练习题"
+:::
+
+## 2. Pandas: 数据分析与处理的瑞士军刀
+
+Pandas 是建立在 Numpy 之上的库，提供了更高级的数据结构和数据分析工具，特别适合处理表格型（二维）数据。
+
+### 2.1 核心数据结构：Series 和 DataFrame
+
+*   **Series:** 一维带标签的数组，可以看作是带索引的 Numpy 数组或特殊的字典。
+    ```python
+    import pandas as pd
+
+    s = pd.Series([4, 7, -5, 3])
+    print(s)
+    print(s.values) # 底层 Numpy 数组
+    print(s.index)  # 索引
+
+    s2 = pd.Series([4, 7, -5, 3], index=['a', 'b', 'c', 'd']) # 自定义索引
+    print(s2)
+    print(s2['b']) # 通过索引访问
+    print(s2[s2 > 0]) # 布尔索引
+    print('b' in s2) # 检查索引是否存在
+
+    # 从字典创建
+    sdata = {'Ohio': 35000, 'Texas': 71000, 'Oregon': 16000, 'Utah': 5000}
+    s3 = pd.Series(sdata)
+    print(s3)
+    ```
+*   **DataFrame:** 二维带标签的数据结构，可以看作是共享相同索引的 Series 的集合，类似于 Excel 表格或 SQL 表。它是 Pandas 中最常用的数据结构。
+    ```python
+    data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+            'year': [2000, 2001, 2002, 2001, 2002, 2003],
+            'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+    df = pd.DataFrame(data)
+    print(df)
+
+    # 指定列顺序和索引
+    df2 = pd.DataFrame(data, columns=['year', 'state', 'pop'],
+                       index=['one', 'two', 'three', 'four', 'five', 'six'])
+    print(df2)
+
+    print(df2['state']) # 获取一列 (Series)
+    print(df2.year)    # 同上 (属性访问，仅限合法标识符列名)
+    print(df2[['year', 'pop']]) # 获取多列 (DataFrame)
+    ```
+
+### 2.2 数据读写
+
+Pandas 可以方便地读取和写入多种格式的数据文件，最常用的是 CSV 文件。
+
+```python
+# 假设当前目录下有 data.csv 文件
+# df = pd.read_csv('data.csv')
+
+# 写入 CSV 文件
+# df.to_csv('output.csv', index=False) # index=False 表示不将索引写入文件
+```
+
+::: {.callout-note title="文件路径"}
+`read_csv` 和 `to_csv` 中的路径可以是相对路径（相对于你的代码文件或工作目录）或绝对路径。
+:::
+
+### 2.3 数据查看与探索
+
+拿到数据后，首先要了解它的基本情况。
+
+```python
+# 假设 df 是一个已加载的 DataFrame
+print(df.head())    # 查看前 5 行数据 (可指定行数 df.head(10))
+print(df.tail())    # 查看后 5 行数据
+print(df.shape)     # 查看 DataFrame 的形状 (行数, 列数)
+print(df.columns)   # 查看所有列名
+print(df.index)     # 查看索引
+print(df.info())    # 查看 DataFrame 的简要信息 (列名、非空值数量、数据类型、内存占用)
+print(df.describe())# 查看数值列的描述性统计信息 (计数、均值、标准差、最小值、分位数、最大值)
+```
+
+### 2.4 数据选择与索引
+
+Pandas 提供了多种方式来选择数据的子集。
+
+*   **选择列:** 如前所述 `df['col_name']` 或 `df[['col1', 'col2']]`。
+*   **选择行 (切片):** `df[0:3]` 选择前 3 行 (基于位置，不推荐单独使用)。
+*   **基于标签的索引 (`.loc`):** 使用行索引标签和列标签进行选择。**推荐使用！**
+    ```python
+    print(df2.loc['three']) # 选择索引为 'three' 的行 (Series)
+    print(df2.loc[['two', 'four']]) # 选择多行 (DataFrame)
+    print(df2.loc['two', ['year', 'pop']]) # 选择 'two' 行的 'year' 和 'pop' 列
+    print(df2.loc[:'three', 'state']) # 选择从开始到 'three' 行的 'state' 列
+    ```
+*   **基于整数位置的索引 (`.iloc`):** 使用整数位置进行选择 (类似 Numpy)。**推荐使用！**
+    ```python
+    print(df.iloc[2]) # 选择第三行 (Series)
+    print(df.iloc[[1, 3, 5]]) # 选择第 2, 4, 6 行 (DataFrame)
+    print(df.iloc[1, [0, 2]]) # 选择第 2 行的第 1 和第 3 列
+    print(df.iloc[:3, 1:]) # 选择前 3 行，第 2 列及之后
+    ```
+*   **布尔索引:** 类似 Numpy，非常强大。
+    ```python
+    print(df[df['pop'] > 2.0]) # 选择 'pop' 列大于 2.0 的所有行
+    print(df[df['state'] == 'Ohio']) # 选择 'state' 列为 'Ohio' 的所有行
+    print(df[(df['year'] > 2001) & (df['pop'] < 3.0)]) # 组合条件 (使用 & | ~)
+    ```
+
+::: {.callout-tip title="AI 辅助 Pandas 学习"}
+*   "用 Pandas 读取名为 'sales.csv' 的文件，并将 'Date' 列设为索引"
+*   "如何用 Pandas 查看 DataFrame 'df' 中 'Category' 列的所有唯一值？"
+*   "解释 Pandas 中 `.loc` 和 `.iloc` 的区别"
+*   "给我一个 Pandas DataFrame，包含学生姓名、科目和分数，然后筛选出数学成绩大于 80 分的学生"
+*   "如何用 Pandas 计算 DataFrame 'df' 中 'Age' 列的平均值？"
+:::
+
+## 3. 数据预处理入门
+
+真实世界的数据往往是不完美的，存在缺失、重复或格式不一致等问题。数据预处理是机器学习流程中至关重要的一步，目的是清洗和转换数据，使其适用于模型训练。
+
+### 3.1 处理缺失值 (Missing Values)
+
+缺失值通常在 Pandas 中表示为 `NaN` (Not a Number)。
+
+```python
+# 假设 df 中存在缺失值
+print(df.isnull()) # 返回一个布尔型的 DataFrame，True 表示缺失
+print(df.isnull().sum()) # 统计每列的缺失值数量
+
+# 处理方式：
+# 1. 删除包含缺失值的行或列
+df_dropped_rows = df.dropna() # 删除任何包含 NaN 的行
+df_dropped_cols = df.dropna(axis=1) # 删除任何包含 NaN 的列
+df_dropped_thresh = df.dropna(thresh=2) # 删除 NaN 数量达到阈值的行
+
+# 2. 填充缺失值
+df_filled_zero = df.fillna(0) # 用 0 填充所有 NaN
+df_filled_mean = df.fillna(df.mean(numeric_only=True)) # 用每列的均值填充 (仅对数值列)
+# 也可以用中位数 df.median() 或指定值填充特定列
+df['col_name'].fillna('Unknown', inplace=True) # inplace=True 直接修改原 DataFrame
+```
+
+### 3.2 处理重复值 (Duplicate Values)
+
+```python
+# 检查重复行
+print(df.duplicated()) # 返回布尔 Series，True 表示该行是重复的 (首次出现除外)
+print(df.duplicated().sum()) # 统计重复行数量
+
+# 删除重复行 (默认保留第一个出现的)
+df_no_duplicates = df.drop_duplicates()
+
+# 基于特定列查找和删除重复项
+df_no_dup_subset = df.drop_duplicates(['col1', 'col2']) # 基于 col1 和 col2 的组合判断重复
+```
+
+## 4. 特征工程基础 (Feature Engineering)
+
+特征工程是指从原始数据中提取或创建更有用的特征，以提高模型性能的过程。
+
+### 4.1 数值特征缩放 (Scaling)
+
+许多机器学习算法对特征的尺度（大小范围）很敏感。如果不同特征的尺度差异很大，可能会导致某些特征对模型的影响过大。特征缩放将数值特征转换到相似的尺度。
+
+*   **标准化 (Standardization):** 将数据转换为均值为 0，标准差为 1 的分布。适用于数据近似高斯分布的情况。使用 `sklearn.preprocessing.StandardScaler`。
+*   **归一化 (Normalization):** 将数据缩放到一个特定的范围，通常是 [0, 1] 或 [-1, 1]。适用于不了解数据分布或数据分布不规则的情况。使用 `sklearn.preprocessing.MinMaxScaler`。
+
+```python
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+import pandas as pd
+import numpy as np
+
+# 示例数据
+data = pd.DataFrame({'Age': [25, 30, 35, 40, 45],
+                     'Salary': [50000, 60000, 75000, 90000, 110000]})
+
+# 标准化
+scaler_std = StandardScaler()
+data_scaled_std = scaler_std.fit_transform(data) # fit_transform 计算并应用转换
+print("Standardized Data:\n", data_scaled_std)
+# data_scaled_std 是一个 Numpy 数组，可以转换回 DataFrame
+# data_scaled_std_df = pd.DataFrame(data_scaled_std, columns=data.columns)
+
+# 归一化 (到 [0, 1])
+scaler_minmax = MinMaxScaler()
+data_scaled_minmax = scaler_minmax.fit_transform(data)
+print("\nNormalized Data (0-1):\n", data_scaled_minmax)
+```
+
+### 4.2 类别特征编码 (Encoding)
+
+机器学习模型通常只能处理数值数据。类别特征（如“性别”、“城市”、“产品类别”）需要转换为数值表示。
+
+*   **标签编码 (Label Encoding):** 将每个类别映射到一个整数。例如，“北京”->0，“上海”->1，“广州”->2。适用于类别间存在**有序关系**的情况（如“低”、“中”、“高”）。使用 `sklearn.preprocessing.LabelEncoder`。 **注意：** 对于无序类别，直接使用标签编码可能会误导模型，让模型认为类别间存在大小关系。
+*   **独热编码 (One-Hot Encoding):** 为每个类别创建一个新的二元（0 或 1）特征列。如果一个样本属于某个类别，则对应的列为 1，其他类别列为 0。适用于类别间**无序关系**的情况。这是最常用的类别编码方式。使用 `sklearn.preprocessing.OneHotEncoder` 或 `pandas.get_dummies()`。
+
+```python
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+import pandas as pd
+
+# 示例数据
+data = pd.DataFrame({'City': ['Beijing', 'Shanghai', 'Guangzhou', 'Beijing', 'Shanghai'],
+                     'Size': ['M', 'L', 'S', 'M', 'L']}) # Size 有序
+
+# 标签编码 (适用于有序 Size 列)
+label_encoder = LabelEncoder()
+data['Size_Encoded'] = label_encoder.fit_transform(data['Size'])
+print("Label Encoded Data:\n", data)
+
+# 独热编码 (适用于无序 City 列)
+# 方法一: sklearn OneHotEncoder
+onehot_encoder = OneHotEncoder(sparse_output=False) # sparse=False 返回密集数组
+city_onehot = onehot_encoder.fit_transform(data[['City']]) # 需要二维输入
+# 获取新列名
+city_categories = onehot_encoder.categories_[0]
+city_onehot_df = pd.DataFrame(city_onehot, columns=[f'City_{cat}' for cat in city_categories])
+print("\nOneHot Encoded City (sklearn):\n", city_onehot_df)
+# 合并回原 DataFrame
+data = pd.concat([data, city_onehot_df], axis=1)
+print("\nCombined DataFrame:\n", data)
+
+
+# 方法二: pandas get_dummies (更简洁)
+data_dummies = pd.get_dummies(data, columns=['City'], prefix='City') # 直接在 DataFrame 上操作
+print("\nOneHot Encoded City (pandas get_dummies):\n", data_dummies)
+```
+
+::: {.callout-tip title="AI 辅助预处理与特征工程"}
+*   "如何用 Pandas 检查 DataFrame 'df' 中 'Age' 列是否有缺失值？"
+*   "用 scikit-learn 的 StandardScaler 对 DataFrame 'numeric_df' 进行标准化"
+*   "解释 One-Hot Encoding 和 Label Encoding 的区别和适用场景"
+*   "给我一段 Python 代码，使用 pandas.get_dummies 对 'df' 中的 'Color' 列进行独热编码"
+*   "如何用 scikit-learn 填充 DataFrame 'df' 中 'Income' 列的缺失值，使用中位数？"
+:::
+
+## 5. 小组项目一：电商用户行为数据探索与预处理
+
+现在，我们将理论付诸实践！
+
+*   **主题:** 电商用户行为数据探索与预处理
+*   **目标:** 熟悉真实数据的处理流程，为后续的建模打下基础。运用本周所学的 Numpy, Pandas 以及数据预处理技术。
+*   **任务:**
+    1.  **分组与选数据集:** (课堂上完成) 选择一个电商用户行为相关的数据集（老师可能提供，或自行寻找公开数据集，如淘宝用户行为数据、天猫用户行为数据等）。
+    2.  **数据加载与探索 (EDA - Exploratory Data Analysis):**
+        *   使用 Pandas 加载数据。
+        *   查看数据基本信息 (`head`, `info`, `describe`)。
+        *   探索数据类型，识别数值和类别特征。
+        *   (可选) 进行初步的可视化，了解数据分布（我们后面会专门学可视化）。
+    3.  **数据预处理:**
+        *   处理缺失值（选择合适的填充或删除策略）。
+        *   处理重复值。
+        *   对必要的特征进行类型转换（例如，时间字符串转为 datetime 对象）。
+        *   对数值特征进行缩放（选择标准化或归一化）。
+        *   对类别特征进行编码（选择标签编码或独热编码）。
+*   **提交:**
+    *   预处理后的数据集 (`.csv` 格式)。
+    *   包含完整数据加载、探索、预处理步骤和代码解释的 Jupyter Notebook (`.ipynb` 格式)。
+*   **DDL:** 第三周第一次课前。
+
+::: {.callout-info title="AI 辅助项目实践"}
+在项目过程中，积极使用 AI 编程助手！
+*   让 AI 帮你生成读取特定格式数据的代码。
+*   询问 AI 如何检查或处理某种数据问题（如“Pandas 如何将时间戳字符串转换为日期对象？”）。
+*   让 AI 帮你生成数据探索性分析的代码片段（如“用 Pandas 计算 'df' 中 'category' 列各个类别的数量”）。
+*   让 AI 解释 scikit-learn 中预处理函数的参数。
+:::
+
+## 6. 本周总结
+
+本周我们学习了 Numpy 和 Pandas 这两个 Python 数据科学的核心库，掌握了它们的基本操作，包括数组运算、数据结构、索引、数据读写和探索。我们还初步接触了数据预处理和特征工程的基本技术，如处理缺失值、重复值，以及数值缩放和类别编码。最后，我们启动了第一个实践项目。
+
+**下周我们将学习第一个经典的监督学习算法——逻辑回归，并开始构建分类模型！**

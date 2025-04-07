@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第二周：课堂练习与实验 – 机器学习Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week3_exercise.html" rel="next">
+<link href="./week1_exercise.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles/custom.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_exercise.html">实验</a></li><li class="breadcrumb-item"><a href="./week2_exercise.html"><span class="chapter-title">第二周：课堂练习与实验</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习Python</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">讲义</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：决策树与随机森林 - 模型优化初探</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：回归算法启程 - 线性回归与多项式回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：回归算法进阶 - XGBoost 与模型优化</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">实验</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_exercise.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第二周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：课堂练习与实验</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#准备工作" id="toc-准备工作" class="nav-link active" data-scroll-target="#准备工作">准备工作</a></li>
+  <li><a href="#练习-1-numpy-基础操作" id="toc-练习-1-numpy-基础操作" class="nav-link" data-scroll-target="#练习-1-numpy-基础操作">练习 1: Numpy 基础操作</a></li>
+  <li><a href="#练习-2-pandas-series-操作" id="toc-练习-2-pandas-series-操作" class="nav-link" data-scroll-target="#练习-2-pandas-series-操作">练习 2: Pandas Series 操作</a></li>
+  <li><a href="#练习-3-pandas-dataframe-操作" id="toc-练习-3-pandas-dataframe-操作" class="nav-link" data-scroll-target="#练习-3-pandas-dataframe-操作">练习 3: Pandas DataFrame 操作</a></li>
+  <li><a href="#练习-4-数据预处理---缺失值与重复值" id="toc-练习-4-数据预处理---缺失值与重复值" class="nav-link" data-scroll-target="#练习-4-数据预处理---缺失值与重复值">练习 4: 数据预处理 - 缺失值与重复值</a></li>
+  <li><a href="#练习-5-特征工程---缩放与编码" id="toc-练习-5-特征工程---缩放与编码" class="nav-link" data-scroll-target="#练习-5-特征工程---缩放与编码">练习 5: 特征工程 - 缩放与编码</a></li>
+  <li><a href="#练习-6-项目一---数据加载与初步探索" id="toc-练习-6-项目一---数据加载与初步探索" class="nav-link" data-scroll-target="#练习-6-项目一---数据加载与初步探索">练习 6: 项目一 - 数据加载与初步探索</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_exercise.html">实验</a></li><li class="breadcrumb-item"><a href="./week2_exercise.html"><span class="chapter-title">第二周：课堂练习与实验</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第二周：课堂练习与实验</span></h1>
+<p class="subtitle lead">Numpy &amp; Pandas 实战与数据预处理入门</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>本周的练习将帮助你熟练掌握 Numpy 和 Pandas 的核心操作，并初步体验数据预处理和特征工程的基本流程。请在 Jupyter Notebook (<code>.ipynb</code>) 文件中完成以下练习。</p>
+<section id="准备工作" class="level2">
+<h2 class="anchored" data-anchor-id="准备工作">准备工作</h2>
+<p>在开始练习前，请确保导入必要的库：</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="练习-1-numpy-基础操作" class="level2">
+<h2 class="anchored" data-anchor-id="练习-1-numpy-基础操作">练习 1: Numpy 基础操作</h2>
+<p><strong>目标:</strong> 熟练使用 Numpy 创建数组、进行运算和索引。</p>
+<ol type="1">
+<li><strong>创建数组:</strong>
+<ul>
+<li>创建一个包含整数 1 到 10 的一维 Numpy 数组 <code>arr1</code>。</li>
+<li>创建一个 3x3 的二维 Numpy 数组 <code>arr2</code>，包含数字 1 到 9。</li>
+<li>创建一个 2x4 的全零 Numpy 数组 <code>arr_zeros</code>。</li>
+<li>创建一个 3x2 的值为 5 的 Numpy 数组 <code>arr_fives</code>。</li>
+<li>使用 <code>np.arange()</code> 创建一个包含 0 到 10 之间所有偶数的一维数组 <code>arr_even</code>。</li>
+<li>使用 <code>np.linspace()</code> 创建一个包含 5 个元素的数组 <code>arr_lin</code>，元素在 0 到 1 之间均匀分布。</li>
+<li>打印出以上所有数组及其形状 (<code>shape</code>)。</li>
+</ul></li>
+<li><strong>数组运算:</strong>
+<ul>
+<li>将 <code>arr1</code> 中的每个元素乘以 3。</li>
+<li>计算 <code>arr1</code> 中每个元素的平方。</li>
+<li>创建一个与 <code>arr1</code> 形状相同，值为 10 的数组 <code>arr_ten</code>，计算 <code>arr1 + arr_ten</code>。</li>
+<li>计算 <code>arr2</code> 中所有元素的和、平均值、最大值、最小值。</li>
+<li>计算 <code>arr2</code> 每行的和以及每列的平均值。</li>
+</ul></li>
+<li><strong>索引与切片:</strong>
+<ul>
+<li>获取 <code>arr1</code> 的第 3 个元素（索引为 2）。</li>
+<li>获取 <code>arr1</code> 的最后 3 个元素。</li>
+<li>获取 <code>arr2</code> 的第二行。</li>
+<li>获取 <code>arr2</code> 的第一列。</li>
+<li>获取 <code>arr2</code> 中索引为 (1, 2) 的元素（第二行第三列）。</li>
+<li>获取 <code>arr2</code> 的前两行、后两列组成的子数组。</li>
+</ul></li>
+<li><strong>布尔索引:</strong>
+<ul>
+<li>找出 <code>arr1</code> 中所有大于 5 的元素。</li>
+<li>找出 <code>arr2</code> 中所有偶数元素，并将它们赋值为 0。</li>
+<li>创建一个布尔数组，用于选择 <code>arr2</code> 中大于 3 且小于 7 的元素。</li>
+</ul></li>
+</ol>
+</section>
+<section id="练习-2-pandas-series-操作" class="level2">
+<h2 class="anchored" data-anchor-id="练习-2-pandas-series-操作">练习 2: Pandas Series 操作</h2>
+<p><strong>目标:</strong> 掌握 Pandas Series 的创建和基本操作。</p>
+<ol type="1">
+<li><strong>创建 Series:</strong>
+<ul>
+<li>使用一个 Python 列表 <code>[10, 20, 30, 40, 50]</code> 创建一个 Series <code>s1</code>。</li>
+<li>创建一个 Series <code>s2</code>，包含 4 个城市名称作为值，并使用自定义索引 <code>['a', 'b', 'c', 'd']</code>。</li>
+<li>使用一个 Python 字典 <code>{'apple': 5, 'banana': 8, 'orange': 3}</code> 创建一个 Series <code>s3</code>。</li>
+<li>打印以上 Series。</li>
+</ul></li>
+<li><strong>访问与操作:</strong>
+<ul>
+<li>访问 <code>s1</code> 的第三个元素。</li>
+<li>访问 <code>s2</code> 中索引为 ‘c’ 的元素。</li>
+<li>访问 <code>s3</code> 中值大于 4 的元素。</li>
+<li>检查索引 ‘b’ 是否在 <code>s2</code> 中。</li>
+<li>计算 <code>s1</code> 中所有元素的和。</li>
+</ul></li>
+</ol>
+</section>
+<section id="练习-3-pandas-dataframe-操作" class="level2">
+<h2 class="anchored" data-anchor-id="练习-3-pandas-dataframe-操作">练习 3: Pandas DataFrame 操作</h2>
+<p><strong>目标:</strong> 熟练使用 Pandas DataFrame 进行数据加载、探索和选择。</p>
+<ol type="1">
+<li><strong>创建 DataFrame:</strong>
+<ul>
+<li>使用以下字典创建一个 DataFrame <code>df1</code>： <code>python     data = {'Name': ['Alice', 'Bob', 'Charlie', 'David'],             'Age': [25, 30, 35, 40],             'City': ['New York', 'London', 'Paris', 'Tokyo']}</code></li>
+<li>打印 <code>df1</code>。</li>
+</ul></li>
+<li><strong>数据探索 (假设你有一个 <code>sales.csv</code> 文件，包含 ‘Date’, ‘Product’, ‘Revenue’, ‘Quantity’ 列):</strong>
+<ul>
+<li><strong>(如果本地没有 <code>sales.csv</code>，可以先手动创建一个简单的 CSV 文件，或使用 AI 生成示例数据)</strong></li>
+<li>使用 <code>pd.read_csv()</code> 读取 <code>sales.csv</code> 文件到 DataFrame <code>df_sales</code>。</li>
+<li>显示 <code>df_sales</code> 的前 5 行和后 3 行。</li>
+<li>查看 <code>df_sales</code> 的形状 (<code>shape</code>)。</li>
+<li>查看 <code>df_sales</code> 的列名 (<code>columns</code>) 和索引 (<code>index</code>)。</li>
+<li>使用 <code>info()</code> 查看每列的数据类型和非空值数量。</li>
+<li>使用 <code>describe()</code> 查看数值列的描述性统计信息。</li>
+<li>查看 ‘Product’ 列有多少种不同的产品 (<code>unique()</code> 或 <code>value_counts()</code>)。</li>
+</ul></li>
+<li><strong>数据选择:</strong>
+<ul>
+<li>选择 <code>df_sales</code> 中的 ‘Revenue’ 列。</li>
+<li>选择 ‘Product’ 和 ‘Quantity’ 两列。</li>
+<li>使用 <code>.loc</code> 选择索引为 10 到 20 (包含 20) 的行。</li>
+<li>使用 <code>.iloc</code> 选择第 5 行到第 10 行（不包含 10）的数据。</li>
+<li>使用 <code>.loc</code> 选择索引为 5，列为 ‘Product’ 的值。</li>
+<li>使用 <code>.iloc</code> 选择第 3 行、第 1 列的值。</li>
+<li>选择 ‘Revenue’ 大于 1000 的所有行。</li>
+<li>选择 ‘Product’ 为 ‘Laptop’ 且 ‘Quantity’ 大于 2 的所有行。</li>
+</ul></li>
+</ol>
+</section>
+<section id="练习-4-数据预处理---缺失值与重复值" class="level2">
+<h2 class="anchored" data-anchor-id="练习-4-数据预处理---缺失值与重复值">练习 4: 数据预处理 - 缺失值与重复值</h2>
+<p><strong>目标:</strong> 练习处理数据中的常见问题。</p>
+<ol type="1">
+<li><strong>创建包含缺失值和重复值的 DataFrame:</strong> <code>python     data_dirty = {'col1': [1, 2, np.nan, 4, 5, 2, 6, np.nan],                   'col2': ['A', 'B', 'A', 'C', 'B', 'B', 'D', 'A'],                   'col3': [10.5, 20.1, 15.3, 10.5, 8.8, 20.1, 12.0, 15.3]}     df_dirty = pd.DataFrame(data_dirty)     # 手动添加重复行     df_dirty = pd.concat([df_dirty, df_dirty.iloc[1:3]], ignore_index=True)     print("原始脏数据:\n", df_dirty)</code></li>
+<li><strong>处理缺失值:</strong>
+<ul>
+<li>检查 <code>df_dirty</code> 中每列的缺失值数量。</li>
+<li>删除所有包含缺失值的<strong>行</strong>，并将结果存储在 <code>df_dropped_rows</code> 中。</li>
+<li>使用 <code>col1</code> 的<strong>均值</strong>填充 <code>col1</code> 中的缺失值。</li>
+<li>使用字符串 ‘Unknown’ 填充 <code>col2</code> 中的缺失值。</li>
+<li>打印处理后的 DataFrame。</li>
+</ul></li>
+<li><strong>处理重复值:</strong>
+<ul>
+<li>检查 <code>df_dirty</code> 中是否存在完全重复的行。</li>
+<li>删除所有完全重复的行，保留第一次出现的行，存储在 <code>df_no_duplicates</code> 中。</li>
+<li>检查基于 ‘col1’ 和 ‘col2’ 两列是否存在重复行。</li>
+<li>删除基于 ‘col1’ 和 ‘col2’ 的重复行，存储在 <code>df_no_dup_subset</code> 中。</li>
+<li>打印处理后的 DataFrame。</li>
+</ul></li>
+</ol>
+</section>
+<section id="练习-5-特征工程---缩放与编码" class="level2">
+<h2 class="anchored" data-anchor-id="练习-5-特征工程---缩放与编码">练习 5: 特征工程 - 缩放与编码</h2>
+<p><strong>目标:</strong> 练习对数值和类别特征进行转换。</p>
+<ol type="1">
+<li><strong>创建包含数值和类别特征的 DataFrame:</strong> <code>python     data_feat = {'Score': [85, 92, 78, 88, 95, 72],                  'Age': [21, 23, 22, 24, 21, 22],                  'Gender': ['Male', 'Female', 'Female', 'Male', 'Female', 'Male'],                  'Grade': ['A', 'A', 'B', 'A', 'A', 'C']} # 假设 Grade 有序 C &lt; B &lt; A     df_feat = pd.DataFrame(data_feat)     print("原始特征数据:\n", df_feat)</code></li>
+<li><strong>数值特征缩放:</strong>
+<ul>
+<li>选择 ‘Score’ 和 ‘Age’ 列。</li>
+<li>使用 <code>StandardScaler</code> 对这两列进行标准化。</li>
+<li>使用 <code>MinMaxScaler</code> 对这两列进行归一化 (缩放到 [0, 1])。</li>
+<li>打印缩放后的结果 (它们将是 Numpy 数组)。</li>
+</ul></li>
+<li><strong>类别特征编码:</strong>
+<ul>
+<li><strong>标签编码:</strong> 对有序特征 ‘Grade’ 使用 <code>LabelEncoder</code> 进行编码。将编码后的结果作为新列 ‘Grade_Encoded’ 添加回 <code>df_feat</code>。</li>
+<li><strong>独热编码:</strong> 对无序特征 ‘Gender’ 使用 <code>pd.get_dummies()</code> 进行独热编码。</li>
+<li><strong>独热编码 (sklearn):</strong> (可选) 尝试使用 <code>OneHotEncoder</code> 对 ‘Gender’ 列进行独热编码，并理解其用法（需要处理输出格式）。</li>
+<li>打印包含编码后特征的 DataFrame。</li>
+</ul></li>
+</ol>
+</section>
+<section id="练习-6-项目一---数据加载与初步探索" class="level2">
+<h2 class="anchored" data-anchor-id="练习-6-项目一---数据加载与初步探索">练习 6: 项目一 - 数据加载与初步探索</h2>
+<p><strong>目标:</strong> 开始你的第一个机器学习项目，应用本周所学知识。</p>
+<ol type="1">
+<li><strong>加载数据:</strong> 使用 Pandas 加载你的小组为项目一选择的电商用户行为数据集。</li>
+<li><strong>初步探索:</strong>
+<ul>
+<li>使用 <code>head()</code>, <code>info()</code>, <code>describe()</code> 等函数初步了解数据。</li>
+<li>识别数据中的数值特征和类别特征。</li>
+<li>检查是否存在时间戳相关的列，如果需要，将其转换为 <code>datetime</code> 类型。</li>
+</ul></li>
+<li><strong>识别预处理需求:</strong>
+<ul>
+<li>检查每列是否存在缺失值 (<code>isnull().sum()</code>)。</li>
+<li>检查是否存在明显的重复行 (<code>duplicated().sum()</code>)。</li>
+<li>思考哪些数值特征可能需要缩放？</li>
+<li>思考哪些类别特征需要编码？应该使用哪种编码方式？</li>
+</ul></li>
+<li><strong>记录发现:</strong> 在你的项目 Notebook 中，用 Markdown 记录下你对数据的初步观察和需要进行的预处理步骤。</li>
+</ol>
+<p><strong>完成这些练习将为你后续的模型构建打下坚实的基础！</strong></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./week1_exercise.html" class="pagination-link" aria-label="第一周：课堂练习与实验">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第一周：课堂练习与实验</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./week3_exercise.html" class="pagination-link" aria-label="第三周：课堂练习与实验">
+        <span class="nav-page-text"><span class="chapter-title">第三周：课堂练习与实验</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

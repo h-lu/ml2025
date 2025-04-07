@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第八周：深入聚类 - DBSCAN 与业务解读 – 机器学习Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week1_exercise.html" rel="next">
+<link href="./week7_lecture.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles/custom.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week8_lecture.html"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习Python</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">讲义</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：决策树与随机森林 - 模型优化初探</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：回归算法启程 - 线性回归与多项式回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：回归算法进阶 - XGBoost 与模型优化</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_lecture.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">实验</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：课堂练习与实验</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#聚类评估指标深入" id="toc-聚类评估指标深入" class="nav-link active" data-scroll-target="#聚类评估指标深入">1. 聚类评估指标深入</a></li>
+  <li><a href="#聚类结果可视化" id="toc-聚类结果可视化" class="nav-link" data-scroll-target="#聚类结果可视化">2. 聚类结果可视化</a></li>
+  <li><a href="#dbscan-聚类算法" id="toc-dbscan-聚类算法" class="nav-link" data-scroll-target="#dbscan-聚类算法">3. DBSCAN 聚类算法</a>
+  <ul class="collapse">
+  <li><a href="#原理简介-核心概念" id="toc-原理简介-核心概念" class="nav-link" data-scroll-target="#原理简介-核心概念">3.1 原理简介 (核心概念)</a></li>
+  <li><a href="#使用-scikit-learn-实现" id="toc-使用-scikit-learn-实现" class="nav-link" data-scroll-target="#使用-scikit-learn-实现">3.2 使用 Scikit-learn 实现</a></li>
+  <li><a href="#如何选择-eps-和-min_samples" id="toc-如何选择-eps-和-min_samples" class="nav-link" data-scroll-target="#如何选择-eps-和-min_samples">3.3 如何选择 <code>eps</code> 和 <code>min_samples</code>？</a></li>
+  <li><a href="#dbscan-优缺点" id="toc-dbscan-优缺点" class="nav-link" data-scroll-target="#dbscan-优缺点">3.4 DBSCAN 优缺点</a></li>
+  </ul></li>
+  <li><a href="#聚类算法选择对比-k-means-vs.-dbscan" id="toc-聚类算法选择对比-k-means-vs.-dbscan" class="nav-link" data-scroll-target="#聚类算法选择对比-k-means-vs.-dbscan">4. 聚类算法选择对比 (K-Means vs.&nbsp;DBSCAN)</a></li>
+  <li><a href="#聚类结果的业务解读-重点" id="toc-聚类结果的业务解读-重点" class="nav-link" data-scroll-target="#聚类结果的业务解读-重点">5. 聚类结果的业务解读 (重点！)</a>
+  <ul class="collapse">
+  <li><a href="#分析各簇特征" id="toc-分析各簇特征" class="nav-link" data-scroll-target="#分析各簇特征">5.1 分析各簇特征</a></li>
+  <li><a href="#给簇贴标签-profiling" id="toc-给簇贴标签-profiling" class="nav-link" data-scroll-target="#给簇贴标签-profiling">5.2 给簇贴标签 (Profiling)</a></li>
+  <li><a href="#转化为商业洞察与行动" id="toc-转化为商业洞察与行动" class="nav-link" data-scroll-target="#转化为商业洞察与行动">5.3 转化为商业洞察与行动</a></li>
+  </ul></li>
+  <li><a href="#小组项目三模型优化与业务解读" id="toc-小组项目三模型优化与业务解读" class="nav-link" data-scroll-target="#小组项目三模型优化与业务解读">6. 小组项目三：模型优化与业务解读</a></li>
+  <li><a href="#本周总结" id="toc-本周总结" class="nav-link" data-scroll-target="#本周总结">7. 本周总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week8_lecture.html"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></h1>
+<p class="subtitle lead">学习基于密度的聚类，掌握聚类评估与可视化，深化用户分群项目</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>上周我们学习了由 MacQueen (1967) 提出的 K-Means 聚类算法，并了解了如何通过 Thorndike (1953) 提出的肘部法则和 Rousseeuw (1987) 提出的轮廓系数来选择 K 值。本周，我们将学习由 Ester 等人 (1996) 提出的另一种重要的聚类算法——<strong>DBSCAN (Density-Based Spatial Clustering of Applications with Noise, 基于密度的噪点空间聚类法）</strong>，它特别擅长发现<strong>任意形状</strong>的簇并能识别<strong>噪声点</strong>。我们还将深入探讨如何评估聚类结果，如何进行可视化，以及最重要的——如何从聚类结果中提炼出有价值的<strong>业务洞察</strong>，并完成我们的用户分群项目（项目三）。</p>
+<div class="callout-info" title="项目三进展">
+<p>请确保你已经完成了项目三（用户分群）的第一阶段任务，包括数据预处理、使用 K-Means 进行聚类以及 K 值的选择过程。</p>
+</div>
+<section id="聚类评估指标深入" class="level2">
+<h2 class="anchored" data-anchor-id="聚类评估指标深入">1. 聚类评估指标深入</h2>
+<p>除了上周提到的轮廓系数，还有其他一些指标可以帮助我们评估聚类效果，尤其是在没有真实标签（Ground Truth）的情况下。</p>
+<ul>
+<li><strong>轮廓系数 (Silhouette Score) 回顾:</strong>
+<ul>
+<li>衡量单个样本与其自身簇的紧密度以及与其他簇的分离度。</li>
+<li>平均轮廓系数越接近 1 越好。</li>
+</ul></li>
+<li><strong>戴维斯-布尔丁指数 (Davies-Bouldin Index, DBI):</strong>
+<ul>
+<li>衡量簇内的紧密度与簇间的分离度之比。它计算每个簇与其最相似簇的相似度，目标是最小化这个值。</li>
+<li><strong>DBI 越小越好</strong>，表示簇内距离小，簇间距离大。</li>
+<li><code>sklearn.metrics.davies_bouldin_score</code></li>
+</ul></li>
+</ul>
+<div id="acd8b1be" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> davies_bouldin_score</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 使用上周的示例数据 ---</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>X_blobs, y_blobs_true <span class="op">=</span> make_blobs(n_samples<span class="op">=</span><span class="dv">300</span>, centers<span class="op">=</span><span class="dv">4</span>, cluster_std<span class="op">=</span><span class="fl">0.8</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>X_scaled <span class="op">=</span> scaler.fit_transform(X_blobs)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 假设已确定 K=4 是较好的选择 ---</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>kmeans_final <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">4</span>, init<span class="op">=</span><span class="st">'k-means++'</span>, n_init<span class="op">=</span><span class="st">'auto'</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>kmeans_final.fit(X_scaled)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>final_labels <span class="op">=</span> kmeans_final.labels_</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 计算 DBI ---</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>dbi_score <span class="op">=</span> davies_bouldin_score(X_scaled, final_labels)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Davies-Bouldin Index (K=4): </span><span class="sc">{</span>dbi_score<span class="sc">:.4f}</span><span class="ss">"</span>) <span class="co"># 值越小越好</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Davies-Bouldin Index (K=4): 0.2244</code></pre>
+</div>
+</div>
+<p><strong>注意:</strong> 这些内部评估指标（不依赖真实标签）可以帮助选择 K 值或比较不同算法/参数的效果，但最终聚类结果的好坏还需要结合业务场景来判断。</p>
+</section>
+<section id="聚类结果可视化" class="level2">
+<h2 class="anchored" data-anchor-id="聚类结果可视化">2. 聚类结果可视化</h2>
+<p>将高维数据的聚类结果可视化出来，有助于我们直观地理解簇的分布和特征。对于二维数据，可以直接绘制散点图。但对于更高维的数据，我们需要先进行<strong>降维 (Dimensionality Reduction)</strong>。</p>
+<ul>
+<li><strong>主成分分析 (PCA - Principal Component Analysis):</strong> 由 Karl Pearson (1901) 提出的一种经典线性降维方法，通过找到数据方差最大的方向（主成分），将高维数据投影到这些主成分方向上，从而实现降维。我们将在后续章节详细探讨其数学原理和应用。</li>
+<li><strong>t-分布随机邻域嵌入 (t-SNE - t-distributed Stochastic Neighbor Embedding):</strong> 由 Laurens van der Maaten 和 Geoffrey Hinton (2008) 提出的一种非线性降维方法，特别擅长将高维数据映射到二维或三维空间进行可视化，能较好地保持数据的局部结构（相似的点在低维空间中也靠近）。计算成本较高。</li>
+</ul>
+<div id="341f4f28" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.manifold <span class="im">import</span> TSNE <span class="im">as</span> t_SNE</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns <span class="co"># 用于更美观的绘图</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 假设 X_scaled 是你的高维特征数据 (已缩放) ---</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># --- final_labels 是你的聚类结果标签 ---</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 使用 PCA 降维到 2 维 ---</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>X_pca <span class="op">=</span> pca.fit_transform(X_scaled)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span>X_pca[:, <span class="dv">0</span>], y<span class="op">=</span>X_pca[:, <span class="dv">1</span>], hue<span class="op">=</span>final_labels, palette<span class="op">=</span><span class="st">'viridis'</span>, s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'K-Means Clustering Visualization (PCA)'</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Principal Component 1'</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Principal Component 2'</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>plt.legend(title<span class="op">=</span><span class="st">'Cluster'</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 使用 t-SNE 降维到 2 维 ---</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># t-SNE 参数:</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># n_components: 降维后的维度 (通常是 2 或 3)</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># perplexity: 与近邻数量相关，影响局部和全局的平衡，常用 5-50</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># n_iter: 迭代次数</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># random_state: 保证结果可复现</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>tsne <span class="op">=</span> t_SNE(n_components<span class="op">=</span><span class="dv">2</span>, perplexity<span class="op">=</span><span class="dv">30</span>, n_iter<span class="op">=</span><span class="dv">300</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>X_tsne <span class="op">=</span> tsne.fit_transform(X_scaled) <span class="co"># t-SNE 通常只用 fit_transform</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span>X_tsne[:, <span class="dv">0</span>], y<span class="op">=</span>X_tsne[:, <span class="dv">1</span>], hue<span class="op">=</span>final_labels, palette<span class="op">=</span><span class="st">'viridis'</span>, s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'K-Means Clustering Visualization (t-SNE)'</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'t-SNE Dimension 1'</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'t-SNE Dimension 2'</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>plt.legend(title<span class="op">=</span><span class="st">'Cluster'</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week8_lecture_files/figure-html/cell-3-output-1.png" width="823" height="597" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week8_lecture_files/figure-html/cell-3-output-2.png" width="819" height="597" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="AI 辅助可视化">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+AI 辅助可视化
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“如何使用 Matplotlib 或 Seaborn 绘制带有不同颜色标记的聚类散点图？”</li>
+<li>“解释 PCA 和 t-SNE 的主要区别以及它们各自的适用场景。”</li>
+<li>“帮我生成代码，使用 PCA 将 ‘feature_df’ 降到 3 维，并绘制 3D 散点图。”</li>
+<li>“t-SNE 中的 <code>perplexity</code> 参数是什么意思？如何选择合适的值？”</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="dbscan-聚类算法" class="level2">
+<h2 class="anchored" data-anchor-id="dbscan-聚类算法">3. DBSCAN 聚类算法</h2>
+<p>K-Means 的主要缺点之一是它难以处理非球状的簇，并且对 K 值的选择和异常值敏感。<strong>DBSCAN</strong> 是一种基于<strong>密度</strong>的聚类算法，可以克服这些缺点。</p>
+<section id="原理简介-核心概念" class="level3">
+<h3 class="anchored" data-anchor-id="原理简介-核心概念">3.1 原理简介 (核心概念)</h3>
+<p>DBSCAN 不需要预先指定簇的数量 K，而是根据样本点的<strong>密度</strong>来划分簇。它定义了以下核心概念：</p>
+<ul>
+<li><strong>ε (Epsilon / eps):</strong> 一个距离阈值，定义了样本点的“邻域”半径。</li>
+<li><strong>MinPts (min_samples):</strong> 一个整数阈值，表示一个点要成为“核心点”，其 ε-邻域内至少需要包含多少个样本点（包括自身）。</li>
+<li><strong>核心点 (Core Point):</strong> 如果一个样本点的 ε-邻域内至少有 MinPts 个样本点，则该点为核心点。</li>
+<li><strong>边界点 (Border Point):</strong> 一个样本点不是核心点，但它落在某个核心点的 ε-邻域内。</li>
+<li><strong>噪声点 (Noise Point / Outlier):</strong> 既不是核心点也不是边界点的样本点。</li>
+</ul>
+<p><strong>DBSCAN 的聚类过程:</strong></p>
+<ol type="1">
+<li>随机选择一个未访问过的样本点 P。</li>
+<li>检查 P 的 ε-邻域：
+<ul>
+<li>如果邻域内样本数<strong>大于等于 MinPts</strong>，则 P 是一个<strong>核心点</strong>。以 P 为起点创建一个<strong>新簇</strong>，并将邻域内的所有点（包括核心点和边界点）加入该簇和待处理队列。</li>
+<li>如果邻域内样本数<strong>小于 MinPts</strong>，则 P 暂时标记为<strong>噪声点</strong>（它后续可能被发现是某个簇的边界点）。</li>
+</ul></li>
+<li>处理队列中的每一个点：
+<ul>
+<li>如果该点是核心点，将其 ε-邻域内所有<strong>未分配簇</strong>且<strong>未标记为噪声</strong>的点加入当前簇和队列。</li>
+<li>如果该点是边界点，不做任何操作（因为它不扩展簇）。</li>
+</ul></li>
+<li>当队列为空时，当前簇形成完毕。返回步骤 1，选择下一个未访问过的点。</li>
+<li>所有点都被访问后，聚类完成。被标记为噪声的点不属于任何簇。</li>
+</ol>
+<p><strong>核心思想:</strong> 一个簇由密度相连的核心点组成，边界点则附属于这些核心点。密度稀疏区域的点被视为噪声。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/DBSCAN-density-data.svg" class="img-fluid figure-img" style="width:60.0%" alt="DBSCAN Concepts"></p>
+<figcaption>DBSCAN Concepts</figcaption>
+</figure>
+</div>
+</section>
+<section id="使用-scikit-learn-实现" class="level3">
+<h3 class="anchored" data-anchor-id="使用-scikit-learn-实现">3.2 使用 Scikit-learn 实现</h3>
+<p>Scikit-learn 提供了 <code>DBSCAN</code> 类。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="特征缩放">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+特征缩放
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>DBSCAN 同样基于距离计算，因此<strong>必须进行特征缩放</strong>。</p>
+</div>
+</div>
+<div id="8b9bb55f" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons <span class="co"># 用于生成非球状测试数据</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 准备非球状数据 (示例) ---</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>X_moons, y_moons <span class="op">=</span> make_moons(n_samples<span class="op">=</span><span class="dv">200</span>, noise<span class="op">=</span><span class="fl">0.05</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 特征缩放</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>scaler_moons <span class="op">=</span> StandardScaler()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>X_moons_scaled <span class="op">=</span> scaler_moons.fit_transform(X_moons)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 训练 DBSCAN 模型 ---</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># eps: 邻域半径，需要根据数据调整</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># min_samples: 成为核心点的最小邻域样本数，通常建议 &gt;= D+1 (D是数据维度)，或根据经验调整</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>dbscan <span class="op">=</span> DBSCAN(eps<span class="op">=</span><span class="fl">0.3</span>, min_samples<span class="op">=</span><span class="dv">5</span>) <span class="co"># 这两个参数需要仔细选择</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 拟合模型并获取标签 (-1 表示噪声点)</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>dbscan_labels <span class="op">=</span> dbscan.fit_predict(X_moons_scaled) <span class="co"># fit_predict 更方便</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DBSCAN 聚类标签 (前 20 个):"</span>, dbscan_labels[:<span class="dv">20</span>])</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>n_clusters_ <span class="op">=</span> <span class="bu">len</span>(<span class="bu">set</span>(dbscan_labels)) <span class="op">-</span> (<span class="dv">1</span> <span class="cf">if</span> <span class="op">-</span><span class="dv">1</span> <span class="kw">in</span> dbscan_labels <span class="cf">else</span> <span class="dv">0</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>n_noise_ <span class="op">=</span> <span class="bu">list</span>(dbscan_labels).count(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">DBSCAN 发现的簇数量: </span><span class="sc">{</span>n_clusters_<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"DBSCAN 发现的噪声点数量: </span><span class="sc">{</span>n_noise_<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 可视化 DBSCAN 结果 ---</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span>X_moons_scaled[:, <span class="dv">0</span>], y<span class="op">=</span>X_moons_scaled[:, <span class="dv">1</span>], hue<span class="op">=</span>dbscan_labels,</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                palette<span class="op">=</span><span class="st">'viridis'</span>, s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, legend<span class="op">=</span><span class="st">'full'</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'DBSCAN Clustering (eps=0.3, min_samples=5)</span><span class="ch">\n</span><span class="ss">Estimated clusters: </span><span class="sc">{</span>n_clusters_<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Scaled Feature 1"</span>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Scaled Feature 2"</span>)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 对比 K-Means 在该数据上的效果 ---</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>kmeans_moons <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">2</span>, init<span class="op">=</span><span class="st">'k-means++'</span>, n_init<span class="op">=</span><span class="st">'auto'</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>kmeans_labels <span class="op">=</span> kmeans_moons.fit_predict(X_moons_scaled)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span>X_moons_scaled[:, <span class="dv">0</span>], y<span class="op">=</span>X_moons_scaled[:, <span class="dv">1</span>], hue<span class="op">=</span>kmeans_labels,</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>                palette<span class="op">=</span><span class="st">'viridis'</span>, s<span class="op">=</span><span class="dv">50</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, legend<span class="op">=</span><span class="st">'full'</span>)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'K-Means Clustering (K=2) on Moons Data'</span>)</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Scaled Feature 1"</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Scaled Feature 2"</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>DBSCAN 聚类标签 (前 20 个): [0 0 0 1 1 1 0 1 1 0 0 1 1 0 1 1 0 1 0 0]
+
+DBSCAN 发现的簇数量: 2
+DBSCAN 发现的噪声点数量: 1</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>Text(0, 0.5, 'Scaled Feature 2')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week8_lecture_files/figure-html/cell-4-output-3.png" width="674" height="542" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week8_lecture_files/figure-html/cell-4-output-4.png" width="674" height="523" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>观察:</strong> K-Means 无法很好地分离月亮形状的数据，而 DBSCAN 可以。</p>
+</section>
+<section id="如何选择-eps-和-min_samples" class="level3">
+<h3 class="anchored" data-anchor-id="如何选择-eps-和-min_samples">3.3 如何选择 <code>eps</code> 和 <code>min_samples</code>？</h3>
+<p>这两个参数的选择对 DBSCAN 的结果至关重要，通常需要一些经验和尝试：</p>
+<ul>
+<li><strong><code>min_samples</code>:</strong>
+<ul>
+<li>通常建议从 <code>D+1</code> 开始尝试，其中 D 是数据的维度。</li>
+<li>对于高维数据或有噪声的数据，可能需要设置更大的值。</li>
+<li><code>min_samples</code> 越大，需要的密度越高，形成的簇越少，噪声点越多。</li>
+</ul></li>
+<li><strong><code>eps</code>:</strong>
+<ul>
+<li>确定 <code>min_samples</code> 后，可以通过绘制 <strong>K-距离图 (K-distance graph)</strong> 来辅助选择 <code>eps</code>。</li>
+<li>计算每个点到其第 <code>min_samples-1</code> 个最近邻的距离（称为 K-距离）。</li>
+<li>将所有点的 K-距离按升序排序并绘制出来。</li>
+<li>寻找图中曲线<strong>斜率急剧变化</strong>的“拐点 (knee/elbow)”。该拐点对应的距离值可以作为 <code>eps</code> 的一个候选值。</li>
+</ul></li>
+</ul>
+<div id="38ddb87b" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> NearestNeighbors</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- K-距离图辅助选择 eps ---</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 假设 min_samples 已选定，例如 min_samples = 5</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">5</span> <span class="co"># k = min_samples</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 找到每个点到其第 k-1 个邻居的距离</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>nbrs <span class="op">=</span> NearestNeighbors(n_neighbors<span class="op">=</span>k).fit(X_moons_scaled)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>distances, indices <span class="op">=</span> nbrs.kneighbors(X_moons_scaled)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 获取每个点的 k-距离 (第 k-1 个邻居的距离，即 distances 数组的最后一列)</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>k_distances <span class="op">=</span> np.sort(distances[:, k<span class="op">-</span><span class="dv">1</span>], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制 K-距离图</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>plt.plot(k_distances)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">-Distance Graph'</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Points sorted by distance"</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="ss">f'</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">-th nearest neighbor distance'</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 在图中寻找“拐点”来估计 eps</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week8_lecture_files/figure-html/cell-5-output-1.png" width="663" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>解读:</strong> 在 Moons 数据的 K-距离图中，拐点大约在 0.3 附近，这与我们之前示例中使用的 <code>eps=0.3</code> 吻合。</p>
+</section>
+<section id="dbscan-优缺点" class="level3">
+<h3 class="anchored" data-anchor-id="dbscan-优缺点">3.4 DBSCAN 优缺点</h3>
+<ul>
+<li><strong>优点:</strong>
+<ul>
+<li><strong>不需要指定簇数量 K。</strong></li>
+<li><strong>能发现任意形状的簇。</strong></li>
+<li><strong>能识别噪声点/异常值。</strong></li>
+<li>对簇的形状和大小不敏感（相比 K-Means）。</li>
+<li>只需要两个参数 (<code>eps</code>, <code>min_samples</code>)。</li>
+</ul></li>
+<li><strong>缺点:</strong>
+<ul>
+<li><strong>对参数 <code>eps</code> 和 <code>min_samples</code> 非常敏感:</strong> 参数选择不当会导致结果差异很大。</li>
+<li><strong>对于密度差异很大的簇效果不佳:</strong> 难以用一组全局参数来识别不同密度的簇。</li>
+<li><strong>对于高维数据效果可能下降:</strong> “维度灾难”使得距离度量在高维空间意义减弱，密度定义变得困难。</li>
+<li><strong>计算复杂度相对较高:</strong> 特别是在密集区域。</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="聚类算法选择对比-k-means-vs.-dbscan" class="level2">
+<h2 class="anchored" data-anchor-id="聚类算法选择对比-k-means-vs.-dbscan">4. 聚类算法选择对比 (K-Means vs.&nbsp;DBSCAN)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 40%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">K-Means</th>
+<th style="text-align: left;">DBSCAN</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>簇形状</strong></td>
+<td style="text-align: left;">倾向于球状、凸形</td>
+<td style="text-align: left;">可以是任意形状</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>簇数量 K</strong></td>
+<td style="text-align: left;">需要预先指定</td>
+<td style="text-align: left;">自动确定</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>噪声/异常值</strong></td>
+<td style="text-align: left;">对异常值敏感，所有点都会被分配到某个簇</td>
+<td style="text-align: left;">能识别噪声点，不将其分配到任何簇</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>簇密度</strong></td>
+<td style="text-align: left;">对密度不敏感</td>
+<td style="text-align: left;">对密度敏感，难以处理密度差异大的簇</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>参数</strong></td>
+<td style="text-align: left;">K</td>
+<td style="text-align: left;"><code>eps</code>, <code>min_samples</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>参数敏感度</strong></td>
+<td style="text-align: left;">对 K 和初始质心敏感</td>
+<td style="text-align: left;">对 <code>eps</code> 和 <code>min_samples</code> 非常敏感</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>计算复杂度</strong></td>
+<td style="text-align: left;">相对较低</td>
+<td style="text-align: left;">可能较高（取决于数据和参数）</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>特征缩放</strong></td>
+<td style="text-align: left;"><strong>需要</strong></td>
+<td style="text-align: left;"><strong>需要</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>适用场景</strong></td>
+<td style="text-align: left;">簇大致呈球状、数量已知、无明显噪声</td>
+<td style="text-align: left;">簇形状不规则、数量未知、可能包含噪声</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="聚类结果的业务解读-重点" class="level2">
+<h2 class="anchored" data-anchor-id="聚类结果的业务解读-重点">5. 聚类结果的业务解读 (重点！)</h2>
+<p>得到聚类结果（每个样本的簇标签）只是第一步，更重要的是理解这些簇代表什么，并将这些理解转化为<strong>商业洞察和行动</strong>。</p>
+<section id="分析各簇特征" class="level3">
+<h3 class="anchored" data-anchor-id="分析各簇特征">5.1 分析各簇特征</h3>
+<ol type="1">
+<li><strong>添加簇标签:</strong> 将聚类得到的标签添加到原始（或预处理前）的 DataFrame 中。</li>
+<li><strong>分组统计:</strong> 使用 <code>groupby()</code> 方法按簇标签分组，然后计算每个簇中各个特征的<strong>描述性统计量</strong>（如 <code>mean()</code>, <code>median()</code>, <code>std()</code>, <code>count()</code>, <code>value_counts()</code>）。</li>
+<li><strong>对比差异:</strong> 比较不同簇之间在关键特征上的<strong>平均值、中位数或分布</strong>差异。例如：
+<ul>
+<li>簇 0 的用户平均年龄比簇 1 低吗？</li>
+<li>簇 2 的用户平均消费金额远高于其他簇吗？</li>
+<li>簇 3 的用户更偏爱购买哪个类别的商品？</li>
+</ul></li>
+<li><strong>可视化特征分布:</strong> 绘制每个簇中关键特征的分布图（如箱线图、直方图、密度图），更直观地比较差异。</li>
+</ol>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 假设 final_labels 是最终的聚类标签 (来自 K-Means 或 DBSCAN, 注意 DBSCAN 有 -1 标签) ---</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 假设 df_original 是包含原始特征的 DataFrame ---</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 假设 X_scaled_df 是包含缩放后特征和索引的 DataFrame ---</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建一个包含原始特征和聚类标签的 DataFrame 用于分析</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># (确保索引对齐，如果需要先 merge)</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 示例：假设 df_original 和 X_scaled 的行索引一致</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>df_analysis <span class="op">=</span> df_original.copy() <span class="co"># 创建副本以防修改原始数据</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>df_analysis[<span class="st">'Cluster'</span>] <span class="op">=</span> final_labels</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 过滤掉噪声点 (如果使用 DBSCAN 且存在噪声)</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>df_analysis_no_noise <span class="op">=</span> df_analysis[df_analysis[<span class="st">'Cluster'</span>] <span class="op">!=</span> <span class="op">-</span><span class="dv">1</span>].copy()</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算每个簇的特征均值 (在去噪数据上)</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 选择你关心的数值特征列</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>numeric_features <span class="op">=</span> [<span class="st">'Age'</span>, <span class="st">'Income'</span>, <span class="st">'SpendingScore'</span>] <span class="co"># 替换为你的实际特征名</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>cluster_means <span class="op">=</span> df_analysis_no_noise.groupby(<span class="st">'Cluster'</span>)[numeric_features].mean()</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"各簇特征均值:</span><span class="ch">\n</span><span class="st">"</span>, cluster_means)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算每个簇的大小 (包括噪声点)</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>cluster_counts <span class="op">=</span> df_analysis[<span class="st">'Cluster'</span>].value_counts().sort_index()</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">各簇样本数量 (包括噪声点 -1):</span><span class="ch">\n</span><span class="st">"</span>, cluster_counts)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co"># (可选) 计算其他统计量，如中位数、标准差等</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster_medians = df_analysis_no_noise.groupby('Cluster')[numeric_features].median()</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster_stds = df_analysis_no_noise.groupby('Cluster')[numeric_features].std()</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 可视化特征分布 (示例：箱线图，在去噪数据上)</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.figure(figsize=(15, 5))</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co"># for i, col in enumerate(numeric_features):</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.subplot(1, len(numeric_features), i+1)</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#     sns.boxplot(x='Cluster', y=col, data=df_analysis_no_noise)</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.title(f'{col} Distribution by Cluster')</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.tight_layout()</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 对于类别特征，可以使用 value_counts()</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co"># categorical_feature = 'Gender' # 替换为你的类别特征名</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster_cat_dist = df_analysis_no_noise.groupby('Cluster')[categorical_feature].value_counts(normalize=True).unstack()</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"\n各簇 {categorical_feature} 分布:\n", cluster_cat_dist)</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster_cat_dist.plot(kind='bar', stacked=True, figsize=(10, 6))</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.title(f'{categorical_feature} Distribution by Cluster')</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.ylabel('Proportion')</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="给簇贴标签-profiling" class="level3">
+<h3 class="anchored" data-anchor-id="给簇贴标签-profiling">5.2 给簇贴标签 (Profiling)</h3>
+<p>根据上一步分析出的各簇显著特征，尝试给每个簇起一个<strong>有意义的标签</strong>，概括这个群体的核心特点。例如：</p>
+<ul>
+<li><strong>簇 0:</strong> 年轻、低收入、高消费意愿 -&gt; “潜力年轻人” / “月光族”</li>
+<li><strong>簇 1:</strong> 中年、高收入、高消费 -&gt; “高价值核心用户”</li>
+<li><strong>簇 2:</strong> 老年、中等收入、低消费 -&gt; “保守储蓄型用户”</li>
+<li><strong>簇 3:</strong> 年龄收入不限、消费极低 -&gt; “低活跃/流失风险用户”</li>
+<li><strong>簇 -1 (噪声):</strong> 行为模式异常或数据不足的用户 -&gt; “待观察/异常用户”</li>
+</ul>
+<p>标签应简洁、易懂，并能反映业务含义。</p>
+</section>
+<section id="转化为商业洞察与行动" class="level3">
+<h3 class="anchored" data-anchor-id="转化为商业洞察与行动">5.3 转化为商业洞察与行动</h3>
+<p>这是最终目的。根据不同用户群体的特征和标签，制定差异化的商业策略：</p>
+<ul>
+<li><strong>对于 “潜力年轻人”:</strong>
+<ul>
+<li><strong>洞察:</strong> 对价格敏感，追求新潮，易受社交影响。</li>
+<li><strong>行动:</strong> 推送优惠券、限时折扣；推广潮流新品；利用社交媒体营销。</li>
+</ul></li>
+<li><strong>对于 “高价值核心用户”:</strong>
+<ul>
+<li><strong>洞察:</strong> 购买力强，注重品质和服务，忠诚度可能较高。</li>
+<li><strong>行动:</strong> 提供 VIP 服务、专属优惠；推荐高端产品；进行客户关系维护。</li>
+</ul></li>
+<li><strong>对于 “保守储蓄型用户”:</strong>
+<ul>
+<li><strong>洞察:</strong> 对价格敏感，需求明确，不易冲动消费。</li>
+<li><strong>行动:</strong> 推送实用性强、性价比高的产品；强调产品耐用性。</li>
+</ul></li>
+<li><strong>对于 “低活跃/流失风险用户”:</strong>
+<ul>
+<li><strong>洞察:</strong> 可能即将流失或对平台不感兴趣。</li>
+<li><strong>行动:</strong> 进行召回活动（如发送关怀邮件、提供回归奖励）；分析流失原因；或暂时减少营销投入。</li>
+</ul></li>
+<li><strong>对于 “待观察/异常用户” (噪声点):</strong>
+<ul>
+<li><strong>洞察:</strong> 行为模式特殊，可能是新用户、异常账户或数据错误。</li>
+<li><strong>行动:</strong> 进一步单独分析这些用户；检查数据质量；监控其后续行为。</li>
+</ul></li>
+</ul>
+<p><strong>关键在于将数据分析结果与业务目标相结合，提出可行的、能带来价值的行动方案。</strong></p>
+</section>
+</section>
+<section id="小组项目三模型优化与业务解读" class="level2">
+<h2 class="anchored" data-anchor-id="小组项目三模型优化与业务解读">6. 小组项目三：模型优化与业务解读</h2>
+<p>本周需要完成用户分群项目的最后部分。</p>
+<ul>
+<li><strong>任务:</strong>
+<ol type="1">
+<li><strong>(可选) 尝试 DBSCAN:</strong>
+<ul>
+<li>在你的预处理数据上尝试使用 <code>DBSCAN</code> 进行聚类。</li>
+<li>仔细选择 <code>eps</code> 和 <code>min_samples</code> 参数（可以借助 K-距离图）。</li>
+<li>评估 DBSCAN 的结果（发现的簇数量、噪声点比例）。</li>
+<li>与 K-Means 的结果进行比较。DBSCAN 是否发现了更有意义的结构或识别出了噪声用户？</li>
+</ul></li>
+<li><strong>选择最终聚类模型:</strong> 根据 K-Means 和 (可选的) DBSCAN 的结果，以及聚类评估指标和可视化效果，选择一个最终的聚类方案（确定算法和参数/K值）。</li>
+<li><strong>(重点) 深入业务解读:</strong>
+<ul>
+<li>将最终的聚类标签添加到你的数据中。</li>
+<li>详细分析每个簇在关键用户特征（人口统计学、消费行为、浏览行为等）上的表现，计算统计量并进行可视化对比（箱线图、条形图等）。</li>
+<li>为每个簇（包括可能的噪声簇）贴上具有业务含义的标签 (Profiling)。</li>
+<li>根据每个簇的特点，提出<strong>具体、可行的商业建议或营销策略</strong>。解释为什么这些策略适用于特定的用户群体。</li>
+</ul></li>
+</ol></li>
+<li><strong>提交:</strong>
+<ul>
+<li>最终的代码，包含 K-Means、DBSCAN、聚类评估、可视化、<strong>详细的业务解读过程和分析</strong>。</li>
+<li>一份简洁的项目报告，总结项目目标、数据、方法（包括 K 值/参数选择）、最终聚类结果、<strong>深入的各簇特征分析与业务洞察</strong>、商业建议。<strong>报告中必须包含详细的业务解读部分。</strong></li>
+</ul></li>
+<li><strong>DDL:</strong> 第九周第一次课前。</li>
+</ul>
+</section>
+<section id="本周总结" class="level2">
+<h2 class="anchored" data-anchor-id="本周总结">7. 本周总结</h2>
+<p>本周我们深入探讨了聚类分析。学习了基于密度的 DBSCAN 算法，了解了其原理、实现、参数选择和优缺点，并与 K-Means 进行了对比。我们还学习了更多的聚类评估指标（DBI）和可视化技术（PCA/t-SNE 降维）。最重要的是，我们强调了聚类结果的业务解读，学习了如何分析簇特征、给簇贴标签，并将其转化为商业价值。最后，我们完成了用户分群项目。</p>
+<p><strong>下周我们将学习模型评估的深化技巧以及如何处理不平衡数据！</strong></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./week7_lecture.html" class="pagination-link" aria-label="第七周：无监督学习初探 - K-Means 聚类">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./week1_exercise.html" class="pagination-link" aria-label="第一周：课堂练习与实验">
+        <span class="nav-page-text"><span class="chapter-title">第一周：课堂练习与实验</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,177 @@
+---
+title: "第八周：课堂练习与实验"
+subtitle: "DBSCAN、聚类评估与业务解读"
+---
+
+本周我们将学习基于密度的聚类算法 DBSCAN，并深入探讨如何评估、可视化和解读聚类结果，特别是从业务角度出发。同时，我们将完成项目三（用户分群）的优化和报告。
+
+## 准备工作
+
+确保导入本周所需的库，并准备好上周使用的聚类数据（或示例数据）。
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import make_blobs, make_moons # 导入生成数据的函数
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans, DBSCAN # 导入 DBSCAN
+from sklearn.metrics import silhouette_score, davies_bouldin_score
+from sklearn.decomposition import PCA
+from sklearn.manifold import t_SNE # 可选，用于可视化
+from sklearn.neighbors import NearestNeighbors # 用于 K-distance plot
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+# %matplotlib inline # 如果在 Jupyter 环境中需要取消注释
+
+# --- 生成用于比较的数据 ---
+# 1. Blobs (适合 K-Means)
+X_blobs, y_blobs_true = make_blobs(n_samples=400, centers=4, cluster_std=0.6, random_state=0)
+scaler_blobs = StandardScaler()
+X_blobs_scaled = scaler_blobs.fit_transform(X_blobs)
+df_blobs_original = pd.DataFrame(X_blobs, columns=['Feature1', 'Feature2']) # 保存原始数据用于解读
+
+# 2. Moons (适合 DBSCAN)
+X_moons, y_moons_true = make_moons(n_samples=300, noise=0.08, random_state=42)
+scaler_moons = StandardScaler()
+X_moons_scaled = scaler_moons.fit_transform(X_moons)
+```
+
+## 练习 1: DBSCAN 实践
+
+**目标:** 理解 DBSCAN 的原理，练习使用 DBSCAN 并观察参数 `eps` 和 `min_samples` 的影响。
+
+**使用 `X_moons_scaled` 数据集。**
+
+1.  **初步尝试 DBSCAN:**
+    *   创建一个 `DBSCAN` 实例，尝试不同的 `eps` 和 `min_samples` 组合，例如：
+        *   `eps=0.2`, `min_samples=5`
+        *   `eps=0.3`, `min_samples=5`
+        *   `eps=0.3`, `min_samples=10`
+        *   `eps=0.5`, `min_samples=5`
+    *   对于每种组合，使用 `fit_predict()` 获取聚类标签。
+    *   打印出每种组合下找到的簇数量（不包括噪声点 -1）和噪声点的数量。
+    *   绘制散点图可视化聚类结果，用不同颜色表示簇，用特定标记（如小黑点 `.` 或 `x`，颜色设为黑色）表示噪声点 (`labels == -1`)。
+    *   在 Markdown 单元格中描述 `eps` 和 `min_samples` 的变化对聚类结果（簇的数量、形状、噪声点）的影响。
+
+2.  **使用 K-距离图选择 `eps`:**
+    *   选择一个 `min_samples` 值（例如，对于二维数据，可以从 3 或 5 开始）。
+    *   使用 `sklearn.neighbors.NearestNeighbors` 找到每个点到其第 `k = min_samples` 个最近邻的距离 (注意：sklearn kneighbors 包含自身，所以查第 k 个邻居)。
+        ```python
+        k = 5 # Example: min_samples = 5
+        nbrs = NearestNeighbors(n_neighbors=k).fit(X_moons_scaled)
+        distances, indices = nbrs.kneighbors(X_moons_scaled)
+        # 获取每个点的 k-距离 (第 k 个邻居的距离，即 distances 数组的最后一列)
+        k_distances = np.sort(distances[:, k-1], axis=0)
+        ```
+    *   绘制 K-距离图 (`plt.plot(k_distances)`)。
+    *   添加标题和坐标轴标签。
+    *   观察图像中的“拐点”（斜率急剧变化的点），估计一个合适的 `eps` 值。
+    *   在 Markdown 单元格中记录你选择的 `eps` 值以及理由。
+    *   使用你选择的 `min_samples` 和估计的 `eps` 再次运行 DBSCAN 并可视化结果。
+
+## 练习 2: K-Means vs. DBSCAN 对比
+
+**目标:** 对比 K-Means 和 DBSCAN 在不同类型数据上的表现。
+
+1.  **在 Moons 数据上运行 K-Means:**
+    *   使用 `X_moons_scaled` 数据。
+    *   训练一个 `KMeans` 模型，设置 `n_clusters=2` (因为我们知道 Moons 数据有 2 个半月形), `n_init='auto'`, `random_state=42`。
+    *   获取聚类标签。
+    *   可视化 K-Means 的聚类结果。
+
+2.  **在 Blobs 数据上运行 DBSCAN:**
+    *   使用 `X_blobs_scaled` 数据。
+    *   首先使用 K-距离图（例如 `min_samples=5`）为 Blobs 数据估计一个合适的 `eps` 值。
+    *   使用估计的 `eps` 和 `min_samples` 训练 `DBSCAN` 模型。
+    *   获取聚类标签。
+    *   可视化 DBSCAN 的聚类结果（注意可能存在的噪声点）。
+
+3.  **对比分析:**
+    *   在 Markdown 单元格中，比较 K-Means 和 DBSCAN 在 Moons 数据集上的表现。哪个算法更适合这种非球状分布？
+    *   比较 K-Means (使用 K=4) 和 DBSCAN 在 Blobs 数据集上的表现。哪个算法更适合这种球状分布？DBSCAN 是否将一些点识别为噪声？这些噪声点合理吗？
+    *   总结 K-Means 和 DBSCAN 的主要区别和适用场景。
+
+## 练习 3: 聚类结果的业务解读 (示例)
+
+**目标:** 练习从聚类结果中提取业务洞察。
+
+**假设我们对 `X_blobs_scaled` 数据运行 K-Means (K=4) 得到了 `final_labels_blobs`。现在我们将这些标签与原始（未缩放）特征关联起来进行分析。**
+
+1.  **合并标签与原始数据:**
+    *   创建一个包含原始特征 `df_blobs_original` 和聚类标签 `final_labels_blobs` 的 DataFrame `df_analysis`。
+    ```python
+    # 确保 kmeans_final 和 final_labels 来自 K=4 的 K-Means 运行
+    kmeans_blobs = KMeans(n_clusters=4, init='k-means++', n_init='auto', random_state=42)
+    final_labels_blobs = kmeans_blobs.fit_predict(X_blobs_scaled)
+
+    df_analysis = df_blobs_original.copy() # 使用包含原始特征的DataFrame
+    df_analysis['Cluster'] = final_labels_blobs
+    print(df_analysis.head())
+    ```
+
+2.  **分析各簇特征:**
+    *   使用 `groupby('Cluster').mean()` 计算每个簇中各特征的平均值。
+    *   使用 `groupby('Cluster').size()` 或 `df_analysis['Cluster'].value_counts()` 查看每个簇的大小。
+    *   使用 `groupby('Cluster').describe()` 查看更详细的统计信息，关注均值、标准差、最小值、最大值等。
+    *   **解读:** 在 Markdown 单元格中描述每个簇的特征。例如：“簇 0 的 Feature1 值较低，Feature2 值较高”，“簇 2 的样本数量最少”等。
+
+3.  **可视化特征分布:**
+    *   使用 `seaborn.boxplot` 或 `seaborn.violinplot` 绘制每个特征在不同簇中的分布情况。
+    ```python
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    sns.boxplot(x='Cluster', y='Feature1', data=df_analysis)
+    plt.title('Feature1 Distribution by Cluster')
+    plt.subplot(1, 2, 2)
+    sns.boxplot(x='Cluster', y='Feature2', data=df_analysis)
+    plt.title('Feature2 Distribution by Cluster')
+    plt.tight_layout()
+    plt.show()
+    ```
+    *   **解读:** 结合统计数据和可视化结果，更深入地理解每个簇的特点。
+
+4.  **给簇贴标签 (Profiling):**
+    *   根据你对各簇特征的分析，在 Markdown 单元格中为每个簇（0, 1, 2, 3）起一个描述性的标签（例如：“高 F1 低 F2 群体”、“低 F1 低 F2 群体”等）。
+
+5.  **提出商业建议 (假设场景):**
+    *   假设 Feature1 代表“最近购买间隔（天数）”，Feature2 代表“平均订单金额”。
+    *   针对你为每个簇打的标签，提出至少一条具体的商业建议。例如：
+        *   对于“高价值近期活跃客户”（假设是高 F2 低 F1 的簇），可以推荐新品、提供 VIP 服务。
+        *   对于“低价值近期流失风险客户”（假设是低 F2 高 F1 的簇），可以发送召回优惠券、进行用户调研。
+
+## 练习 4: 项目三 - 优化与业务解读
+
+**目标:** 完成用户分群项目，重点进行业务解读。
+
+1.  **(可选) 尝试 DBSCAN:**
+    *   在你的项目三预处理数据 (`X_project_scaled`) 上运行 DBSCAN。
+    *   使用 K-距离图等方法尝试找到合适的 `eps` 和 `min_samples`。
+    *   可视化 DBSCAN 的结果（可以使用 PCA 或 t-SNE 降维）。
+    *   与上周的 K-Means 结果进行比较。DBSCAN 是否提供了不同的视角或发现了噪声点？
+
+2.  **选择最终模型:**
+    *   基于 K-Means 和 DBSCAN（如果尝试了）的结果，结合轮廓系数、DBI 指数、可视化效果以及你对业务的理解，确定最终使用的聚类模型和参数（例如，最终决定使用 K-Means 且 K=5）。在 Notebook 中说明你的选择理由。
+
+3.  **深入业务解读 (核心):**
+    *   将最终选定模型的聚类标签合并回包含**原始特征**（未缩放）的 DataFrame。
+    *   **详细分析每个簇的特征:**
+        *   计算各簇在人口统计学特征（年龄、性别、地区等，如果可用）上的分布。
+        *   计算各簇在关键业务行为特征（如购买频率、最近购买时间、平均订单价值、浏览时长、购买品类偏好等）上的平均值、中位数等统计量。
+        *   使用合适的图表（箱线图、条形图、饼图等）可视化这些特征在不同簇之间的差异。
+    *   **用户画像 (Profiling):** 基于上述分析，为每个簇（包括可能的噪声簇）创建清晰的用户画像，并打上简洁明了的标签（例如：“高价值忠诚客户”、“价格敏感型学生”、“低频高价值客户”、“流失风险客户”等）。
+    *   **商业建议:** 针对每个用户画像，提出 2-3 条具体的、可操作的商业建议或营销策略。例如：
+        *   针对“高价值忠诚客户”：推出会员忠诚度计划、新品优先体验。
+        *   针对“价格敏感型学生”：推送促销活动信息、提供学生折扣。
+        *   针对“流失风险客户”：进行召回营销、调研流失原因。
+
+4.  **撰写报告:**
+    *   完成项目三的最终报告
+    *   **重点突出业务解读部分:** 详细描述每个簇的用户画像、特征差异以及对应的商业建议。使用图表辅助说明。
+    *   报告结构参考第十六周讲义。
+
+**提交项目三的最终代码和报告。**
+
+**下周我们将学习更高级的模型评估方法和处理不平衡数据的技巧。**

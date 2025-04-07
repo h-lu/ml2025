@@ -1,0 +1,257 @@
+---
+title: "第七周：无监督学习初探 - K-Means 聚类"
+subtitle: "探索数据中的隐藏结构，学习第一个聚类算法，启动用户分群项目"
+---
+
+到目前为止，我们学习的都是**监督学习 (Supervised Learning)**，即我们给模型提供带有“正确答案”（标签）的数据进行训练。本周，我们将进入机器学习的另一个重要领域——**无监督学习 (Unsupervised Learning)**。在无监督学习中，我们处理的数据**没有标签**，目标是让算法自己去发现数据中隐藏的结构或模式。我们将学习最经典、最常用的无监督学习算法之一：**K-Means 聚类 (Clustering)**，并启动我们的第三个实践项目：用户分群。
+
+::: {.callout-success title="项目二提交提醒"}
+请确保你已经按时提交了项目二（房价预测）的最终 Notebook 和报告。
+:::
+
+## 1. 无监督学习与聚类概述
+
+**无监督学习**的核心在于探索数据的内在结构，而不需要预先定义的标签。常见的无监督学习任务包括：
+
+*   **聚类 (Clustering):** 将相似的数据点分到同一个组（簇），将不相似的数据点分到不同的组。目标是使得**簇内相似度高，簇间相似度低**。
+*   **降维 (Dimensionality Reduction):** 在保留数据主要信息的前提下，减少数据的特征数量（我们后面会学 PCA）。
+*   **关联规则挖掘 (Association Rule Mining):** 发现数据项之间的有趣关联（例如，“购买啤酒的人也倾向于购买尿布”）。
+
+**聚类**的应用非常广泛：
+
+*   **用户分群/市场细分:** 将具有相似特征或行为的用户划分到不同群体，以便进行精准营销或定制服务。
+*   **图像分割:** 将图像中像素根据颜色、纹理等特征聚类，以识别不同区域。
+*   **异常检测:** 正常的数据点会聚集在一起，而异常点则会远离这些簇。
+*   **文档分组:** 将内容相似的文档自动归类。
+
+## 2. K-Means 聚类算法
+
+K-Means 是最简单、最常用的聚类算法之一。它的目标是将数据集划分为 **K** 个预先指定的簇。
+
+### 2.1 算法原理与步骤 (直观理解)
+
+K-Means 的工作流程非常直观：
+
+1.  **指定 K 值:** 首先，你需要**人为指定**你想要将数据分成多少个簇 (K)。
+2.  **随机初始化质心 (Centroids):** 随机选择 K 个数据点作为初始的**簇质心**（每个簇的中心点）。
+3.  **分配样本 (Assignment Step):** 对于数据集中的每一个样本点，计算它到 **K 个质心** 的距离（通常是欧氏距离），并将该样本点分配给**距离最近**的那个质心所代表的簇。
+4.  **更新质心 (Update Step):** 对于每一个簇，重新计算其**所有成员样本点的平均值**，将这个平均值作为该簇**新的质心**。
+5.  **迭代:** 重复步骤 3 和步骤 4，直到满足停止条件：
+    *   质心不再发生明显变化（或变化小于某个阈值）。
+    *   样本点所属的簇不再发生变化。
+    *   达到最大迭代次数。
+
+![K-Means Steps](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/K-means_convergence.gif/300px-K-means_convergence.gif){fig-alt="K-Means Convergence Steps"}
+
+### 2.2 使用 Scikit-learn 实现
+
+Scikit-learn 提供了 `KMeans` 类。
+
+::: {.callout-warning title="特征缩放的重要性"}
+K-Means 算法基于距离计算。如果特征的尺度（范围）差异很大，尺度较大的特征会对距离计算产生不成比例的影响。因此，在运行 K-Means 之前，**强烈建议对数据进行特征缩放**（例如使用 `StandardScaler` 或 `MinMaxScaler`）。
+:::
+
+```{python}
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import make_blobs # 用于生成聚类测试数据
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+# --- 准备数据 (示例：生成一些聚类数据) ---
+# n_samples: 样本总数
+# centers: 簇中心的数量或具体坐标
+# cluster_std: 每个簇的标准差 (控制簇的分散程度)
+# random_state: 保证结果可复现
+X_blobs, y_blobs_true = make_blobs(n_samples=300, centers=4, cluster_std=0.8, random_state=42)
+
+# 可视化生成的数据
+# plt.scatter(X_blobs[:, 0], X_blobs[:, 1], s=50) # s 控制点的大小
+# plt.title("Generated Blobs Data")
+# plt.xlabel("Feature 1")
+# plt.ylabel("Feature 2")
+# plt.show()
+
+# --- 特征缩放 ---
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_blobs)
+
+# --- 训练 K-Means 模型 ---
+# 1. 创建模型实例
+# n_clusters: 指定 K 值 (簇的数量)
+# init: 初始化质心的方法，常用 'k-means++' (更智能的初始化，有助于收敛) 或 'random'
+# n_init: 运行 K-Means 算法的次数 (使用不同的随机质心)，最终选择最优结果。'auto' 通常基于 init 方法选择。
+# max_iter: 单次运行的最大迭代次数
+# random_state: 保证结果可复现
+kmeans = KMeans(n_clusters=4, init='k-means++', n_init='auto', random_state=42)
+
+# 2. 拟合模型 (无监督学习，只需要 X)
+kmeans.fit(X_scaled)
+
+# --- 获取聚类结果 ---
+# 获取每个样本所属的簇标签 (0 到 K-1)
+cluster_labels = kmeans.labels_
+print("样本的聚类标签 (前 20 个):", cluster_labels[:20])
+
+# 获取最终的簇质心坐标 (在缩放后的空间中)
+centroids = kmeans.cluster_centers_
+print("\n最终的簇质心坐标:\n", centroids)
+
+# (可选) 获取模型的目标函数值 (inertia_)：所有样本点到其所属质心距离的平方和
+inertia = kmeans.inertia_
+print(f"\n模型的 Inertia 值: {inertia:.4f}")
+
+# --- 可视化聚类结果 ---
+plt.figure(figsize=(8, 6))
+# 根据聚类标签绘制散点图，不同簇使用不同颜色 (c=cluster_labels)
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=cluster_labels, s=50, cmap='viridis')
+# 绘制簇质心
+plt.scatter(centroids[:, 0], centroids[:, 1], c='red', s=200, alpha=0.75, marker='X', label='Centroids')
+plt.title("K-Means Clustering Results (K=4)")
+plt.xlabel("Scaled Feature 1")
+plt.ylabel("Scaled Feature 2")
+plt.legend()
+# plt.show()
+```
+
+### 2.3 如何选择 K 值？
+
+K-Means 的一个关键问题是如何确定最佳的簇数量 K。没有绝对完美的方法，但常用的启发式方法有：
+
+#### 2.3.1 肘部法则 (Elbow Method)
+
+1.  尝试不同的 K 值（例如从 1 到 10）。
+2.  对于每个 K 值，运行 K-Means 算法，并计算**簇内平方和 (Within-Cluster Sum of Squares, WCSS)**，也称为 **Inertia** (`kmeans.inertia_`)。Inertia 衡量了簇内样本的紧凑程度，值越小表示簇内样本越相似。
+3.  绘制 K 值与对应的 Inertia 值的关系图。
+4.  观察曲线：随着 K 值的增加，Inertia 通常会逐渐减小。寻找曲线下降速率**由陡峭变平缓**的那个点，形状像一个“肘部 (Elbow)”。这个“肘部”对应的 K 值通常被认为是比较合适的 K 值。
+
+**原理:** 当 K 小于真实簇数时，增加 K 会显著提高簇内紧密度，Inertia 大幅下降；当 K 超过真实簇数时，再增加 K 对 Inertia 的改善效果会变得不明显。
+
+```{python}
+# --- 肘部法则 ---
+inertia_values = []
+k_range = range(1, 11) # 尝试 K 从 1 到 10
+
+for k in k_range:
+    kmeans_elbow = KMeans(n_clusters=k, init='k-means++', n_init='auto', random_state=42)
+    kmeans_elbow.fit(X_scaled)
+    inertia_values.append(kmeans_elbow.inertia_)
+
+# 绘制肘部图
+plt.figure(figsize=(8, 5))
+plt.plot(k_range, inertia_values, marker='o')
+plt.title('Elbow Method for Optimal K')
+plt.xlabel('Number of Clusters (K)')
+plt.ylabel('Inertia (WCSS)')
+plt.xticks(k_range)
+plt.grid(True)
+# plt.show()
+```
+
+**解读:** 在上面的示例数据中，肘部通常出现在 K=4 的位置。
+
+#### 2.3.2 轮廓系数 (Silhouette Score)
+
+轮廓系数衡量一个样本与其自身簇的紧密度（内聚度）以及与其他簇的分离度。
+
+1.  对于样本 `i`：
+    *   计算它与**同簇**中所有其他点的平均距离 `a(i)`（簇内不相似度）。
+    *   计算它与**最近的其他簇**中所有点的平均距离 `b(i)`（簇间不相似度）。
+2.  样本 `i` 的轮廓系数 `s(i) = (b(i) - a(i)) / max(a(i), b(i))`。
+3.  整个数据集的轮廓系数是所有样本 `s(i)` 的**平均值**。
+
+**取值范围:** -1 到 1。
+
+*   **接近 1:** 表示样本远离相邻簇，聚类效果好。
+*   **接近 0:** 表示样本在两个簇的边界上。
+*   **接近 -1:** 表示样本可能被分到了错误的簇。
+
+**使用方法:** 计算不同 K 值对应的平均轮廓系数，选择使得**平均轮廓系数最大**的 K 值。
+
+```{python}
+from sklearn.metrics import silhouette_score
+
+# --- 轮廓系数 ---
+silhouette_scores = []
+# K=1 时无法计算轮廓系数，所以从 K=2 开始
+k_range_silhouette = range(2, 11)
+
+for k in k_range_silhouette:
+    kmeans_sil = KMeans(n_clusters=k, init='k-means++', n_init='auto', random_state=42)
+    kmeans_sil.fit(X_scaled)
+    labels = kmeans_sil.labels_
+    # 计算该 K 值下的平均轮廓系数
+    score = silhouette_score(X_scaled, labels)
+    silhouette_scores.append(score)
+    print(f"K={k}, Silhouette Score: {score:.4f}")
+
+# 绘制轮廓系数图
+plt.figure(figsize=(8, 5))
+plt.plot(k_range_silhouette, silhouette_scores, marker='o')
+plt.title('Silhouette Score for Optimal K')
+plt.xlabel('Number of Clusters (K)')
+plt.ylabel('Average Silhouette Score')
+plt.xticks(k_range_silhouette)
+plt.grid(True)
+# plt.show()
+```
+
+**解读:** 选择轮廓系数最高的 K 值（在示例中通常是 K=4）。
+
+::: {.callout-note title="K 值选择的建议"}
+*   肘部法则比较直观，但有时“肘部”不明显。
+*   轮廓系数提供了更量化的指标，但计算成本稍高。
+*   通常建议结合这两种方法，并**结合业务理解**来最终确定 K 值。例如，即使 K=5 的轮廓系数略高于 K=4，但如果 K=4 的聚类结果在业务上更有意义、更容易解释，也可能选择 K=4。
+:::
+
+### 2.4 K-Means 的优缺点
+
+*   **优点:**
+    *   **简单高效:** 算法原理简单，计算速度快，尤其对于大数据集。
+    *   **易于理解和实现。**
+    *   **效果尚可:** 在许多情况下能得到合理的聚类结果，特别是当簇是凸形且大小相似时。
+*   **缺点:**
+    *   **需要预先指定 K 值:** K 值的选择对结果影响很大，且选择不当可能导致效果不佳。
+    *   **对初始质心敏感:** 不同的初始质心可能导致不同的聚类结果（使用 `k-means++` 初始化可以缓解）。
+    *   **对异常值敏感:** 异常值可能严重影响质心的计算。
+    *   **倾向于发现球状簇:** 对于非球状、形状不规则或大小差异很大的簇，效果可能不好。
+    *   **基于距离:** 需要对数据进行特征缩放。
+
+## 3. 小组项目三 (阶段一)：用户分群模型构建
+
+现在，我们将运用 K-Means 来探索用户数据，尝试将用户划分为不同的群体。
+
+*   **主题:** 用户分群模型构建
+*   **目标:** 掌握使用 K-Means 进行聚类的流程，理解 K 值选择方法，并为后续的用户画像分析打下基础。
+*   **数据集:** (老师提供或推荐，例如包含用户基本信息、消费行为、浏览记录等的用户数据集)
+*   **任务 (阶段一):**
+    1.  **数据加载与探索 (EDA):**
+        *   加载用户数据集。
+        *   理解特征含义，识别可能用于聚类的特征（例如：年龄、收入、消费频率、最近消费时间、平均订单金额、浏览时长等）。
+        *   进行初步的数据探索和可视化。
+    2.  **数据预处理:**
+        *   选择用于聚类的特征子集。
+        *   处理缺失值。
+        *   处理类别特征（如果需要）。
+        *   **(关键!) 对选定的数值特征进行特征缩放 (StandardScaler)**。
+    3.  **K-Means 聚类与 K 值选择:**
+        *   使用**肘部法则**，绘制 Inertia 随 K 值变化的曲线，初步判断可能的 K 值范围。
+        *   使用**轮廓系数**，计算不同 K 值对应的平均轮廓系数，找到最优的 K 值。
+        *   结合两种方法和业务理解，确定最终的 K 值。
+    4.  **执行最终聚类:** 使用确定的 K 值，运行 K-Means 算法，得到每个用户的聚类标签。
+
+
+::: {.callout-tip title="AI 辅助项目实践"}
+*   "如何使用 Pandas 选择 DataFrame 中用于聚类的特定列？"
+*   "帮我生成 Python 代码，使用 StandardScaler 对 DataFrame 'user_features' 进行缩放。"
+*   "解释 K-Means 的 `inertia_` 属性代表什么？"
+*   "如何解读轮廓系数图来选择最佳 K 值？"
+*   "给我一些关于用户分群常见特征的建议。"
+:::
+
+## 4. 本周总结
+
+本周我们开启了无监督学习的大门，重点学习了经典的 K-Means 聚类算法。我们理解了其工作原理、实现步骤，并掌握了如何使用肘部法则和轮廓系数来选择合适的簇数量 K。我们还强调了特征缩放在 K-Means 中的重要性，并启动了第三个实践项目——用户分群。
+
+**下周我们将学习更多关于聚类评估和可视化的方法，并介绍另一种聚类算法 DBSCAN。**

@@ -1,0 +1,309 @@
+---
+title: "第九周：模型评估深化与不平衡数据处理"
+subtitle: "掌握高级评估技巧，攻克数据不平衡难题"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+    number-sections: true
+---
+
+# 第九周：模型评估深化与不平衡数据处理
+
+前几周我们学习了多种分类和回归算法，并掌握了基本的模型评估方法。然而，在实际应用中，我们常常会遇到更复杂的情况，例如数据类别分布极不均衡，或者需要更精细地评估模型在特定方面的表现。本周，我们将深入探讨**模型评估**的技巧，学习 **P-R 曲线**、**交叉验证策略**以及**多分类评估**方法。同时，我们将重点关注一个常见且棘手的挑战——**处理不平衡数据 (Imbalanced Data)**，学习常用的应对策略，如 **SMOTE 过采样**和**代价敏感学习**。
+
+::: {.callout-success title="项目三提交提醒"}
+请确保你已经按时提交了项目三（用户分群）的最终 Notebook 和报告。
+:::
+
+## 1. 模型评估深化
+
+简单地依赖准确率 (Accuracy) 来评估分类模型，尤其是在类别不平衡的情况下，可能会产生误导。我们需要更细致、更有针对性的评估工具。
+
+### 1.1 精确率-召回率曲线 (Precision-Recall Curve, P-R Curve)
+
+我们在第三周学习了 ROC 曲线和 AUC 值，它们是评估二分类模型性能的常用工具。但在某些场景下，特别是当**我们更关注正类别（少数类）的识别性能**，且**数据严重不平衡**时，P-R 曲线通常能提供更有价值的信息。
+
+*   **回顾:**
+    *   **精确率 (Precision):** TP / (TP + FP) - 预测为正的样本中有多少是真的正。
+    *   **召回率 (Recall):** TP / (TP + FN) - 真实为正的样本中有多少被预测出来了。
+*   **P-R 曲线:**
+    *   **横坐标:** 召回率 (Recall)
+    *   **纵坐标:** 精确率 (Precision)
+    *   曲线描绘了在**不同分类阈值**下，精确率与召回率的关系。
+*   **解读:**
+    *   理想的模型是精确率和召回率都尽可能高，即曲线尽量靠近右上角 (1, 1)。
+    *   曲线下的面积 (Area Under the P-R Curve, **AUC-PR** 或 **AP - Average Precision**) 可以作为 P-R 曲线的整体性能度量，值越接近 1 越好。
+    *   相比 ROC 曲线，P-R 曲线对正类别（少数类）的性能变化更敏感。如果模型在识别少数类方面表现不佳，P-R 曲线会更明显地反映出来。
+
+```python
+from sklearn.metrics import precision_recall_curve, average_precision_score
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import make_classification # 生成不平衡数据
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import Counter # 后面会用到
+
+# --- 生成不平衡的示例数据 ---
+# weights=[0.95, 0.05] 表示类别 0 占 95%，类别 1 (正类/少数类) 占 5%
+X_imb, y_imb = make_classification(n_samples=1000, n_features=20, n_informative=2,
+                               n_redundant=10, n_clusters_per_class=1, weights=[0.95, 0.05],
+                               flip_y=0, random_state=42)
+
+# --- 数据预处理和划分 ---
+scaler = StandardScaler()
+X_imb_scaled = scaler.fit_transform(X_imb)
+X_train_imb, X_test_imb, y_train_imb, y_test_imb = train_test_split(
+    X_imb_scaled, y_imb, test_size=0.3, random_state=42, stratify=y_imb
+)
+
+# --- 训练一个模型 (例如逻辑回归) ---
+lr_imb = LogisticRegression(solver='liblinear', random_state=42)
+lr_imb.fit(X_train_imb, y_train_imb)
+y_pred_proba_imb = lr_imb.predict_proba(X_test_imb)[:, 1] # 获取正类的预测概率
+
+# --- 计算并绘制 P-R 曲线 ---
+precision, recall, thresholds = precision_recall_curve(y_test_imb, y_pred_proba_imb)
+ap_score = average_precision_score(y_test_imb, y_pred_proba_imb)
+
+plt.figure(figsize=(8, 6))
+plt.plot(recall, precision, marker='.', label=f'Logistic Regression (AP = {ap_score:.2f})')
+# 找到最接近左上角的阈值点 (可选)
+# f1_scores = 2 * (precision * recall) / (precision + recall + 1e-9) # 避免除以0
+# best_threshold_idx = np.argmax(f1_scores)
+# plt.plot(recall[best_threshold_idx], precision[best_threshold_idx], 'ro', markersize=8, label='Best Threshold (Max F1)')
+
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.legend()
+plt.grid(True)
+# plt.show()
+
+print(f"Average Precision (AP) Score: {ap_score:.4f}")
+```
+
+::: {.callout-note title="ROC vs. P-R"}
+*   **ROC 曲线:** 对类别分布不敏感，能较好地反映模型整体区分正负类的能力。当正负样本数量接近，或两者都重要时常用。
+*   **P-R 曲线:** 对少数类的性能更敏感。当数据严重不平衡，且你更关心少数类（正类）的查准率和查全率时，P-R 曲线通常更有用（例如欺诈检测、罕见病诊断）。
+:::
+
+### 1.2 交叉验证策略深化
+
+我们在第四周学习了 K 折交叉验证。对于特定问题，还有更合适的 CV 策略：
+
+*   **分层 K 折交叉验证 (Stratified K-Fold):**
+    *   **适用场景:** 分类问题，特别是**类别不平衡**的数据。
+    *   **原理:** 在划分 K 个折时，确保每个折中的**类别比例**与原始训练数据集中的类别比例大致相同。
+    *   **优点:** 保证了每个验证集都能代表整体数据的类别分布，评估结果更可靠。
+    *   **实现:** `sklearn.model_selection.StratifiedKFold`。`cross_val_score` 在处理分类问题时通常默认使用它。
+*   **(概念) 嵌套交叉验证 (Nested Cross-Validation):**
+    *   **适用场景:** 当你需要同时进行**超参数调优**和**模型性能评估**时，为了避免信息泄露（即用测试集信息来选择超参数），需要使用嵌套 CV。
+    *   **原理:**
+        *   **外层循环 (Outer Loop):** 将数据划分为 K 个折，用于最终的模型评估。每次迭代用 K-1 折作为外层训练集，1 折作为外层测试集。
+        *   **内层循环 (Inner Loop):** 在**外层训练集**上执行超参数调优（例如使用 GridSearchCV 或 RandomizedSearchCV，它们内部也包含交叉验证）。找到最优超参数后，用这些参数在外层训练集上训练模型。
+        *   **评估:** 用训练好的模型在外层测试集上进行评估。
+        *   重复外层循环 K 次，最终评估结果是 K 次外层测试集评估结果的平均值。
+    *   **优点:** 提供了对模型泛化能力**更无偏**的估计，因为它严格分开了超参数选择和最终评估所用的数据。
+    *   **缺点:** 计算成本非常高。
+    *   **实现:** 通常需要手动编写嵌套循环，结合 `GridSearchCV`/`RandomizedSearchCV` 和 `cross_val_score` 或 `StratifiedKFold`。
+
+### 1.3 多分类评估指标
+
+对于有三个或更多类别的问题，精确率、召回率和 F1 分数需要考虑如何对每个类别进行平均：
+
+*   **宏平均 (Macro Average):**
+    *   **计算方式:** **独立计算每个类别**的指标（Precision, Recall, F1），然后取**算术平均值**（不考虑每个类别的样本数量）。
+    *   **特点:** 平等对待所有类别。如果少数类别的性能很重要，宏平均是重要的参考指标。
+*   **微平均 (Micro Average):**
+    *   **计算方式:** 将所有类别的 TP, FP, FN **汇总**起来，然后基于这些汇总值计算**全局**的指标。
+    *   **特点:** 考虑了每个样本的贡献。在多分类中，Micro-Precision = Micro-Recall = Micro-F1 = Accuracy。
+*   **加权平均 (Weighted Average):**
+    *   **计算方式:** 独立计算每个类别的指标，然后根据每个类别的**样本数量（支持度 Support）进行加权平均**。
+    *   **特点:** 考虑了类别不平衡。样本多的类别对最终指标的贡献更大。
+
+`sklearn.metrics.classification_report` 会同时报告这三种平均值。
+
+```python
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report
+
+# --- 生成多分类数据 ---
+X_multi, y_multi = make_classification(n_samples=1000, n_features=20, n_informative=5,
+                                       n_redundant=0, n_classes=3, # 指定 3 个类别
+                                       n_clusters_per_class=1, random_state=42)
+
+# --- 划分数据 ---
+X_train_multi, X_test_multi, y_train_multi, y_test_multi = train_test_split(
+    X_multi, y_multi, test_size=0.3, random_state=42, stratify=y_multi
+)
+
+# --- 训练多分类模型 (例如 SVM) ---
+svm_multi = SVC(decision_function_shape='ovr', random_state=42) # 'ovr': One-vs-Rest 策略
+svm_multi.fit(X_train_multi, y_train_multi)
+y_pred_multi = svm_multi.predict(X_test_multi)
+
+# --- 查看分类报告 (包含 Macro/Weighted Avg) ---
+report_multi = classification_report(y_test_multi, y_pred_multi, target_names=['Class 0', 'Class 1', 'Class 2'])
+print("多分类报告:\n", report_multi)
+# 注意报告中 accuracy 行的值等于 micro avg f1-score
+```
+
+::: {.callout-tip title="AI 辅助理解高级评估"}
+*   "在什么情况下 P-R 曲线比 ROC 曲线更有用？请举例说明。"
+*   "解释 Stratified K-Fold 相比普通 K-Fold 的优势。"
+*   "嵌套交叉验证的主要目的是什么？为什么它能提供更无偏的评估？"
+*   "在多分类任务中，宏平均 F1 和加权平均 F1 分别反映了模型的哪方面性能？"
+*   "如果一个多分类模型的 Micro Avg F1 很高，但 Macro Avg F1 很低，这通常意味着什么？"
+:::
+
+## 2. 处理不平衡数据 (Handling Imbalanced Data)
+
+**不平衡数据**是指数据集中不同类别的样本数量差异悬殊的情况。例如，欺诈检测中，欺诈交易（少数类）远少于正常交易（多数类）；疾病诊断中，患病（少数类）样本远少于健康（多数类）样本。
+
+**挑战:** 大多数标准机器学习算法的目标是最大化整体准确率，这会导致模型倾向于**偏向多数类**，而**忽略少数类**。模型可能在多数类上表现很好，但在我们通常更关心的少数类上表现很差，导致整体准确率看似很高，但实际应用价值低。
+
+### 2.1 处理策略
+
+主要有两大类策略：数据层面和算法层面。
+
+#### 2.1.1 数据层面方法
+
+通过调整训练数据的类别分布来解决不平衡问题。
+
+*   **欠采样 (Undersampling):**
+    *   **方法:** 随机地**删除**多数类样本，使得多数类和少数类的数量接近。
+    *   **优点:** 可以减少训练数据量，加快训练速度。
+    *   **缺点:** 可能**丢失**多数类中的重要信息。
+    *   **实现:** `imbalanced-learn` 库提供了多种欠采样方法，如 `RandomUnderSampler`, `NearMiss` 等。
+*   **过采样 (Oversampling):**
+    *   **方法:** **增加**少数类样本的数量。
+    *   **简单过采样:** 随机复制少数类样本。缺点是可能导致模型对特定的少数类样本过拟合。
+    *   **(重点) SMOTE (Synthetic Minority Over-sampling Technique):**
+        *   **原理:** 不是简单复制，而是为少数类样本**合成新的、相似的样本**。它找到一个少数类样本，然后从其 K 个最近邻中随机选择一个，在这两个样本之间的连线上随机生成一个新的合成样本。
+        *   **优点:** 避免了简单复制带来的过拟合风险，能提供更多样化的少数类信息。
+        *   **缺点:** 可能生成噪声样本（如果少数类样本分布分散或与其他类重叠）；对高维数据效果可能减弱。
+        *   **实现:** `imbalanced-learn` 库中的 `SMOTE` 类。
+
+**使用 `imbalanced-learn` (需要先安装: `pip install imbalanced-learn`)**
+
+```python
+# 检查 imbalanced-learn 是否已安装，如果需要安装，取消下一行注释
+# !pip install imbalanced-learn
+
+from imblearn.over_sampling import SMOTE
+from collections import Counter # 用于查看类别计数
+
+# --- 使用之前生成的不平衡数据 X_train_imb, y_train_imb ---
+print("原始训练集类别分布:", Counter(y_train_imb))
+
+# --- 应用 SMOTE ---
+# k_neighbors: 选择近邻的数量
+# random_state: 保证结果可复现
+smote = SMOTE(k_neighbors=5, random_state=42)
+X_train_resampled, y_train_resampled = smote.fit_resample(X_train_imb, y_train_imb)
+
+print("SMOTE 重采样后训练集类别分布:", Counter(y_train_resampled)) # 类别数量应相等
+
+# --- 在重采样后的数据上训练模型 ---
+lr_smote = LogisticRegression(solver='liblinear', random_state=42)
+lr_smote.fit(X_train_resampled, y_train_resampled)
+y_pred_smote = lr_smote.predict(X_test_imb) # 评估仍在原始测试集上进行
+y_pred_proba_smote = lr_smote.predict_proba(X_test_imb)[:, 1]
+
+# --- 评估 SMOTE 后的模型 ---
+print("\n--- SMOTE 后逻辑回归评估 ---")
+print(classification_report(y_test_imb, y_pred_smote))
+
+# 计算 P-R 曲线和 AP
+precision_smote, recall_smote, _ = precision_recall_curve(y_test_imb, y_pred_proba_smote)
+ap_score_smote = average_precision_score(y_test_imb, y_pred_proba_smote)
+print(f"SMOTE 后 Average Precision (AP) Score: {ap_score_smote:.4f}")
+
+# --- 绘制对比 P-R 曲线 ---
+plt.figure(figsize=(8, 6))
+plt.plot(recall, precision, marker='.', label=f'Original LR (AP = {ap_score:.2f})')
+plt.plot(recall_smote, precision_smote, marker='.', label=f'LR with SMOTE (AP = {ap_score_smote:.2f})')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve Comparison')
+plt.legend()
+plt.grid(True)
+# plt.show()
+```
+
+**观察:** 使用 SMOTE 后，模型的召回率通常会有显著提升（能找出更多少数类样本），AP 分数也可能提高。
+
+#### 2.1.2 算法层面方法：代价敏感学习 (Cost-Sensitive Learning)
+
+*   **方法:** 在算法层面，为不同类别的**误分类**分配不同的**代价（权重）**。通常，将**少数类的误分类代价设置得更高**，使得模型在训练时更倾向于正确分类少数类样本。
+*   **实现:** 许多 Scikit-learn 分类器（如 `LogisticRegression`, `SVC`, `DecisionTreeClassifier`, `RandomForestClassifier`）提供了 `class_weight` 参数。
+    *   设置为字典 `{class_label: weight}`，手动指定每个类别的权重。
+    *   设置为 `'balanced'`，算法会自动根据样本数量反比地调整权重，即**少数类获得更高的权重**。这是最常用的方式。
+
+```python
+# --- 使用 class_weight='balanced' ---
+lr_balanced = LogisticRegression(solver='liblinear', class_weight='balanced', random_state=42)
+lr_balanced.fit(X_train_imb, y_train_imb) # 在原始不平衡数据上训练
+y_pred_balanced = lr_balanced.predict(X_test_imb)
+y_pred_proba_balanced = lr_balanced.predict_proba(X_test_imb)[:, 1]
+
+# --- 评估 class_weight='balanced' 后的模型 ---
+print("\n--- class_weight='balanced' 后逻辑回归评估 ---")
+print(classification_report(y_test_imb, y_pred_balanced))
+
+precision_balanced, recall_balanced, _ = precision_recall_curve(y_test_imb, y_pred_proba_balanced)
+ap_score_balanced = average_precision_score(y_test_imb, y_pred_proba_balanced)
+print(f"class_weight='balanced' 后 Average Precision (AP) Score: {ap_score_balanced:.4f}")
+
+# --- 绘制对比 P-R 曲线 ---
+plt.figure(figsize=(8, 6))
+plt.plot(recall, precision, marker='.', label=f'Original LR (AP = {ap_score:.2f})')
+plt.plot(recall_smote, precision_smote, marker='.', label=f'LR with SMOTE (AP = {ap_score_smote:.2f})')
+plt.plot(recall_balanced, precision_balanced, marker='.', label=f'LR with class_weight=balanced (AP = {ap_score_balanced:.2f})')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve Comparison')
+plt.legend()
+plt.grid(True)
+# plt.show()
+```
+
+**观察:** 使用 `class_weight='balanced'` 通常也能有效提高模型对少数类的识别能力（召回率），效果与 SMOTE 类似或各有优劣，计算成本通常更低。
+
+### 2.2 如何选择策略？
+
+*   **没有绝对最优的方法**，需要根据具体问题和数据进行尝试和评估。
+*   **优先尝试 `class_weight='balanced'`**，因为它实现简单，计算成本低。
+*   如果 `class_weight='balanced'` 效果不佳，可以尝试 **SMOTE** 或其他过采样/欠采样方法。
+*   **评估指标的选择至关重要:** 对于不平衡数据，应重点关注 **Recall, Precision, F1-Score (特别是 Macro Avg 或针对少数类的), P-R 曲线, AUC-PR**，而不是 Accuracy。
+*   **结合业务场景:** 思考哪种错误（FP 或 FN）的代价更高，选择能更好控制该类错误的策略和评估指标。
+
+::: {.callout-tip title="AI 辅助处理不平衡数据"}
+*   "解释为什么准确率在不平衡数据集上是具有误导性的指标？"
+*   "SMOTE 是如何生成合成样本的？它的主要优点是什么？"
+*   "除了 SMOTE，还有哪些其他的过采样技术？（例如 ADASYN）"
+*   "代价敏感学习的基本原理是什么？`class_weight='balanced'` 是如何工作的？"
+*   "在处理不平衡数据时，应该在划分训练/测试集之前还是之后进行重采样（如 SMOTE）？为什么？" (答案：之后，只对训练集重采样)
+:::
+
+## 3. 实践与讨论
+
+*   **回顾项目:** 回顾你之前做的分类项目（如项目一），检查数据是否存在类别不平衡问题。如果存在，尝试使用 SMOTE 或 `class_weight='balanced'` 重新训练模型，并使用 P-R 曲线和 F1 分数（特别是 Macro Avg）来评估效果是否有改善。
+*   **案例分析:** (老师可提供一个典型的不平衡商业数据集，如信用卡欺诈数据)
+    *   分析数据不平衡程度。
+    *   讨论在该场景下，哪种评估指标最重要？为什么？
+    *   分组讨论并尝试不同的处理策略（欠采样、SMOTE、代价敏感学习）。
+    *   比较不同策略的效果，并解释原因。
+
+## 4. 本周总结
+
+本周我们深化了对模型评估的理解，学习了 P-R 曲线、更细致的交叉验证策略和多分类评估方法。我们还重点 tackling 了不平衡数据问题，掌握了 SMOTE 过采样和代价敏感学习等实用技术。理解何时以及如何应用这些高级评估和处理技巧，对于构建在现实世界中表现稳健且有价值的机器学习模型至关重要。
+
+**下周我们将学习降维技术（PCA）和特征选择方法！**

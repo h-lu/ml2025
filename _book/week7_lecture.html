@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第七周：无监督学习初探 - K-Means 聚类 – 机器学习Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week8_lecture.html" rel="next">
+<link href="./week6_lecture.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles/custom.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week7_lecture.html"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习Python</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">讲义</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：决策树与随机森林 - 模型优化初探</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：回归算法启程 - 线性回归与多项式回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：回归算法进阶 - XGBoost 与模型优化</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_lecture.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">实验</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：课堂练习与实验</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#无监督学习与聚类概述" id="toc-无监督学习与聚类概述" class="nav-link active" data-scroll-target="#无监督学习与聚类概述">1. 无监督学习与聚类概述</a></li>
+  <li><a href="#k-means-聚类算法" id="toc-k-means-聚类算法" class="nav-link" data-scroll-target="#k-means-聚类算法">2. K-Means 聚类算法</a>
+  <ul class="collapse">
+  <li><a href="#算法原理与步骤-直观理解" id="toc-算法原理与步骤-直观理解" class="nav-link" data-scroll-target="#算法原理与步骤-直观理解">2.1 算法原理与步骤 (直观理解)</a></li>
+  <li><a href="#使用-scikit-learn-实现" id="toc-使用-scikit-learn-实现" class="nav-link" data-scroll-target="#使用-scikit-learn-实现">2.2 使用 Scikit-learn 实现</a></li>
+  <li><a href="#如何选择-k-值" id="toc-如何选择-k-值" class="nav-link" data-scroll-target="#如何选择-k-值">2.3 如何选择 K 值？</a></li>
+  <li><a href="#k-means-的优缺点" id="toc-k-means-的优缺点" class="nav-link" data-scroll-target="#k-means-的优缺点">2.4 K-Means 的优缺点</a></li>
+  </ul></li>
+  <li><a href="#小组项目三-阶段一用户分群模型构建" id="toc-小组项目三-阶段一用户分群模型构建" class="nav-link" data-scroll-target="#小组项目三-阶段一用户分群模型构建">3. 小组项目三 (阶段一)：用户分群模型构建</a></li>
+  <li><a href="#本周总结" id="toc-本周总结" class="nav-link" data-scroll-target="#本周总结">4. 本周总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week7_lecture.html"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></h1>
+<p class="subtitle lead">探索数据中的隐藏结构，学习第一个聚类算法，启动用户分群项目</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>到目前为止，我们学习的都是<strong>监督学习 (Supervised Learning)</strong>，即我们给模型提供带有“正确答案”（标签）的数据进行训练。本周，我们将进入机器学习的另一个重要领域——<strong>无监督学习 (Unsupervised Learning)</strong>。在无监督学习中，我们处理的数据<strong>没有标签</strong>，目标是让算法自己去发现数据中隐藏的结构或模式。我们将学习最经典、最常用的无监督学习算法之一：<strong>K-Means 聚类 (Clustering)</strong>，并启动我们的第三个实践项目：用户分群。</p>
+<div class="callout-success" title="项目二提交提醒">
+<p>请确保你已经按时提交了项目二（房价预测）的最终 Notebook 和报告。</p>
+</div>
+<section id="无监督学习与聚类概述" class="level2">
+<h2 class="anchored" data-anchor-id="无监督学习与聚类概述">1. 无监督学习与聚类概述</h2>
+<p><strong>无监督学习</strong>的核心在于探索数据的内在结构，而不需要预先定义的标签。常见的无监督学习任务包括：</p>
+<ul>
+<li><strong>聚类 (Clustering):</strong> 将相似的数据点分到同一个组（簇），将不相似的数据点分到不同的组。目标是使得<strong>簇内相似度高，簇间相似度低</strong>。</li>
+<li><strong>降维 (Dimensionality Reduction):</strong> 在保留数据主要信息的前提下，减少数据的特征数量（我们后面会学 PCA）。</li>
+<li><strong>关联规则挖掘 (Association Rule Mining):</strong> 发现数据项之间的有趣关联（例如，“购买啤酒的人也倾向于购买尿布”）。</li>
+</ul>
+<p><strong>聚类</strong>的应用非常广泛：</p>
+<ul>
+<li><strong>用户分群/市场细分:</strong> 将具有相似特征或行为的用户划分到不同群体，以便进行精准营销或定制服务。</li>
+<li><strong>图像分割:</strong> 将图像中像素根据颜色、纹理等特征聚类，以识别不同区域。</li>
+<li><strong>异常检测:</strong> 正常的数据点会聚集在一起，而异常点则会远离这些簇。</li>
+<li><strong>文档分组:</strong> 将内容相似的文档自动归类。</li>
+</ul>
+</section>
+<section id="k-means-聚类算法" class="level2">
+<h2 class="anchored" data-anchor-id="k-means-聚类算法">2. K-Means 聚类算法</h2>
+<p>K-Means 是最简单、最常用的聚类算法之一。它的目标是将数据集划分为 <strong>K</strong> 个预先指定的簇。</p>
+<section id="算法原理与步骤-直观理解" class="level3">
+<h3 class="anchored" data-anchor-id="算法原理与步骤-直观理解">2.1 算法原理与步骤 (直观理解)</h3>
+<p>K-Means 的工作流程非常直观：</p>
+<ol type="1">
+<li><strong>指定 K 值:</strong> 首先，你需要<strong>人为指定</strong>你想要将数据分成多少个簇 (K)。</li>
+<li><strong>随机初始化质心 (Centroids):</strong> 随机选择 K 个数据点作为初始的<strong>簇质心</strong>（每个簇的中心点）。</li>
+<li><strong>分配样本 (Assignment Step):</strong> 对于数据集中的每一个样本点，计算它到 <strong>K 个质心</strong> 的距离（通常是欧氏距离），并将该样本点分配给<strong>距离最近</strong>的那个质心所代表的簇。</li>
+<li><strong>更新质心 (Update Step):</strong> 对于每一个簇，重新计算其<strong>所有成员样本点的平均值</strong>，将这个平均值作为该簇<strong>新的质心</strong>。</li>
+<li><strong>迭代:</strong> 重复步骤 3 和步骤 4，直到满足停止条件：
+<ul>
+<li>质心不再发生明显变化（或变化小于某个阈值）。</li>
+<li>样本点所属的簇不再发生变化。</li>
+<li>达到最大迭代次数。</li>
+</ul></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/K-means_convergence.gif/300px-K-means_convergence.gif" class="img-fluid figure-img" alt="K-Means Convergence Steps"></p>
+<figcaption>K-Means Steps</figcaption>
+</figure>
+</div>
+</section>
+<section id="使用-scikit-learn-实现" class="level3">
+<h3 class="anchored" data-anchor-id="使用-scikit-learn-实现">2.2 使用 Scikit-learn 实现</h3>
+<p>Scikit-learn 提供了 <code>KMeans</code> 类。</p>
+<div class="callout callout-style-default callout-warning callout-titled" title="特征缩放的重要性">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+特征缩放的重要性
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>K-Means 算法基于距离计算。如果特征的尺度（范围）差异很大，尺度较大的特征会对距离计算产生不成比例的影响。因此，在运行 K-Means 之前，<strong>强烈建议对数据进行特征缩放</strong>（例如使用 <code>StandardScaler</code> 或 <code>MinMaxScaler</code>）。</p>
+</div>
+</div>
+<div id="e38962d3" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs <span class="co"># 用于生成聚类测试数据</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 准备数据 (示例：生成一些聚类数据) ---</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># n_samples: 样本总数</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># centers: 簇中心的数量或具体坐标</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster_std: 每个簇的标准差 (控制簇的分散程度)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># random_state: 保证结果可复现</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>X_blobs, y_blobs_true <span class="op">=</span> make_blobs(n_samples<span class="op">=</span><span class="dv">300</span>, centers<span class="op">=</span><span class="dv">4</span>, cluster_std<span class="op">=</span><span class="fl">0.8</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 可视化生成的数据</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.scatter(X_blobs[:, 0], X_blobs[:, 1], s=50) # s 控制点的大小</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.title("Generated Blobs Data")</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.xlabel("Feature 1")</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.ylabel("Feature 2")</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 特征缩放 ---</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>X_scaled <span class="op">=</span> scaler.fit_transform(X_blobs)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 训练 K-Means 模型 ---</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. 创建模型实例</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># n_clusters: 指定 K 值 (簇的数量)</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># init: 初始化质心的方法，常用 'k-means++' (更智能的初始化，有助于收敛) 或 'random'</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># n_init: 运行 K-Means 算法的次数 (使用不同的随机质心)，最终选择最优结果。'auto' 通常基于 init 方法选择。</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># max_iter: 单次运行的最大迭代次数</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># random_state: 保证结果可复现</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span><span class="dv">4</span>, init<span class="op">=</span><span class="st">'k-means++'</span>, n_init<span class="op">=</span><span class="st">'auto'</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. 拟合模型 (无监督学习，只需要 X)</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>kmeans.fit(X_scaled)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 获取聚类结果 ---</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co"># 获取每个样本所属的簇标签 (0 到 K-1)</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>cluster_labels <span class="op">=</span> kmeans.labels_</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"样本的聚类标签 (前 20 个):"</span>, cluster_labels[:<span class="dv">20</span>])</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="co"># 获取最终的簇质心坐标 (在缩放后的空间中)</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>centroids <span class="op">=</span> kmeans.cluster_centers_</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">最终的簇质心坐标:</span><span class="ch">\n</span><span class="st">"</span>, centroids)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="co"># (可选) 获取模型的目标函数值 (inertia_)：所有样本点到其所属质心距离的平方和</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>inertia <span class="op">=</span> kmeans.inertia_</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">模型的 Inertia 值: </span><span class="sc">{</span>inertia<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 可视化聚类结果 ---</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="co"># 根据聚类标签绘制散点图，不同簇使用不同颜色 (c=cluster_labels)</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>plt.scatter(X_scaled[:, <span class="dv">0</span>], X_scaled[:, <span class="dv">1</span>], c<span class="op">=</span>cluster_labels, s<span class="op">=</span><span class="dv">50</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制簇质心</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>plt.scatter(centroids[:, <span class="dv">0</span>], centroids[:, <span class="dv">1</span>], c<span class="op">=</span><span class="st">'red'</span>, s<span class="op">=</span><span class="dv">200</span>, alpha<span class="op">=</span><span class="fl">0.75</span>, marker<span class="op">=</span><span class="st">'X'</span>, label<span class="op">=</span><span class="st">'Centroids'</span>)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"K-Means Clustering Results (K=4)"</span>)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Scaled Feature 1"</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Scaled Feature 2"</span>)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>样本的聚类标签 (前 20 个): [3 3 0 1 3 1 2 1 0 2 0 2 0 0 3 0 3 2 0 0]
+
+最终的簇质心坐标:
+ [[ 0.14591084  0.99015106]
+ [-0.65576768 -1.56289287]
+ [ 1.54533333 -0.13223908]
+ [-1.03547649  0.70498088]]
+
+模型的 Inertia 值: 11.3170</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week7_lecture_files/figure-html/cell-2-output-2.png" width="677" height="523" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="如何选择-k-值" class="level3">
+<h3 class="anchored" data-anchor-id="如何选择-k-值">2.3 如何选择 K 值？</h3>
+<p>K-Means 的一个关键问题是如何确定最佳的簇数量 K。没有绝对完美的方法，但常用的启发式方法有：</p>
+<section id="肘部法则-elbow-method" class="level4">
+<h4 class="anchored" data-anchor-id="肘部法则-elbow-method">2.3.1 肘部法则 (Elbow Method)</h4>
+<ol type="1">
+<li>尝试不同的 K 值（例如从 1 到 10）。</li>
+<li>对于每个 K 值，运行 K-Means 算法，并计算<strong>簇内平方和 (Within-Cluster Sum of Squares, WCSS)</strong>，也称为 <strong>Inertia</strong> (<code>kmeans.inertia_</code>)。Inertia 衡量了簇内样本的紧凑程度，值越小表示簇内样本越相似。</li>
+<li>绘制 K 值与对应的 Inertia 值的关系图。</li>
+<li>观察曲线：随着 K 值的增加，Inertia 通常会逐渐减小。寻找曲线下降速率<strong>由陡峭变平缓</strong>的那个点，形状像一个“肘部 (Elbow)”。这个“肘部”对应的 K 值通常被认为是比较合适的 K 值。</li>
+</ol>
+<p><strong>原理:</strong> 当 K 小于真实簇数时，增加 K 会显著提高簇内紧密度，Inertia 大幅下降；当 K 超过真实簇数时，再增加 K 对 Inertia 的改善效果会变得不明显。</p>
+<div id="ac1a783e" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 肘部法则 ---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>inertia_values <span class="op">=</span> []</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>k_range <span class="op">=</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>) <span class="co"># 尝试 K 从 1 到 10</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> k_range:</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    kmeans_elbow <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, init<span class="op">=</span><span class="st">'k-means++'</span>, n_init<span class="op">=</span><span class="st">'auto'</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    kmeans_elbow.fit(X_scaled)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    inertia_values.append(kmeans_elbow.inertia_)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制肘部图</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.plot(k_range, inertia_values, marker<span class="op">=</span><span class="st">'o'</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Elbow Method for Optimal K'</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of Clusters (K)'</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Inertia (WCSS)'</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>plt.xticks(k_range)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week7_lecture_files/figure-html/cell-3-output-1.png" width="667" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>解读:</strong> 在上面的示例数据中，肘部通常出现在 K=4 的位置。</p>
+</section>
+<section id="轮廓系数-silhouette-score" class="level4">
+<h4 class="anchored" data-anchor-id="轮廓系数-silhouette-score">2.3.2 轮廓系数 (Silhouette Score)</h4>
+<p>轮廓系数衡量一个样本与其自身簇的紧密度（内聚度）以及与其他簇的分离度。</p>
+<ol type="1">
+<li>对于样本 <code>i</code>：
+<ul>
+<li>计算它与<strong>同簇</strong>中所有其他点的平均距离 <code>a(i)</code>（簇内不相似度）。</li>
+<li>计算它与<strong>最近的其他簇</strong>中所有点的平均距离 <code>b(i)</code>（簇间不相似度）。</li>
+</ul></li>
+<li>样本 <code>i</code> 的轮廓系数 <code>s(i) = (b(i) - a(i)) / max(a(i), b(i))</code>。</li>
+<li>整个数据集的轮廓系数是所有样本 <code>s(i)</code> 的<strong>平均值</strong>。</li>
+</ol>
+<p><strong>取值范围:</strong> -1 到 1。</p>
+<ul>
+<li><strong>接近 1:</strong> 表示样本远离相邻簇，聚类效果好。</li>
+<li><strong>接近 0:</strong> 表示样本在两个簇的边界上。</li>
+<li><strong>接近 -1:</strong> 表示样本可能被分到了错误的簇。</li>
+</ul>
+<p><strong>使用方法:</strong> 计算不同 K 值对应的平均轮廓系数，选择使得<strong>平均轮廓系数最大</strong>的 K 值。</p>
+<div id="4d302e08" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 轮廓系数 ---</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>silhouette_scores <span class="op">=</span> []</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># K=1 时无法计算轮廓系数，所以从 K=2 开始</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>k_range_silhouette <span class="op">=</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">11</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> k_range_silhouette:</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    kmeans_sil <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, init<span class="op">=</span><span class="st">'k-means++'</span>, n_init<span class="op">=</span><span class="st">'auto'</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    kmeans_sil.fit(X_scaled)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> kmeans_sil.labels_</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 计算该 K 值下的平均轮廓系数</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    score <span class="op">=</span> silhouette_score(X_scaled, labels)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    silhouette_scores.append(score)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"K=</span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">, Silhouette Score: </span><span class="sc">{</span>score<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 绘制轮廓系数图</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>plt.plot(k_range_silhouette, silhouette_scores, marker<span class="op">=</span><span class="st">'o'</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Silhouette Score for Optimal K'</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of Clusters (K)'</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Average Silhouette Score'</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>plt.xticks(k_range_silhouette)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K=2, Silhouette Score: 0.5700
+K=3, Silhouette Score: 0.7642
+K=4, Silhouette Score: 0.8386
+K=5, Silhouette Score: 0.7089
+K=6, Silhouette Score: 0.5767
+K=7, Silhouette Score: 0.4564
+K=8, Silhouette Score: 0.4650
+K=9, Silhouette Score: 0.3510
+K=10, Silhouette Score: 0.3533</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week7_lecture_files/figure-html/cell-4-output-2.png" width="663" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>解读:</strong> 选择轮廓系数最高的 K 值（在示例中通常是 K=4）。</p>
+<div class="callout callout-style-default callout-note callout-titled" title="K 值选择的建议">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+K 值选择的建议
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>肘部法则比较直观，但有时“肘部”不明显。</li>
+<li>轮廓系数提供了更量化的指标，但计算成本稍高。</li>
+<li>通常建议结合这两种方法，并<strong>结合业务理解</strong>来最终确定 K 值。例如，即使 K=5 的轮廓系数略高于 K=4，但如果 K=4 的聚类结果在业务上更有意义、更容易解释，也可能选择 K=4。</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="k-means-的优缺点" class="level3">
+<h3 class="anchored" data-anchor-id="k-means-的优缺点">2.4 K-Means 的优缺点</h3>
+<ul>
+<li><strong>优点:</strong>
+<ul>
+<li><strong>简单高效:</strong> 算法原理简单，计算速度快，尤其对于大数据集。</li>
+<li><strong>易于理解和实现。</strong></li>
+<li><strong>效果尚可:</strong> 在许多情况下能得到合理的聚类结果，特别是当簇是凸形且大小相似时。</li>
+</ul></li>
+<li><strong>缺点:</strong>
+<ul>
+<li><strong>需要预先指定 K 值:</strong> K 值的选择对结果影响很大，且选择不当可能导致效果不佳。</li>
+<li><strong>对初始质心敏感:</strong> 不同的初始质心可能导致不同的聚类结果（使用 <code>k-means++</code> 初始化可以缓解）。</li>
+<li><strong>对异常值敏感:</strong> 异常值可能严重影响质心的计算。</li>
+<li><strong>倾向于发现球状簇:</strong> 对于非球状、形状不规则或大小差异很大的簇，效果可能不好。</li>
+<li><strong>基于距离:</strong> 需要对数据进行特征缩放。</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="小组项目三-阶段一用户分群模型构建" class="level2">
+<h2 class="anchored" data-anchor-id="小组项目三-阶段一用户分群模型构建">3. 小组项目三 (阶段一)：用户分群模型构建</h2>
+<p>现在，我们将运用 K-Means 来探索用户数据，尝试将用户划分为不同的群体。</p>
+<ul>
+<li><strong>主题:</strong> 用户分群模型构建</li>
+<li><strong>目标:</strong> 掌握使用 K-Means 进行聚类的流程，理解 K 值选择方法，并为后续的用户画像分析打下基础。</li>
+<li><strong>数据集:</strong> (老师提供或推荐，例如包含用户基本信息、消费行为、浏览记录等的用户数据集)</li>
+<li><strong>任务 (阶段一):</strong>
+<ol type="1">
+<li><strong>数据加载与探索 (EDA):</strong>
+<ul>
+<li>加载用户数据集。</li>
+<li>理解特征含义，识别可能用于聚类的特征（例如：年龄、收入、消费频率、最近消费时间、平均订单金额、浏览时长等）。</li>
+<li>进行初步的数据探索和可视化。</li>
+</ul></li>
+<li><strong>数据预处理:</strong>
+<ul>
+<li>选择用于聚类的特征子集。</li>
+<li>处理缺失值。</li>
+<li>处理类别特征（如果需要）。</li>
+<li><strong>(关键!) 对选定的数值特征进行特征缩放 (StandardScaler)</strong>。</li>
+</ul></li>
+<li><strong>K-Means 聚类与 K 值选择:</strong>
+<ul>
+<li>使用<strong>肘部法则</strong>，绘制 Inertia 随 K 值变化的曲线，初步判断可能的 K 值范围。</li>
+<li>使用<strong>轮廓系数</strong>，计算不同 K 值对应的平均轮廓系数，找到最优的 K 值。</li>
+<li>结合两种方法和业务理解，确定最终的 K 值。</li>
+</ul></li>
+<li><strong>执行最终聚类:</strong> 使用确定的 K 值，运行 K-Means 算法，得到每个用户的聚类标签。</li>
+</ol></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled" title="AI 辅助项目实践">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+AI 辅助项目实践
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“如何使用 Pandas 选择 DataFrame 中用于聚类的特定列？”</li>
+<li>“帮我生成 Python 代码，使用 StandardScaler 对 DataFrame ‘user_features’ 进行缩放。”</li>
+<li>“解释 K-Means 的 <code>inertia_</code> 属性代表什么？”</li>
+<li>“如何解读轮廓系数图来选择最佳 K 值？”</li>
+<li>“给我一些关于用户分群常见特征的建议。”</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="本周总结" class="level2">
+<h2 class="anchored" data-anchor-id="本周总结">4. 本周总结</h2>
+<p>本周我们开启了无监督学习的大门，重点学习了经典的 K-Means 聚类算法。我们理解了其工作原理、实现步骤，并掌握了如何使用肘部法则和轮廓系数来选择合适的簇数量 K。我们还强调了特征缩放在 K-Means 中的重要性，并启动了第三个实践项目——用户分群。</p>
+<p><strong>下周我们将学习更多关于聚类评估和可视化的方法，并介绍另一种聚类算法 DBSCAN。</strong></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./week6_lecture.html" class="pagination-link" aria-label="第六周：回归算法进阶 - XGBoost 与模型优化">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第六周：回归算法进阶 - XGBoost 与模型优化</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./week8_lecture.html" class="pagination-link" aria-label="第八周：深入聚类 - DBSCAN 与业务解读">
+        <span class="nav-page-text"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
