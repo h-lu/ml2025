@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>第九周：模型评估深化与不平衡数据处理 – 机器学习Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./week1_exercise.html" rel="next">
+<link href="./week8_lecture.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles/custom.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week9_lecture.html"><span class="chapter-title">第九周：模型评估深化与不平衡数据处理</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">机器学习Python</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">讲义</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：数据处理利器 Numpy &amp; Pandas 与项目启动</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：分类算法初探 - 逻辑回归与支持向量机</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：决策树与随机森林 - 模型优化初探</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：回归算法启程 - 线性回归与多项式回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：回归算法进阶 - XGBoost 与模型优化</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：无监督学习初探 - K-Means 聚类</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week9_lecture.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第九周：模型评估深化与不平衡数据处理</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">实验</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week1_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第一周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week2_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第二周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week3_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第三周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week4_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第四周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week5_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第五周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week6_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第六周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week7_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第七周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week8_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week9_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第九周：课堂练习与实验</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">项目</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project1_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目一：电商用户行为分析与购买预测</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project2_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目二：房价预测模型构建与优化</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project3_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project4_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目四：时间序列预测与业务应用</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./final_project_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">小组综合项目：机器学习技术融合应用</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#模型评估深化" id="toc-模型评估深化" class="nav-link active" data-scroll-target="#模型评估深化">1. 模型评估深化</a>
+  <ul class="collapse">
+  <li><a href="#精确率-召回率曲线-precision-recall-curve-p-r-curve" id="toc-精确率-召回率曲线-precision-recall-curve-p-r-curve" class="nav-link" data-scroll-target="#精确率-召回率曲线-precision-recall-curve-p-r-curve">1.1 精确率-召回率曲线 (Precision-Recall Curve, P-R Curve)</a></li>
+  <li><a href="#交叉验证策略深化" id="toc-交叉验证策略深化" class="nav-link" data-scroll-target="#交叉验证策略深化">1.2 交叉验证策略深化</a></li>
+  <li><a href="#多分类评估指标" id="toc-多分类评估指标" class="nav-link" data-scroll-target="#多分类评估指标">1.3 多分类评估指标</a></li>
+  </ul></li>
+  <li><a href="#处理不平衡数据-handling-imbalanced-data" id="toc-处理不平衡数据-handling-imbalanced-data" class="nav-link" data-scroll-target="#处理不平衡数据-handling-imbalanced-data">2. 处理不平衡数据 (Handling Imbalanced Data)</a>
+  <ul class="collapse">
+  <li><a href="#处理策略" id="toc-处理策略" class="nav-link" data-scroll-target="#处理策略">2.1 处理策略</a></li>
+  <li><a href="#如何选择策略" id="toc-如何选择策略" class="nav-link" data-scroll-target="#如何选择策略">2.2 如何选择策略？</a></li>
+  </ul></li>
+  <li><a href="#实践与讨论" id="toc-实践与讨论" class="nav-link" data-scroll-target="#实践与讨论">3. 实践与讨论</a></li>
+  <li><a href="#本周总结" id="toc-本周总结" class="nav-link" data-scroll-target="#本周总结">4. 本周总结</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./week1_lecture.html">讲义</a></li><li class="breadcrumb-item"><a href="./week9_lecture.html"><span class="chapter-title">第九周：模型评估深化与不平衡数据处理</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">第九周：模型评估深化与不平衡数据处理</span></h1>
+<p class="subtitle lead">掌握高级评估技巧，攻克数据不平衡难题</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>前几周我们学习了多种分类和回归算法，并掌握了基本的模型评估方法。然而，在实际应用中，我们常常会遇到更复杂的情况，例如数据类别分布极不均衡，或者需要更精细地评估模型在特定方面的表现。本周，我们将深入探讨<strong>模型评估</strong>的技巧，学习 <strong>P-R 曲线</strong>、<strong>交叉验证策略</strong>以及<strong>多分类评估</strong>方法。同时，我们将重点关注一个常见且棘手的挑战——<strong>处理不平衡数据 (Imbalanced Data)</strong>，学习常用的应对策略，如 <strong>SMOTE 过采样</strong>和<strong>代价敏感学习</strong>。</p>
+<div class="callout-success" title="项目三提交提醒">
+<p>请确保你已经按时提交了项目三（用户分群）的最终 Notebook 和报告。</p>
+</div>
+<section id="模型评估深化" class="level2">
+<h2 class="anchored" data-anchor-id="模型评估深化">1. 模型评估深化</h2>
+<p>简单地依赖准确率 (Accuracy) 来评估分类模型，尤其是在类别不平衡的情况下，可能会产生误导。我们需要更细致、更有针对性的评估工具。</p>
+<section id="精确率-召回率曲线-precision-recall-curve-p-r-curve" class="level3">
+<h3 class="anchored" data-anchor-id="精确率-召回率曲线-precision-recall-curve-p-r-curve">1.1 精确率-召回率曲线 (Precision-Recall Curve, P-R Curve)</h3>
+<p>我们在第三周学习了 ROC 曲线和 AUC 值，它们是评估二分类模型性能的常用工具。但在某些场景下，特别是当<strong>我们更关注正类别（少数类）的识别性能</strong>，且<strong>数据严重不平衡</strong>时，P-R 曲线通常能提供更有价值的信息。</p>
+<div class="callout callout-style-default callout-note callout-titled" title="P-R 曲线与不平衡数据">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+P-R 曲线与不平衡数据
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>当负样本（多数类）数量远大于正样本（少数类）时，即使模型将大量负样本错误地预测为正样本（高 FP），FPR (FP / (FP + TN)) 的值也可能很低，导致 ROC 曲线看起来很好。而 P-R 曲线中的精确率 (TP / (TP + FP)) 对 FP 更敏感，能更真实地反映模型在识别少数类时的查准能力。</p>
+</div>
+</div>
+<ul>
+<li><strong>回顾:</strong>
+<ul>
+<li><strong>精确率 (Precision):</strong> TP / (TP + FP) - 预测为正的样本中有多少是真的正。</li>
+<li><strong>召回率 (Recall):</strong> TP / (TP + FN) - 真实为正的样本中有多少被预测出来了。</li>
+</ul></li>
+<li><strong>P-R 曲线:</strong>
+<ul>
+<li><strong>横坐标:</strong> 召回率 (Recall)</li>
+<li><strong>纵坐标:</strong> 精确率 (Precision)</li>
+<li>曲线描绘了在<strong>不同分类阈值</strong>下，精确率与召回率的关系。</li>
+</ul></li>
+<li><strong>解读:</strong>
+<ul>
+<li>理想的模型是精确率和召回率都尽可能高，即曲线尽量靠近右上角 (1, 1)。</li>
+<li>曲线下的面积 (Area Under the P-R Curve, <strong>AUC-PR</strong> 或 <strong>AP - Average Precision</strong>) 可以作为 P-R 曲线的整体性能度量，值越接近 1 越好。</li>
+<li>相比 ROC 曲线，P-R 曲线对正类别（少数类）的性能变化更敏感。如果模型在识别少数类方面表现不佳，P-R 曲线会更明显地反映出来。</li>
+</ul></li>
+</ul>
+<div id="8f9abb9a" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> precision_recall_curve, average_precision_score</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_classification <span class="co"># 生成不平衡数据</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter <span class="co"># 后面会用到</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 生成不平衡的示例数据 ---</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># n_samples=1000: 生成1000个样本</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># n_features=10: 每个样本有10个特征</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># n_informative=2: 其中2个是信息特征（对分类有贡献）</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># n_redundant=0: 没有冗余特征（线性组合的信息特征）</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># n_repeated=0: 没有重复特征</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># n_classes=2: 二分类问题</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># n_clusters_per_class=1: 每个类别只有一个簇</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># weights=[0.9, 0.1]: 类别分布为90%负类，10%正类（不平衡数据）</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># flip_y=0.01: 随机噪声，1%的标签会被翻转</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># class_sep=1.0: 类别之间的分离程度，值越大类别越容易区分</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># random_state=42: 随机种子，确保结果可复现</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>X_imb, y_imb <span class="op">=</span> make_classification(n_samples<span class="op">=</span><span class="dv">1000</span>, n_features<span class="op">=</span><span class="dv">10</span>, n_informative<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>                               n_redundant<span class="op">=</span><span class="dv">0</span>, n_repeated<span class="op">=</span><span class="dv">0</span>, n_classes<span class="op">=</span><span class="dv">2</span>, n_clusters_per_class<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>                               weights<span class="op">=</span>[<span class="fl">0.9</span>, <span class="fl">0.1</span>], flip_y<span class="op">=</span><span class="fl">0.01</span>, class_sep<span class="op">=</span><span class="fl">1.0</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 数据预处理和划分 ---</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>X_imb_scaled <span class="op">=</span> scaler.fit_transform(X_imb)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 stratify=y_imb 参数确保训练集和测试集中类别比例与原始数据集一致</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 这对于不平衡数据集尤为重要，可以避免某个类别在划分后比例失调</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>X_train_imb, X_test_imb, y_train_imb, y_test_imb <span class="op">=</span> train_test_split(</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    X_imb_scaled, y_imb, test_size<span class="op">=</span><span class="fl">0.3</span>, random_state<span class="op">=</span><span class="dv">42</span>, stratify<span class="op">=</span>y_imb</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 训练一个模型 (例如逻辑回归) ---</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用适当的正则化，帮助模型在不平衡数据上有更好的泛化能力</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>lr_imb <span class="op">=</span> LogisticRegression(solver<span class="op">=</span><span class="st">'liblinear'</span>, C<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>lr_imb.fit(X_train_imb, y_train_imb)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>y_pred_proba_imb <span class="op">=</span> lr_imb.predict_proba(X_test_imb)[:, <span class="dv">1</span>] <span class="co"># 获取正类的预测概率</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 计算并绘制 P-R 曲线 ---</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>precision, recall, thresholds <span class="op">=</span> precision_recall_curve(y_test_imb, y_pred_proba_imb)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>ap_score <span class="op">=</span> average_precision_score(y_test_imb, y_pred_proba_imb)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>plt.plot(recall, precision, marker<span class="op">=</span><span class="st">'.'</span>, label<span class="op">=</span><span class="ss">f'Logistic Regression (AP = </span><span class="sc">{</span>ap_score<span class="sc">:.2f}</span><span class="ss">)'</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="co"># 找到最接近左上角的阈值点 (可选)</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co"># f1_scores = 2 * (precision * recall) / (precision + recall + 1e-9) # 避免除以0</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="co"># best_threshold_idx = np.argmax(f1_scores)</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.plot(recall[best_threshold_idx], precision[best_threshold_idx], 'ro', markersize=8, label='Best Threshold (Max F1)')</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Recall'</span>)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precision'</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Precision-Recall Curve'</span>)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Average Precision (AP) Score: </span><span class="sc">{</span>ap_score<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Average Precision (AP) Score: 0.9540</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week9_lecture_files/figure-html/cell-2-output-2.png" width="663" height="523" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="理解 `make_classification`">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+理解 <code>make_classification</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>make_classification</code> 是生成模拟分类数据的强大工具。通过调整 <code>weights</code> 参数可以轻松创建不平衡数据集，<code>class_sep</code> 控制类别区分度，<code>flip_y</code> 引入噪声，有助于测试模型在不同数据特性下的鲁棒性。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="预测概率的重要性">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+预测概率的重要性
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>P-R 曲线和 ROC 曲线都需要模型输出属于正类的概率（<code>predict_proba</code> 返回的第二列），而不是直接的类别预测（<code>predict</code>）。这是因为曲线是通过改变分类阈值来绘制的，而阈值是作用在概率上的。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="ROC vs. P-R">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+ROC vs.&nbsp;P-R
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>ROC 曲线:</strong> 对类别分布不敏感，能较好地反映模型整体区分正负类的能力。当正负样本数量接近，或两者都重要时常用。ROC 曲线以假正率（False Positive Rate, FPR）为横轴，真正率（True Positive Rate, TPR，即召回率）为纵轴绘制。与P-R曲线不同，ROC曲线同时考虑了正类和负类的表现，而P-R曲线则更专注于正类的精确率和召回率。</li>
+<li><strong>P-R 曲线:</strong> 对少数类的性能更敏感。当数据严重不平衡，且你更关心少数类（正类）的精确率和召回率时，P-R 曲线通常更有用（例如欺诈检测、罕见病诊断）。P-R 曲线以召回率为横轴，精确率为纵轴绘制。</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="交叉验证策略深化" class="level3">
+<h3 class="anchored" data-anchor-id="交叉验证策略深化">1.2 交叉验证策略深化</h3>
+<p>我们在第四周学习了 K 折交叉验证。对于特定问题，还有更合适的 CV 策略：</p>
+<ul>
+<li><strong>分层 K 折交叉验证 (Stratified K-Fold):</strong>
+<ul>
+<li><strong>适用场景:</strong> 分类问题，特别是<strong>类别不平衡</strong>的数据。</li>
+<li><strong>原理:</strong> 在划分 K 个折时，确保每个折中的<strong>类别比例</strong>与原始训练数据集中的类别比例大致相同。</li>
+<li><strong>优点:</strong> 保证了每个验证集都能代表整体数据的类别分布，评估结果更可靠。</li>
+<li><strong>实现:</strong> <code>sklearn.model_selection.StratifiedKFold</code>。<code>cross_val_score</code> 在处理分类问题时通常默认使用它。</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-important callout-titled" title="分层抽样的必要性">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+分层抽样的必要性
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>在处理不平衡数据时，使用普通 K-Fold 可能导致某些折中几乎没有少数类样本，使得该折的评估结果失去意义。分层 K-Fold 确保了每个折都能反映原始数据的类别分布，是处理不平衡分类问题交叉验证的标准做法。</p>
+</div>
+</div>
+<ul>
+<li><strong>(概念) 嵌套交叉验证 (Nested Cross-Validation):</strong>
+<ul>
+<li><strong>适用场景:</strong> 当你需要同时进行<strong>超参数调优</strong>和<strong>模型性能评估</strong>时，为了避免信息泄露（即用测试集信息来选择超参数），需要使用嵌套 CV。</li>
+<li><strong>原理:</strong>
+<ul>
+<li><strong>外层循环 (Outer Loop):</strong> 将数据划分为 K 个折，用于最终的模型评估。每次迭代用 K-1 折作为外层训练集，1 折作为外层测试集。</li>
+<li><strong>内层循环 (Inner Loop):</strong> 在<strong>外层训练集</strong>上执行超参数调优（例如使用 GridSearchCV 或 RandomizedSearchCV，它们内部也包含交叉验证）。找到最优超参数后，用这些参数在外层训练集上训练模型。</li>
+<li><strong>评估:</strong> 用训练好的模型在外层测试集上进行评估。</li>
+<li>重复外层循环 K 次，最终评估结果是 K 次外层测试集评估结果的平均值。</li>
+</ul></li>
+<li><strong>优点:</strong> 提供了对模型泛化能力<strong>更无偏</strong>的估计，因为它严格分开了超参数选择和最终评估所用的数据。</li>
+<li><strong>缺点:</strong> 计算成本非常高。</li>
+<li><strong>实现:</strong> 通常需要手动编写嵌套循环，结合 <code>GridSearchCV</code>/<code>RandomizedSearchCV</code> 和 <code>cross_val_score</code> 或 <code>StratifiedKFold</code>。</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-warning callout-titled" title="嵌套交叉验证与信息泄露">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+嵌套交叉验证与信息泄露
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>如果在整个数据集上进行超参数调优（如 GridSearchCV），然后用 K-Fold 评估选定超参数的模型，那么测试集的信息实际上已经间接参与了超参数的选择过程，导致评估结果过于乐观。嵌套交叉验证通过内外两层循环严格分离了调优和评估数据，避免了这种信息泄露。</p>
+</div>
+</div>
+</section>
+<section id="多分类评估指标" class="level3">
+<h3 class="anchored" data-anchor-id="多分类评估指标">1.3 多分类评估指标</h3>
+<p>对于有三个或更多类别的问题，精确率、召回率和 F1 分数需要考虑如何对每个类别进行平均：</p>
+<ul>
+<li><strong>宏平均 (Macro Average):</strong>
+<ul>
+<li><strong>计算方式:</strong> <strong>独立计算每个类别</strong>的指标（Precision, Recall, F1），然后取<strong>算术平均值</strong>（不考虑每个类别的样本数量）。</li>
+<li><strong>特点:</strong> 平等对待所有类别。如果少数类别的性能很重要，宏平均是重要的参考指标。</li>
+</ul></li>
+<li><strong>微平均 (Micro Average):</strong>
+<ul>
+<li><strong>计算方式:</strong> 将所有类别的 TP, FP, FN <strong>汇总</strong>起来，然后基于这些汇总值计算<strong>全局</strong>的指标。</li>
+<li><strong>特点:</strong> 考虑了每个样本的贡献。在多分类中，Micro-Precision = Micro-Recall = Micro-F1 = Accuracy。</li>
+</ul></li>
+<li><strong>加权平均 (Weighted Average):</strong>
+<ul>
+<li><strong>计算方式:</strong> 独立计算每个类别的指标，然后根据每个类别的<strong>样本数量（支持度 Support）进行加权平均</strong>。</li>
+<li><strong>特点:</strong> 考虑了类别不平衡。样本多的类别对最终指标的贡献更大。</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled" title="如何选择平均策略？">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+如何选择平均策略？
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>宏平均 (Macro):</strong> 当你平等关心所有类别的性能时使用，即使是小类别。</li>
+<li><strong>微平均 (Micro):</strong> 当你关心整体的分类准确性时使用（在多分类中等于 Accuracy）。</li>
+<li><strong>加权平均 (Weighted):</strong> 当你想考虑类别不平衡，让样本多的类别有更大影响时使用。</li>
+</ul>
+</div>
+</div>
+<p><code>sklearn.metrics.classification_report</code> 会同时报告这三种平均值。</p>
+<div id="89ef73bd" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_classification</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 生成多分类数据 ---</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>X_multi, y_multi <span class="op">=</span> make_classification(n_samples<span class="op">=</span><span class="dv">1000</span>, n_features<span class="op">=</span><span class="dv">20</span>, n_informative<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                                       n_redundant<span class="op">=</span><span class="dv">0</span>, n_classes<span class="op">=</span><span class="dv">3</span>, <span class="co"># 指定 3 个类别</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                                       n_clusters_per_class<span class="op">=</span><span class="dv">1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 划分数据 ---</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>X_train_multi, X_test_multi, y_train_multi, y_test_multi <span class="op">=</span> train_test_split(</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    X_multi, y_multi, test_size<span class="op">=</span><span class="fl">0.3</span>, random_state<span class="op">=</span><span class="dv">42</span>, stratify<span class="op">=</span>y_multi</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 训练多分类模型 (例如 SVM) ---</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>svm_multi <span class="op">=</span> SVC(decision_function_shape<span class="op">=</span><span class="st">'ovr'</span>, random_state<span class="op">=</span><span class="dv">42</span>) <span class="co"># 'ovr': One-vs-Rest 策略</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>svm_multi.fit(X_train_multi, y_train_multi)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>y_pred_multi <span class="op">=</span> svm_multi.predict(X_test_multi)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 查看分类报告 (包含 Macro/Weighted Avg) ---</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>report_multi <span class="op">=</span> classification_report(y_test_multi, y_pred_multi, target_names<span class="op">=</span>[<span class="st">'Class 0'</span>, <span class="st">'Class 1'</span>, <span class="st">'Class 2'</span>])</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"多分类报告:</span><span class="ch">\n</span><span class="st">"</span>, report_multi)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 注意报告中 accuracy 行的值等于 micro avg f1-score</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>多分类报告:
+               precision    recall  f1-score   support
+
+     Class 0       0.94      1.00      0.97       101
+     Class 1       0.99      0.93      0.96       100
+     Class 2       0.97      0.97      0.97        99
+
+    accuracy                           0.97       300
+   macro avg       0.97      0.97      0.97       300
+weighted avg       0.97      0.97      0.97       300
+</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="AI 辅助理解高级评估">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+AI 辅助理解高级评估
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“在什么情况下 P-R 曲线比 ROC 曲线更有用？请举例说明。”</li>
+<li>“解释 Stratified K-Fold 相比普通 K-Fold 的优势。”</li>
+<li>“嵌套交叉验证的主要目的是什么？为什么它能提供更无偏的评估？”</li>
+<li>“在多分类任务中，宏平均 F1 和加权平均 F1 分别反映了模型的哪方面性能？”</li>
+<li>“如果一个多分类模型的 Micro Avg F1 很高，但 Macro Avg F1 很低，这通常意味着什么？”</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="处理不平衡数据-handling-imbalanced-data" class="level2">
+<h2 class="anchored" data-anchor-id="处理不平衡数据-handling-imbalanced-data">2. 处理不平衡数据 (Handling Imbalanced Data)</h2>
+<p><strong>不平衡数据</strong>是指数据集中不同类别的样本数量差异悬殊的情况。例如，欺诈检测中，欺诈交易（少数类）远少于正常交易（多数类）；疾病诊断中，患病（少数类）样本远少于健康（多数类）样本。</p>
+<p><strong>挑战:</strong> 大多数标准机器学习算法的目标是最大化整体准确率，这会导致模型倾向于<strong>偏向多数类</strong>，而<strong>忽略少数类</strong>。模型可能在多数类上表现很好，但在我们通常更关心的少数类上表现很差，导致整体准确率看似很高，但实际应用价值低。</p>
+<section id="处理策略" class="level3">
+<h3 class="anchored" data-anchor-id="处理策略">2.1 处理策略</h3>
+<p>主要有两大类策略：数据层面和算法层面。</p>
+<section id="数据层面方法" class="level4">
+<h4 class="anchored" data-anchor-id="数据层面方法">2.1.1 数据层面方法</h4>
+<p>通过调整训练数据的类别分布来解决不平衡问题。</p>
+<ul>
+<li><strong>欠采样 (Undersampling):</strong>
+<ul>
+<li><strong>方法:</strong> 随机地<strong>删除</strong>多数类样本，使得多数类和少数类的数量接近。</li>
+<li><strong>优点:</strong> 可以减少训练数据量，加快训练速度。</li>
+<li><strong>缺点:</strong> 可能<strong>丢失</strong>多数类中的重要信息。</li>
+<li><strong>实现:</strong> <code>imbalanced-learn</code> 库提供了多种欠采样方法，如 <code>RandomUnderSampler</code>, <code>NearMiss</code> 等。</li>
+</ul></li>
+<li><strong>过采样 (Oversampling):</strong>
+<ul>
+<li><strong>方法:</strong> <strong>增加</strong>少数类样本的数量。</li>
+<li><strong>简单过采样:</strong> 随机复制少数类样本。缺点是可能导致模型对特定的少数类样本过拟合。</li>
+<li><strong>(重点) SMOTE (Synthetic Minority Over-sampling Technique):</strong>
+<ul>
+<li><strong>原理:</strong> 不是简单复制，而是为少数类样本<strong>合成新的、相似的样本</strong>。它找到一个少数类样本，然后从其 K 个最近邻中随机选择一个，在这两个样本之间的连线上随机生成一个新的合成样本。</li>
+<li><strong>优点:</strong> 避免了简单复制带来的过拟合风险，能提供更多样化的少数类信息。</li>
+<li><strong>缺点:</strong> 可能生成噪声样本（如果少数类样本分布分散或与其他类重叠）；对高维数据效果可能减弱。</li>
+<li><strong>实现:</strong> <code>imbalanced-learn</code> 库中的 <code>SMOTE</code> 类。</li>
+</ul></li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled" title="SMOTE 的变种">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+SMOTE 的变种
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>除了基础的 SMOTE，还有一些改进版本，如 Borderline-SMOTE（更关注边界上的少数类样本）和 ADASYN（Adaptive Synthetic Sampling，根据学习难度自适应地为不同少数类样本生成不同数量的合成样本）。这些可以在 <code>imbalanced-learn</code> 库中找到。</p>
+</div>
+</div>
+<p><strong>使用 <code>imbalanced-learn</code> (需要先安装: <code>pip install imbalanced-learn</code>)</strong></p>
+<div id="cd1dcb29" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 检查 imbalanced-learn 是否已安装，如果需要安装，取消下一行注释</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># !pip install imbalanced-learn</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> imblearn.over_sampling <span class="im">import</span> SMOTE</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter <span class="co"># 用于查看类别计数</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 使用之前生成的不平衡数据 X_train_imb, y_train_imb ---</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"原始训练集类别分布:"</span>, Counter(y_train_imb))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 应用 SMOTE ---</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># k_neighbors: 选择近邻的数量，对于少数类样本较少的情况，需要选择适当的k值</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># random_state: 保证结果可复现</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>smote <span class="op">=</span> SMOTE(k_neighbors<span class="op">=</span><span class="dv">5</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>X_train_resampled, y_train_resampled <span class="op">=</span> smote.fit_resample(X_train_imb, y_train_imb)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"SMOTE 重采样后训练集类别分布:"</span>, Counter(y_train_resampled)) <span class="co"># 类别数量应相等</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 在重采样后的数据上训练模型 ---</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用与原始模型相同的参数</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>lr_smote <span class="op">=</span> LogisticRegression(solver<span class="op">=</span><span class="st">'liblinear'</span>, C<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>lr_smote.fit(X_train_resampled, y_train_resampled)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>y_pred_smote <span class="op">=</span> lr_smote.predict(X_test_imb) <span class="co"># 评估仍在原始测试集上进行</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>y_pred_proba_smote <span class="op">=</span> lr_smote.predict_proba(X_test_imb)[:, <span class="dv">1</span>]</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 评估 SMOTE 后的模型 ---</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- SMOTE 后逻辑回归评估 ---"</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test_imb, y_pred_smote))</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算 P-R 曲线和 AP</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>precision_smote, recall_smote, _ <span class="op">=</span> precision_recall_curve(y_test_imb, y_pred_proba_smote)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>ap_score_smote <span class="op">=</span> average_precision_score(y_test_imb, y_pred_proba_smote)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"SMOTE 后 Average Precision (AP) Score: </span><span class="sc">{</span>ap_score_smote<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 绘制对比 P-R 曲线 ---</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>plt.plot(recall, precision, marker<span class="op">=</span><span class="st">'.'</span>, label<span class="op">=</span><span class="ss">f'Original LR (AP = </span><span class="sc">{</span>ap_score<span class="sc">:.2f}</span><span class="ss">)'</span>) </span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>plt.plot(recall_smote, precision_smote, marker<span class="op">=</span><span class="st">'.'</span>, label<span class="op">=</span><span class="ss">f'LR with SMOTE (AP = </span><span class="sc">{</span>ap_score_smote<span class="sc">:.2f}</span><span class="ss">)'</span>) </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Recall'</span>)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precision'</span>)</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Precision-Recall Curve Comparison'</span>)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>原始训练集类别分布: Counter({0: 626, 1: 74})
+SMOTE 重采样后训练集类别分布: Counter({0: 626, 1: 626})
+
+--- SMOTE 后逻辑回归评估 ---
+              precision    recall  f1-score   support
+
+           0       1.00      0.96      0.98       269
+           1       0.71      0.97      0.82        31
+
+    accuracy                           0.96       300
+   macro avg       0.86      0.96      0.90       300
+weighted avg       0.97      0.96      0.96       300
+
+SMOTE 后 Average Precision (AP) Score: 0.9461</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week9_lecture_files/figure-html/cell-4-output-2.png" width="663" height="523" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled" title="重采样只应用于训练集！">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+重采样只应用于训练集！
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>过采样（如 SMOTE）或欠采样应该<strong>只应用于训练数据</strong> (<code>fit_resample(X_train, y_train)</code>)。测试集必须保持原始分布，以模拟模型在真实未见数据上的表现。如果在整个数据集或测试集上进行重采样，会人为地改变评估环境，导致评估结果不可靠。</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled" title="使用 SMOTE 后 AP 一定会改善吗？">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+使用 SMOTE 后 AP 一定会改善吗？
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>不一定</strong>。虽然 SMOTE 通常能改善模型对少数类的识别能力，但 AP 是否提升取决于多个因素：
+<ul>
+<li><strong>数据分布特征:</strong> 如果少数类样本在特征空间中分布过于稀疏或离散，SMOTE 生成的合成样本可能质量不高，反而会引入噪声。</li>
+<li><strong>k 值选择:</strong> 如果 k_neighbors 参数设置不当，可能导致生成的样本偏离真实分布。</li>
+<li><strong>模型特性:</strong> 某些模型对数据分布变化更敏感，可能无法有效利用 SMOTE 生成的新样本。</li>
+<li><strong>过拟合风险:</strong> 过度使用 SMOTE 可能导致模型在训练集上表现很好，但在测试集上泛化能力下降。</li>
+</ul></li>
+<li><strong>建议:</strong> 在使用 SMOTE 后，务必通过交叉验证等方式评估模型在测试集上的表现，而不仅仅是训练集。同时，可以尝试不同的 k 值，或结合其他方法（如 class_weight=‘balanced’）来获得更好的效果。</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="算法层面方法代价敏感学习-cost-sensitive-learning" class="level4">
+<h4 class="anchored" data-anchor-id="算法层面方法代价敏感学习-cost-sensitive-learning">2.1.2 算法层面方法：代价敏感学习 (Cost-Sensitive Learning)</h4>
+<ul>
+<li><strong>方法:</strong> 在算法层面，为不同类别的<strong>误分类</strong>分配不同的<strong>代价（权重）</strong>。通常，将<strong>少数类的误分类代价设置得更高</strong>，使得模型在训练时更倾向于正确分类少数类样本。</li>
+<li><strong>实现:</strong> 许多 Scikit-learn 分类器（如 <code>LogisticRegression</code>, <code>SVC</code>, <code>DecisionTreeClassifier</code>, <code>RandomForestClassifier</code>）提供了 <code>class_weight</code> 参数。
+<ul>
+<li>设置为字典 <code>{class_label: weight}</code>，手动指定每个类别的权重。</li>
+<li>设置为 <code>'balanced'</code>，算法会自动根据样本数量反比地调整权重，即<strong>少数类获得更高的权重</strong>。这是最常用的方式。</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled" title="`class_weight='balanced'` 如何计算权重？">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<code>class_weight='balanced'</code> 如何计算权重？
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>当设置 <code>class_weight='balanced'</code> 时，每个类别的权重计算公式通常是 <code>n_samples / (n_classes * n_samples_j)</code>，其中 <code>n_samples</code> 是总样本数，<code>n_classes</code> 是类别数量，<code>n_samples_j</code> 是类别 j 的样本数。这样，样本数较少的类别会获得更高的权重。</p>
+</div>
+</div>
+<div id="79853937" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 使用 class_weight='balanced' ---</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 保持与其他模型相同的C参数</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>lr_balanced <span class="op">=</span> LogisticRegression(solver<span class="op">=</span><span class="st">'liblinear'</span>, C<span class="op">=</span><span class="fl">0.1</span>, class_weight<span class="op">=</span><span class="st">'balanced'</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>lr_balanced.fit(X_train_imb, y_train_imb) <span class="co"># 在原始不平衡数据上训练</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>y_pred_balanced <span class="op">=</span> lr_balanced.predict(X_test_imb)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>y_pred_proba_balanced <span class="op">=</span> lr_balanced.predict_proba(X_test_imb)[:, <span class="dv">1</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 评估 class_weight='balanced' 后的模型 ---</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- class_weight='balanced' 后逻辑回归评估 ---"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(classification_report(y_test_imb, y_pred_balanced))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>precision_balanced, recall_balanced, _ <span class="op">=</span> precision_recall_curve(y_test_imb, y_pred_proba_balanced)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>ap_score_balanced <span class="op">=</span> average_precision_score(y_test_imb, y_pred_proba_balanced)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"class_weight='balanced' 后 Average Precision (AP) Score: </span><span class="sc">{</span>ap_score_balanced<span class="sc">:.4f}</span><span class="ss">"</span>) </span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 绘制对比 P-R 曲线 ---</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>plt.plot(recall, precision, marker<span class="op">=</span><span class="st">'.'</span>, label<span class="op">=</span><span class="ss">f'Original LR (AP = </span><span class="sc">{</span>ap_score<span class="sc">:.2f}</span><span class="ss">)'</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>plt.plot(recall_smote, precision_smote, marker<span class="op">=</span><span class="st">'.'</span>, label<span class="op">=</span><span class="ss">f'LR with SMOTE (AP = </span><span class="sc">{</span>ap_score_smote<span class="sc">:.2f}</span><span class="ss">)'</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>plt.plot(recall_balanced, precision_balanced, marker<span class="op">=</span><span class="st">'.'</span>, label<span class="op">=</span><span class="ss">f'LR with class_weight=balanced (AP = </span><span class="sc">{</span>ap_score_balanced<span class="sc">:.2f}</span><span class="ss">)'</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Recall'</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Precision'</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Precision-Recall Curve Comparison'</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+--- class_weight='balanced' 后逻辑回归评估 ---
+              precision    recall  f1-score   support
+
+           0       1.00      0.92      0.96       269
+           1       0.58      0.97      0.72        31
+
+    accuracy                           0.92       300
+   macro avg       0.79      0.94      0.84       300
+weighted avg       0.95      0.92      0.93       300
+
+class_weight='balanced' 后 Average Precision (AP) Score: 0.9132</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="week9_lecture_files/figure-html/cell-5-output-2.png" width="663" height="523" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="观察">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+观察
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>使用 <code>class_weight='balanced'</code> 通常也能有效提高模型对少数类的识别能力（召回率），效果与 SMOTE 类似或各有优劣，计算成本通常更低。</p>
+</div>
+</div>
+</section>
+</section>
+<section id="如何选择策略" class="level3">
+<h3 class="anchored" data-anchor-id="如何选择策略">2.2 如何选择策略？</h3>
+<ul>
+<li><strong>没有绝对最优的方法</strong>，需要根据具体问题和数据进行尝试和评估。</li>
+<li><strong>优先尝试 <code>class_weight='balanced'</code></strong>，因为它实现简单，计算成本低。</li>
+<li>如果 <code>class_weight='balanced'</code> 效果不佳，可以尝试 <strong>SMOTE</strong> 或其他过采样/欠采样方法。</li>
+<li><strong>评估指标的选择至关重要:</strong> 对于不平衡数据，应重点关注 <strong>Recall, Precision, F1-Score (特别是 Macro Avg 或针对少数类的), P-R 曲线, AUC-PR</strong>，而不是 Accuracy。</li>
+<li><strong>结合业务场景:</strong> 思考哪种错误（FP 或 FN）的代价更高，选择能更好控制该类错误的策略和评估指标。</li>
+</ul>
+<div class="callout-success" title="评估是关键">
+<p>处理不平衡数据的核心在于<strong>选择正确的评估指标</strong>并<strong>结合业务需求</strong>。没有一种方法是万能的，需要不断实验、评估（使用 P-R 曲线、AUC-PR、F1 Macro 等）并理解不同策略对模型行为的影响，才能找到最适合当前问题的解决方案。</p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="AI 辅助处理不平衡数据">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+AI 辅助处理不平衡数据
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>“解释为什么准确率在不平衡数据集上是具有误导性的指标？”</li>
+<li>“SMOTE 是如何生成合成样本的？它的主要优点是什么？”</li>
+<li>“除了 SMOTE，还有哪些其他的过采样技术？（例如 ADASYN）”</li>
+<li>“代价敏感学习的基本原理是什么？<code>class_weight='balanced'</code> 是如何工作的？”</li>
+<li>“在处理不平衡数据时，应该在划分训练/测试集之前还是之后进行重采样（如 SMOTE）？为什么？” (答案：之后，只对训练集重采样)</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="实践与讨论" class="level2">
+<h2 class="anchored" data-anchor-id="实践与讨论">3. 实践与讨论</h2>
+<ul>
+<li><strong>回顾项目:</strong> 回顾你之前做的分类项目（如项目一），检查数据是否存在类别不平衡问题。如果存在，尝试使用 SMOTE 或 <code>class_weight='balanced'</code> 重新训练模型，并使用 P-R 曲线和 F1 分数（特别是 Macro Avg）来评估效果是否有改善。</li>
+<li><strong>案例分析:</strong> (老师可提供一个典型的不平衡商业数据集，如信用卡欺诈数据)
+<ul>
+<li>分析数据不平衡程度。</li>
+<li>讨论在该场景下，哪种评估指标最重要？为什么？</li>
+<li>分组讨论并尝试不同的处理策略（欠采样、SMOTE、代价敏感学习）。</li>
+<li>比较不同策略的效果，并解释原因。</li>
+</ul></li>
+</ul>
+</section>
+<section id="本周总结" class="level2">
+<h2 class="anchored" data-anchor-id="本周总结">4. 本周总结</h2>
+<p>本周我们深化了对模型评估的理解，学习了 P-R 曲线、更细致的交叉验证策略和多分类评估方法。我们还重点 tackling 了不平衡数据问题，掌握了 SMOTE 过采样和代价敏感学习等实用技术。理解何时以及如何应用这些高级评估和处理技巧，对于构建在现实世界中表现稳健且有价值的机器学习模型至关重要。</p>
+<p><strong>下周我们将学习降维技术（PCA）和特征选择方法！</strong></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./week8_lecture.html" class="pagination-link" aria-label="第八周：深入聚类 - DBSCAN 与业务解读">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./week1_exercise.html" class="pagination-link" aria-label="第一周：课堂练习与实验">
+        <span class="nav-page-text"><span class="chapter-title">第一周：课堂练习与实验</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

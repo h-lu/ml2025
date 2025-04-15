@@ -594,6 +594,61 @@
     ]
   },
   {
+    "objectID": "week9_lecture.html",
+    "href": "week9_lecture.html",
+    "title": "第九周：模型评估深化与不平衡数据处理",
+    "section": "",
+    "text": "1. 模型评估深化\n简单地依赖准确率 (Accuracy) 来评估分类模型，尤其是在类别不平衡的情况下，可能会产生误导。我们需要更细致、更有针对性的评估工具。",
+    "crumbs": [
+      "讲义",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第九周：模型评估深化与不平衡数据处理</span>"
+    ]
+  },
+  {
+    "objectID": "week9_lecture.html#模型评估深化",
+    "href": "week9_lecture.html#模型评估深化",
+    "title": "第九周：模型评估深化与不平衡数据处理",
+    "section": "",
+    "text": "1.1 精确率-召回率曲线 (Precision-Recall Curve, P-R Curve)\n我们在第三周学习了 ROC 曲线和 AUC 值，它们是评估二分类模型性能的常用工具。但在某些场景下，特别是当我们更关注正类别（少数类）的识别性能，且数据严重不平衡时，P-R 曲线通常能提供更有价值的信息。\n\n\n\n\n\n\nP-R 曲线与不平衡数据\n\n\n\n当负样本（多数类）数量远大于正样本（少数类）时，即使模型将大量负样本错误地预测为正样本（高 FP），FPR (FP / (FP + TN)) 的值也可能很低，导致 ROC 曲线看起来很好。而 P-R 曲线中的精确率 (TP / (TP + FP)) 对 FP 更敏感，能更真实地反映模型在识别少数类时的查准能力。\n\n\n\n回顾:\n\n精确率 (Precision): TP / (TP + FP) - 预测为正的样本中有多少是真的正。\n召回率 (Recall): TP / (TP + FN) - 真实为正的样本中有多少被预测出来了。\n\nP-R 曲线:\n\n横坐标: 召回率 (Recall)\n纵坐标: 精确率 (Precision)\n曲线描绘了在不同分类阈值下，精确率与召回率的关系。\n\n解读:\n\n理想的模型是精确率和召回率都尽可能高，即曲线尽量靠近右上角 (1, 1)。\n曲线下的面积 (Area Under the P-R Curve, AUC-PR 或 AP - Average Precision) 可以作为 P-R 曲线的整体性能度量，值越接近 1 越好。\n相比 ROC 曲线，P-R 曲线对正类别（少数类）的性能变化更敏感。如果模型在识别少数类方面表现不佳，P-R 曲线会更明显地反映出来。\n\n\n\nfrom sklearn.metrics import precision_recall_curve, average_precision_score\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.datasets import make_classification # 生成不平衡数据\nimport matplotlib.pyplot as plt\nimport numpy as np\nfrom collections import Counter # 后面会用到\n\n# --- 生成不平衡的示例数据 ---\n# n_samples=1000: 生成1000个样本\n# n_features=10: 每个样本有10个特征\n# n_informative=2: 其中2个是信息特征（对分类有贡献）\n# n_redundant=0: 没有冗余特征（线性组合的信息特征）\n# n_repeated=0: 没有重复特征\n# n_classes=2: 二分类问题\n# n_clusters_per_class=1: 每个类别只有一个簇\n# weights=[0.9, 0.1]: 类别分布为90%负类，10%正类（不平衡数据）\n# flip_y=0.01: 随机噪声，1%的标签会被翻转\n# class_sep=1.0: 类别之间的分离程度，值越大类别越容易区分\n# random_state=42: 随机种子，确保结果可复现\nX_imb, y_imb = make_classification(n_samples=1000, n_features=10, n_informative=2,\n                               n_redundant=0, n_repeated=0, n_classes=2, n_clusters_per_class=1,\n                               weights=[0.9, 0.1], flip_y=0.01, class_sep=1.0, random_state=42)\n\n\n# --- 数据预处理和划分 ---\nscaler = StandardScaler()\nX_imb_scaled = scaler.fit_transform(X_imb)\n# 使用 stratify=y_imb 参数确保训练集和测试集中类别比例与原始数据集一致\n# 这对于不平衡数据集尤为重要，可以避免某个类别在划分后比例失调\nX_train_imb, X_test_imb, y_train_imb, y_test_imb = train_test_split(\n    X_imb_scaled, y_imb, test_size=0.3, random_state=42, stratify=y_imb\n)\n\n# --- 训练一个模型 (例如逻辑回归) ---\n# 使用适当的正则化，帮助模型在不平衡数据上有更好的泛化能力\nlr_imb = LogisticRegression(solver='liblinear', C=0.1, random_state=42)\nlr_imb.fit(X_train_imb, y_train_imb)\ny_pred_proba_imb = lr_imb.predict_proba(X_test_imb)[:, 1] # 获取正类的预测概率\n\n\n# --- 计算并绘制 P-R 曲线 ---\nprecision, recall, thresholds = precision_recall_curve(y_test_imb, y_pred_proba_imb)\nap_score = average_precision_score(y_test_imb, y_pred_proba_imb)\n\nplt.figure(figsize=(8, 6))\nplt.plot(recall, precision, marker='.', label=f'Logistic Regression (AP = {ap_score:.2f})')\n# 找到最接近左上角的阈值点 (可选)\n# f1_scores = 2 * (precision * recall) / (precision + recall + 1e-9) # 避免除以0\n# best_threshold_idx = np.argmax(f1_scores)\n# plt.plot(recall[best_threshold_idx], precision[best_threshold_idx], 'ro', markersize=8, label='Best Threshold (Max F1)')\n\nplt.xlabel('Recall')\nplt.ylabel('Precision')\nplt.title('Precision-Recall Curve')\nplt.legend()\nplt.grid(True)\n# plt.show()\n\nprint(f\"Average Precision (AP) Score: {ap_score:.4f}\")\n\nAverage Precision (AP) Score: 0.9540\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n理解 make_classification\n\n\n\nmake_classification 是生成模拟分类数据的强大工具。通过调整 weights 参数可以轻松创建不平衡数据集，class_sep 控制类别区分度，flip_y 引入噪声，有助于测试模型在不同数据特性下的鲁棒性。\n\n\n\n\n\n\n\n\n预测概率的重要性\n\n\n\nP-R 曲线和 ROC 曲线都需要模型输出属于正类的概率（predict_proba 返回的第二列），而不是直接的类别预测（predict）。这是因为曲线是通过改变分类阈值来绘制的，而阈值是作用在概率上的。\n\n\n\n\n\n\n\n\nROC vs. P-R\n\n\n\n\nROC 曲线: 对类别分布不敏感，能较好地反映模型整体区分正负类的能力。当正负样本数量接近，或两者都重要时常用。ROC 曲线以假正率（False Positive Rate, FPR）为横轴，真正率（True Positive Rate, TPR，即召回率）为纵轴绘制。与P-R曲线不同，ROC曲线同时考虑了正类和负类的表现，而P-R曲线则更专注于正类的精确率和召回率。\nP-R 曲线: 对少数类的性能更敏感。当数据严重不平衡，且你更关心少数类（正类）的精确率和召回率时，P-R 曲线通常更有用（例如欺诈检测、罕见病诊断）。P-R 曲线以召回率为横轴，精确率为纵轴绘制。\n\n\n\n\n\n1.2 交叉验证策略深化\n我们在第四周学习了 K 折交叉验证。对于特定问题，还有更合适的 CV 策略：\n\n分层 K 折交叉验证 (Stratified K-Fold):\n\n适用场景: 分类问题，特别是类别不平衡的数据。\n原理: 在划分 K 个折时，确保每个折中的类别比例与原始训练数据集中的类别比例大致相同。\n优点: 保证了每个验证集都能代表整体数据的类别分布，评估结果更可靠。\n实现: sklearn.model_selection.StratifiedKFold。cross_val_score 在处理分类问题时通常默认使用它。\n\n\n\n\n\n\n\n\n分层抽样的必要性\n\n\n\n在处理不平衡数据时，使用普通 K-Fold 可能导致某些折中几乎没有少数类样本，使得该折的评估结果失去意义。分层 K-Fold 确保了每个折都能反映原始数据的类别分布，是处理不平衡分类问题交叉验证的标准做法。\n\n\n\n(概念) 嵌套交叉验证 (Nested Cross-Validation):\n\n适用场景: 当你需要同时进行超参数调优和模型性能评估时，为了避免信息泄露（即用测试集信息来选择超参数），需要使用嵌套 CV。\n原理:\n\n外层循环 (Outer Loop): 将数据划分为 K 个折，用于最终的模型评估。每次迭代用 K-1 折作为外层训练集，1 折作为外层测试集。\n内层循环 (Inner Loop): 在外层训练集上执行超参数调优（例如使用 GridSearchCV 或 RandomizedSearchCV，它们内部也包含交叉验证）。找到最优超参数后，用这些参数在外层训练集上训练模型。\n评估: 用训练好的模型在外层测试集上进行评估。\n重复外层循环 K 次，最终评估结果是 K 次外层测试集评估结果的平均值。\n\n优点: 提供了对模型泛化能力更无偏的估计，因为它严格分开了超参数选择和最终评估所用的数据。\n缺点: 计算成本非常高。\n实现: 通常需要手动编写嵌套循环，结合 GridSearchCV/RandomizedSearchCV 和 cross_val_score 或 StratifiedKFold。\n\n\n\n\n\n\n\n\n嵌套交叉验证与信息泄露\n\n\n\n如果在整个数据集上进行超参数调优（如 GridSearchCV），然后用 K-Fold 评估选定超参数的模型，那么测试集的信息实际上已经间接参与了超参数的选择过程，导致评估结果过于乐观。嵌套交叉验证通过内外两层循环严格分离了调优和评估数据，避免了这种信息泄露。\n\n\n\n\n1.3 多分类评估指标\n对于有三个或更多类别的问题，精确率、召回率和 F1 分数需要考虑如何对每个类别进行平均：\n\n宏平均 (Macro Average):\n\n计算方式: 独立计算每个类别的指标（Precision, Recall, F1），然后取算术平均值（不考虑每个类别的样本数量）。\n特点: 平等对待所有类别。如果少数类别的性能很重要，宏平均是重要的参考指标。\n\n微平均 (Micro Average):\n\n计算方式: 将所有类别的 TP, FP, FN 汇总起来，然后基于这些汇总值计算全局的指标。\n特点: 考虑了每个样本的贡献。在多分类中，Micro-Precision = Micro-Recall = Micro-F1 = Accuracy。\n\n加权平均 (Weighted Average):\n\n计算方式: 独立计算每个类别的指标，然后根据每个类别的样本数量（支持度 Support）进行加权平均。\n特点: 考虑了类别不平衡。样本多的类别对最终指标的贡献更大。\n\n\n\n\n\n\n\n\n如何选择平均策略？\n\n\n\n\n宏平均 (Macro): 当你平等关心所有类别的性能时使用，即使是小类别。\n微平均 (Micro): 当你关心整体的分类准确性时使用（在多分类中等于 Accuracy）。\n加权平均 (Weighted): 当你想考虑类别不平衡，让样本多的类别有更大影响时使用。\n\n\n\nsklearn.metrics.classification_report 会同时报告这三种平均值。\n\nfrom sklearn.datasets import make_classification\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.svm import SVC\nfrom sklearn.metrics import classification_report\n\n# --- 生成多分类数据 ---\nX_multi, y_multi = make_classification(n_samples=1000, n_features=20, n_informative=5,\n                                       n_redundant=0, n_classes=3, # 指定 3 个类别\n                                       n_clusters_per_class=1, random_state=42)\n\n# --- 划分数据 ---\nX_train_multi, X_test_multi, y_train_multi, y_test_multi = train_test_split(\n    X_multi, y_multi, test_size=0.3, random_state=42, stratify=y_multi\n)\n\n# --- 训练多分类模型 (例如 SVM) ---\nsvm_multi = SVC(decision_function_shape='ovr', random_state=42) # 'ovr': One-vs-Rest 策略\nsvm_multi.fit(X_train_multi, y_train_multi)\ny_pred_multi = svm_multi.predict(X_test_multi)\n\n# --- 查看分类报告 (包含 Macro/Weighted Avg) ---\nreport_multi = classification_report(y_test_multi, y_pred_multi, target_names=['Class 0', 'Class 1', 'Class 2'])\nprint(\"多分类报告:\\n\", report_multi)\n# 注意报告中 accuracy 行的值等于 micro avg f1-score\n\n多分类报告:\n               precision    recall  f1-score   support\n\n     Class 0       0.94      1.00      0.97       101\n     Class 1       0.99      0.93      0.96       100\n     Class 2       0.97      0.97      0.97        99\n\n    accuracy                           0.97       300\n   macro avg       0.97      0.97      0.97       300\nweighted avg       0.97      0.97      0.97       300\n\n\n\n\n\n\n\n\n\nAI 辅助理解高级评估\n\n\n\n\n“在什么情况下 P-R 曲线比 ROC 曲线更有用？请举例说明。”\n“解释 Stratified K-Fold 相比普通 K-Fold 的优势。”\n“嵌套交叉验证的主要目的是什么？为什么它能提供更无偏的评估？”\n“在多分类任务中，宏平均 F1 和加权平均 F1 分别反映了模型的哪方面性能？”\n“如果一个多分类模型的 Micro Avg F1 很高，但 Macro Avg F1 很低，这通常意味着什么？”",
+    "crumbs": [
+      "讲义",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第九周：模型评估深化与不平衡数据处理</span>"
+    ]
+  },
+  {
+    "objectID": "week9_lecture.html#处理不平衡数据-handling-imbalanced-data",
+    "href": "week9_lecture.html#处理不平衡数据-handling-imbalanced-data",
+    "title": "第九周：模型评估深化与不平衡数据处理",
+    "section": "2. 处理不平衡数据 (Handling Imbalanced Data)",
+    "text": "2. 处理不平衡数据 (Handling Imbalanced Data)\n不平衡数据是指数据集中不同类别的样本数量差异悬殊的情况。例如，欺诈检测中，欺诈交易（少数类）远少于正常交易（多数类）；疾病诊断中，患病（少数类）样本远少于健康（多数类）样本。\n挑战: 大多数标准机器学习算法的目标是最大化整体准确率，这会导致模型倾向于偏向多数类，而忽略少数类。模型可能在多数类上表现很好，但在我们通常更关心的少数类上表现很差，导致整体准确率看似很高，但实际应用价值低。\n\n2.1 处理策略\n主要有两大类策略：数据层面和算法层面。\n\n2.1.1 数据层面方法\n通过调整训练数据的类别分布来解决不平衡问题。\n\n欠采样 (Undersampling):\n\n方法: 随机地删除多数类样本，使得多数类和少数类的数量接近。\n优点: 可以减少训练数据量，加快训练速度。\n缺点: 可能丢失多数类中的重要信息。\n实现: imbalanced-learn 库提供了多种欠采样方法，如 RandomUnderSampler, NearMiss 等。\n\n过采样 (Oversampling):\n\n方法: 增加少数类样本的数量。\n简单过采样: 随机复制少数类样本。缺点是可能导致模型对特定的少数类样本过拟合。\n(重点) SMOTE (Synthetic Minority Over-sampling Technique):\n\n原理: 不是简单复制，而是为少数类样本合成新的、相似的样本。它找到一个少数类样本，然后从其 K 个最近邻中随机选择一个，在这两个样本之间的连线上随机生成一个新的合成样本。\n优点: 避免了简单复制带来的过拟合风险，能提供更多样化的少数类信息。\n缺点: 可能生成噪声样本（如果少数类样本分布分散或与其他类重叠）；对高维数据效果可能减弱。\n实现: imbalanced-learn 库中的 SMOTE 类。\n\n\n\n\n\n\n\n\n\nSMOTE 的变种\n\n\n\n除了基础的 SMOTE，还有一些改进版本，如 Borderline-SMOTE（更关注边界上的少数类样本）和 ADASYN（Adaptive Synthetic Sampling，根据学习难度自适应地为不同少数类样本生成不同数量的合成样本）。这些可以在 imbalanced-learn 库中找到。\n\n\n使用 imbalanced-learn (需要先安装: pip install imbalanced-learn)\n\n# 检查 imbalanced-learn 是否已安装，如果需要安装，取消下一行注释\n# !pip install imbalanced-learn\n\nfrom imblearn.over_sampling import SMOTE\nfrom collections import Counter # 用于查看类别计数\n\n# --- 使用之前生成的不平衡数据 X_train_imb, y_train_imb ---\nprint(\"原始训练集类别分布:\", Counter(y_train_imb))\n\n# --- 应用 SMOTE ---\n# k_neighbors: 选择近邻的数量，对于少数类样本较少的情况，需要选择适当的k值\n# random_state: 保证结果可复现\nsmote = SMOTE(k_neighbors=5, random_state=42)\nX_train_resampled, y_train_resampled = smote.fit_resample(X_train_imb, y_train_imb)\n\nprint(\"SMOTE 重采样后训练集类别分布:\", Counter(y_train_resampled)) # 类别数量应相等\n\n\n\n# --- 在重采样后的数据上训练模型 ---\n# 使用与原始模型相同的参数\nlr_smote = LogisticRegression(solver='liblinear', C=0.1, random_state=42)\nlr_smote.fit(X_train_resampled, y_train_resampled)\ny_pred_smote = lr_smote.predict(X_test_imb) # 评估仍在原始测试集上进行\ny_pred_proba_smote = lr_smote.predict_proba(X_test_imb)[:, 1]\n\n# --- 评估 SMOTE 后的模型 ---\nprint(\"\\n--- SMOTE 后逻辑回归评估 ---\")\nprint(classification_report(y_test_imb, y_pred_smote))\n\n# 计算 P-R 曲线和 AP\nprecision_smote, recall_smote, _ = precision_recall_curve(y_test_imb, y_pred_proba_smote)\nap_score_smote = average_precision_score(y_test_imb, y_pred_proba_smote)\nprint(f\"SMOTE 后 Average Precision (AP) Score: {ap_score_smote:.4f}\")\n\n# --- 绘制对比 P-R 曲线 ---\nplt.figure(figsize=(8, 6))\nplt.plot(recall, precision, marker='.', label=f'Original LR (AP = {ap_score:.2f})') \nplt.plot(recall_smote, precision_smote, marker='.', label=f'LR with SMOTE (AP = {ap_score_smote:.2f})') \nplt.xlabel('Recall')\nplt.ylabel('Precision')\nplt.title('Precision-Recall Curve Comparison')\nplt.legend()\nplt.grid(True)\nplt.show()\n\n原始训练集类别分布: Counter({0: 626, 1: 74})\nSMOTE 重采样后训练集类别分布: Counter({0: 626, 1: 626})\n\n--- SMOTE 后逻辑回归评估 ---\n              precision    recall  f1-score   support\n\n           0       1.00      0.96      0.98       269\n           1       0.71      0.97      0.82        31\n\n    accuracy                           0.96       300\n   macro avg       0.86      0.96      0.90       300\nweighted avg       0.97      0.96      0.96       300\n\nSMOTE 后 Average Precision (AP) Score: 0.9461\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n重采样只应用于训练集！\n\n\n\n过采样（如 SMOTE）或欠采样应该只应用于训练数据 (fit_resample(X_train, y_train))。测试集必须保持原始分布，以模拟模型在真实未见数据上的表现。如果在整个数据集或测试集上进行重采样，会人为地改变评估环境，导致评估结果不可靠。\n\n\n\n\n\n\n\n\n使用 SMOTE 后 AP 一定会改善吗？\n\n\n\n\n不一定。虽然 SMOTE 通常能改善模型对少数类的识别能力，但 AP 是否提升取决于多个因素：\n\n数据分布特征: 如果少数类样本在特征空间中分布过于稀疏或离散，SMOTE 生成的合成样本可能质量不高，反而会引入噪声。\nk 值选择: 如果 k_neighbors 参数设置不当，可能导致生成的样本偏离真实分布。\n模型特性: 某些模型对数据分布变化更敏感，可能无法有效利用 SMOTE 生成的新样本。\n过拟合风险: 过度使用 SMOTE 可能导致模型在训练集上表现很好，但在测试集上泛化能力下降。\n\n建议: 在使用 SMOTE 后，务必通过交叉验证等方式评估模型在测试集上的表现，而不仅仅是训练集。同时，可以尝试不同的 k 值，或结合其他方法（如 class_weight=‘balanced’）来获得更好的效果。\n\n\n\n\n\n2.1.2 算法层面方法：代价敏感学习 (Cost-Sensitive Learning)\n\n方法: 在算法层面，为不同类别的误分类分配不同的代价（权重）。通常，将少数类的误分类代价设置得更高，使得模型在训练时更倾向于正确分类少数类样本。\n实现: 许多 Scikit-learn 分类器（如 LogisticRegression, SVC, DecisionTreeClassifier, RandomForestClassifier）提供了 class_weight 参数。\n\n设置为字典 {class_label: weight}，手动指定每个类别的权重。\n设置为 'balanced'，算法会自动根据样本数量反比地调整权重，即少数类获得更高的权重。这是最常用的方式。\n\n\n\n\n\n\n\n\nclass_weight='balanced' 如何计算权重？\n\n\n\n当设置 class_weight='balanced' 时，每个类别的权重计算公式通常是 n_samples / (n_classes * n_samples_j)，其中 n_samples 是总样本数，n_classes 是类别数量，n_samples_j 是类别 j 的样本数。这样，样本数较少的类别会获得更高的权重。\n\n\n\n# --- 使用 class_weight='balanced' ---\n# 保持与其他模型相同的C参数\nlr_balanced = LogisticRegression(solver='liblinear', C=0.1, class_weight='balanced', random_state=42)\nlr_balanced.fit(X_train_imb, y_train_imb) # 在原始不平衡数据上训练\ny_pred_balanced = lr_balanced.predict(X_test_imb)\ny_pred_proba_balanced = lr_balanced.predict_proba(X_test_imb)[:, 1]\n\n# --- 评估 class_weight='balanced' 后的模型 ---\nprint(\"\\n--- class_weight='balanced' 后逻辑回归评估 ---\")\nprint(classification_report(y_test_imb, y_pred_balanced))\n\nprecision_balanced, recall_balanced, _ = precision_recall_curve(y_test_imb, y_pred_proba_balanced)\nap_score_balanced = average_precision_score(y_test_imb, y_pred_proba_balanced)\nprint(f\"class_weight='balanced' 后 Average Precision (AP) Score: {ap_score_balanced:.4f}\") \n\n# --- 绘制对比 P-R 曲线 ---\nplt.figure(figsize=(8, 6))\nplt.plot(recall, precision, marker='.', label=f'Original LR (AP = {ap_score:.2f})')\nplt.plot(recall_smote, precision_smote, marker='.', label=f'LR with SMOTE (AP = {ap_score_smote:.2f})')\nplt.plot(recall_balanced, precision_balanced, marker='.', label=f'LR with class_weight=balanced (AP = {ap_score_balanced:.2f})')\nplt.xlabel('Recall')\nplt.ylabel('Precision')\nplt.title('Precision-Recall Curve Comparison')\nplt.legend()\nplt.grid(True)\nplt.show()\n\n\n--- class_weight='balanced' 后逻辑回归评估 ---\n              precision    recall  f1-score   support\n\n           0       1.00      0.92      0.96       269\n           1       0.58      0.97      0.72        31\n\n    accuracy                           0.92       300\n   macro avg       0.79      0.94      0.84       300\nweighted avg       0.95      0.92      0.93       300\n\nclass_weight='balanced' 后 Average Precision (AP) Score: 0.9132\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n观察\n\n\n\n使用 class_weight='balanced' 通常也能有效提高模型对少数类的识别能力（召回率），效果与 SMOTE 类似或各有优劣，计算成本通常更低。\n\n\n\n\n\n2.2 如何选择策略？\n\n没有绝对最优的方法，需要根据具体问题和数据进行尝试和评估。\n优先尝试 class_weight='balanced'，因为它实现简单，计算成本低。\n如果 class_weight='balanced' 效果不佳，可以尝试 SMOTE 或其他过采样/欠采样方法。\n评估指标的选择至关重要: 对于不平衡数据，应重点关注 Recall, Precision, F1-Score (特别是 Macro Avg 或针对少数类的), P-R 曲线, AUC-PR，而不是 Accuracy。\n结合业务场景: 思考哪种错误（FP 或 FN）的代价更高，选择能更好控制该类错误的策略和评估指标。\n\n\n处理不平衡数据的核心在于选择正确的评估指标并结合业务需求。没有一种方法是万能的，需要不断实验、评估（使用 P-R 曲线、AUC-PR、F1 Macro 等）并理解不同策略对模型行为的影响，才能找到最适合当前问题的解决方案。\n\n\n\n\n\n\n\nAI 辅助处理不平衡数据\n\n\n\n\n“解释为什么准确率在不平衡数据集上是具有误导性的指标？”\n“SMOTE 是如何生成合成样本的？它的主要优点是什么？”\n“除了 SMOTE，还有哪些其他的过采样技术？（例如 ADASYN）”\n“代价敏感学习的基本原理是什么？class_weight='balanced' 是如何工作的？”\n“在处理不平衡数据时，应该在划分训练/测试集之前还是之后进行重采样（如 SMOTE）？为什么？” (答案：之后，只对训练集重采样)",
+    "crumbs": [
+      "讲义",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第九周：模型评估深化与不平衡数据处理</span>"
+    ]
+  },
+  {
+    "objectID": "week9_lecture.html#实践与讨论",
+    "href": "week9_lecture.html#实践与讨论",
+    "title": "第九周：模型评估深化与不平衡数据处理",
+    "section": "3. 实践与讨论",
+    "text": "3. 实践与讨论\n\n回顾项目: 回顾你之前做的分类项目（如项目一），检查数据是否存在类别不平衡问题。如果存在，尝试使用 SMOTE 或 class_weight='balanced' 重新训练模型，并使用 P-R 曲线和 F1 分数（特别是 Macro Avg）来评估效果是否有改善。\n案例分析: (老师可提供一个典型的不平衡商业数据集，如信用卡欺诈数据)\n\n分析数据不平衡程度。\n讨论在该场景下，哪种评估指标最重要？为什么？\n分组讨论并尝试不同的处理策略（欠采样、SMOTE、代价敏感学习）。\n比较不同策略的效果，并解释原因。",
+    "crumbs": [
+      "讲义",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第九周：模型评估深化与不平衡数据处理</span>"
+    ]
+  },
+  {
+    "objectID": "week9_lecture.html#本周总结",
+    "href": "week9_lecture.html#本周总结",
+    "title": "第九周：模型评估深化与不平衡数据处理",
+    "section": "4. 本周总结",
+    "text": "4. 本周总结\n本周我们深化了对模型评估的理解，学习了 P-R 曲线、更细致的交叉验证策略和多分类评估方法。我们还重点 tackling 了不平衡数据问题，掌握了 SMOTE 过采样和代价敏感学习等实用技术。理解何时以及如何应用这些高级评估和处理技巧，对于构建在现实世界中表现稳健且有价值的机器学习模型至关重要。\n下周我们将学习降维技术（PCA）和特征选择方法！",
+    "crumbs": [
+      "讲义",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第九周：模型评估深化与不平衡数据处理</span>"
+    ]
+  },
+  {
     "objectID": "week1_exercise.html",
     "href": "week1_exercise.html",
     "title": "第一周：课堂练习与实验",
@@ -601,7 +656,7 @@
     "text": "练习 1: 环境检查与 Hello World\n目标: 确认你的 Python 环境 (Anaconda/Miniconda) 和代码编辑器 (VS Code/Cursor) 已正确安装和配置。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第一周：课堂练习与实验</span>"
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第一周：课堂练习与实验</span>"
     ]
   },
   {
@@ -612,7 +667,7 @@
     "text": "打开终端 (Terminal):\n\n在 Windows 上，可以搜索 “Anaconda Prompt”。\n在 macOS 或 Linux 上，打开系统自带的终端。\n\n检查 Conda: 在终端输入 conda --version 并回车。如果显示 Conda 版本号，说明安装成功。\n检查 Python: 在终端输入 python --version 并回车。确认 Python 版本（通常是 3.x）。\n启动 VS Code (或 Cursor):\n安装 Python 扩展: 在 VS Code 的扩展市场搜索 “Python” (来自 Microsoft) 并安装。\n安装 Jupyter 扩展: 搜索 “Jupyter” (来自 Microsoft) 并安装。\n创建第一个 Jupyter Notebook:\n\n在 VS Code 中，通过 文件 &gt; 新建文件 创建一个新文件。\n将文件保存为 week1_hello.ipynb。\n在第一个单元格 (Cell) 中输入以下代码： python     print(\"Hello, Machine Learning World!\")     message = \"环境配置成功！\"     print(message)\n按 Shift + Enter (或点击单元格左侧的运行按钮) 执行单元格。\n确认: 你应该能看到代码下输出了 “Hello, Machine Learning World!” 和 “环境配置成功！”。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第一周：课堂练习与实验</span>"
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第一周：课堂练习与实验</span>"
     ]
   },
   {
@@ -623,7 +678,7 @@
     "text": "练习 2: AI 辅助 Python 基础回顾\n目标: 利用 AI 编程助手 (如 GitHub Copilot, 通义灵码, Cursor 内置 AI 等) 快速复习 Python 基础语法。\n说明: 在 week1_hello.ipynb 文件中继续添加新的单元格来完成以下练习。尝试使用 AI 工具生成代码、解释代码或回答你的问题。\n\n变量与数据类型:\n\n任务: 创建变量分别存储你的姓名 (字符串)、年龄 (整数)、期望的薪资 (浮点数) 以及是否喜欢编程 (布尔值)。打印出这些变量的类型和值。\nAI 提示示例: \"创建一个名为 name 的字符串变量并赋值为 '张三'\"，\"如何查看变量 age 的数据类型？\"\n\n基本运算符:\n\n任务: 计算 (10 + 5) * 3 / 2 的结果。判断你的年龄是否大于 18 且小于 30。\nAI 提示示例: \"计算 (10 + 5) * 3 / 2\"，\"写一个 Python 表达式判断变量 age 是否在 18 和 30 之间 (不包括 30)\"\n\n数据结构 (列表 List):\n\n任务: 创建一个包含你最喜欢的三门课程名称的列表。访问列表的第一个元素。向列表末尾添加一门新的课程。\nAI 提示示例: \"创建一个包含 '数学', '英语', '物理' 的 Python 列表\"，\"如何获取列表 my_list 的第一个元素？\"，\"如何在列表 my_list 末尾添加元素 '化学'？\"\n\n数据结构 (字典 Dict):\n\n任务: 创建一个字典，存储你的姓名和年龄信息 (键分别为 ‘name’ 和 ‘age’)。访问字典中 ‘name’ 对应的值。向字典中添加一个新的键值对，表示你的专业 (键为 ‘major’)。\nAI 提示示例: \"创建一个 Python 字典，包含键 'name' 值为 '李四'，键 'age' 值为 20\"，\"如何获取字典 my_dict 中键 'name' 对应的值？\"，\"如何向字典 my_dict 添加键 'major' 值为 '计算机科学'？\"\n\n控制流 (if-else):\n\n任务: 判断你的年龄是否大于等于 18 岁，如果是，则打印 “成年人”，否则打印 “未成年人”。\nAI 提示示例: \"写一个 Python if-else 语句，判断 age 是否大于等于 18\"\n\n控制流 (for 循环):\n\n任务: 遍历你之前创建的课程列表，并打印出每门课程的名称。\nAI 提示示例: \"写一个 Python for 循环，遍历列表 course_list 并打印每个元素\"\n\n函数 (Function):\n\n任务: 定义一个名为 greet 的函数，接收一个参数 name，函数内部打印 “你好, [name]!”。调用这个函数并传入你的姓名。\nAI 提示示例: \"定义一个名为 greet 的 Python 函数，接收参数 name，并打印 '你好, ' + name + '!'\", \"如何调用函数 greet 并传入参数 '王五'？\"",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第一周：课堂练习与实验</span>"
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第一周：课堂练习与实验</span>"
     ]
   },
   {
@@ -634,7 +689,7 @@
     "text": "练习 3: Jupyter Notebook 基本操作\n目标: 熟悉 Jupyter Notebook 的基本操作。\n\n单元格类型:\n\n在 week1_hello.ipynb 中，创建一个新的代码单元格 (Code Cell) 和一个新的 Markdown 单元格 (Markdown Cell)。\n切换类型: 尝试将代码单元格切换为 Markdown，再切换回来。（提示：可以使用工具栏或快捷键）。\n\nMarkdown 语法:\n\n在 Markdown 单元格中，尝试使用以下语法编写一些内容：\n\n# 一级标题\n## 二级标题\n*斜体文字* 或 _斜体文字_\n**粗体文字** 或 __粗体文字__\n- 无序列表项 1\n- 无序列表项 2\n1. 有序列表项 1\n2. 有序列表项 2\n[链接文字](https://www.google.com)\n\n按 Shift + Enter 渲染 Markdown 单元格，查看效果。\n\n单元格操作:\n\n尝试在不同单元格之间移动。\n插入新的单元格（在当前单元格上方或下方）。\n复制、剪切、粘贴单元格。\n删除单元格。\n运行所有单元格。\n中断内核运行（如果某个单元格卡住）。\n重启内核。\n\n\n完成以上练习后，你应该对课程所需的环境和工具有了基本的了解和操作能力。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>10</span>  <span class='chapter-title'>第一周：课堂练习与实验</span>"
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第一周：课堂练习与实验</span>"
     ]
   },
   {
@@ -645,7 +700,7 @@
     "text": "准备工作\n在开始练习前，请确保导入必要的库：",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
     ]
   },
   {
@@ -656,7 +711,7 @@
     "text": "import numpy as np\nimport pandas as pd\nfrom sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
     ]
   },
   {
@@ -667,7 +722,7 @@
     "text": "练习 1: Numpy 基础操作\n目标: 熟练使用 Numpy 创建数组、进行运算和索引。\n\n创建数组:\n\n创建一个包含整数 1 到 10 的一维 Numpy 数组 arr1。\n创建一个 3x3 的二维 Numpy 数组 arr2，包含数字 1 到 9。\n创建一个 2x4 的全零 Numpy 数组 arr_zeros。\n创建一个 3x2 的值为 5 的 Numpy 数组 arr_fives。\n使用 np.arange() 创建一个包含 0 到 10 之间所有偶数的一维数组 arr_even。\n使用 np.linspace() 创建一个包含 5 个元素的数组 arr_lin，元素在 0 到 1 之间均匀分布。\n打印出以上所有数组及其形状 (shape)。\n\n数组运算:\n\n将 arr1 中的每个元素乘以 3。\n计算 arr1 中每个元素的平方。\n创建一个与 arr1 形状相同，值为 10 的数组 arr_ten，计算 arr1 + arr_ten。\n计算 arr2 中所有元素的和、平均值、最大值、最小值。\n计算 arr2 每行的和以及每列的平均值。\n\n索引与切片:\n\n获取 arr1 的第 3 个元素（索引为 2）。\n获取 arr1 的最后 3 个元素。\n获取 arr2 的第二行。\n获取 arr2 的第一列。\n获取 arr2 中索引为 (1, 2) 的元素（第二行第三列）。\n获取 arr2 的前两行、后两列组成的子数组。\n\n布尔索引:\n\n找出 arr1 中所有大于 5 的元素。\n找出 arr2 中所有偶数元素，并将它们赋值为 0。\n创建一个布尔数组，用于选择 arr2 中大于 3 且小于 7 的元素。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
     ]
   },
   {
@@ -678,7 +733,7 @@
     "text": "练习 2: Pandas Series 操作\n目标: 掌握 Pandas Series 的创建和基本操作。\n\n创建 Series:\n\n使用一个 Python 列表 [10, 20, 30, 40, 50] 创建一个 Series s1。\n创建一个 Series s2，包含 4 个城市名称作为值，并使用自定义索引 ['a', 'b', 'c', 'd']。\n使用一个 Python 字典 {'apple': 5, 'banana': 8, 'orange': 3} 创建一个 Series s3。\n打印以上 Series。\n\n访问与操作:\n\n访问 s1 的第三个元素。\n访问 s2 中索引为 ‘c’ 的元素。\n访问 s3 中值大于 4 的元素。\n检查索引 ‘b’ 是否在 s2 中。\n计算 s1 中所有元素的和。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
     ]
   },
   {
@@ -689,7 +744,7 @@
     "text": "练习 3: Pandas DataFrame 操作\n目标: 熟练使用 Pandas DataFrame 进行数据加载、探索和选择。\n\n创建 DataFrame:\n\n使用以下字典创建一个 DataFrame df1： python     data = {'Name': ['Alice', 'Bob', 'Charlie', 'David'],             'Age': [25, 30, 35, 40],             'City': ['New York', 'London', 'Paris', 'Tokyo']}\n打印 df1。\n\n数据探索 (假设你有一个 sales.csv 文件，包含 ‘Date’, ‘Product’, ‘Revenue’, ‘Quantity’ 列):\n\n(如果本地没有 sales.csv，可以先手动创建一个简单的 CSV 文件，或使用 AI 生成示例数据)\n使用 pd.read_csv() 读取 sales.csv 文件到 DataFrame df_sales。\n显示 df_sales 的前 5 行和后 3 行。\n查看 df_sales 的形状 (shape)。\n查看 df_sales 的列名 (columns) 和索引 (index)。\n使用 info() 查看每列的数据类型和非空值数量。\n使用 describe() 查看数值列的描述性统计信息。\n查看 ‘Product’ 列有多少种不同的产品 (unique() 或 value_counts())。\n\n数据选择:\n\n选择 df_sales 中的 ‘Revenue’ 列。\n选择 ‘Product’ 和 ‘Quantity’ 两列。\n使用 .loc 选择索引为 10 到 20 (包含 20) 的行。\n使用 .iloc 选择第 5 行到第 10 行（不包含 10）的数据。\n使用 .loc 选择索引为 5，列为 ‘Product’ 的值。\n使用 .iloc 选择第 3 行、第 1 列的值。\n选择 ‘Revenue’ 大于 1000 的所有行。\n选择 ‘Product’ 为 ‘Laptop’ 且 ‘Quantity’ 大于 2 的所有行。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
     ]
   },
   {
@@ -700,7 +755,7 @@
     "text": "练习 4: 数据预处理 - 缺失值与重复值\n目标: 练习处理数据中的常见问题。\n\n创建包含缺失值和重复值的 DataFrame: python     data_dirty = {'col1': [1, 2, np.nan, 4, 5, 2, 6, np.nan],                   'col2': ['A', 'B', 'A', 'C', 'B', 'B', 'D', 'A'],                   'col3': [10.5, 20.1, 15.3, 10.5, 8.8, 20.1, 12.0, 15.3]}     df_dirty = pd.DataFrame(data_dirty)     # 手动添加重复行     df_dirty = pd.concat([df_dirty, df_dirty.iloc[1:3]], ignore_index=True)     print(\"原始脏数据:\\n\", df_dirty)\n处理缺失值:\n\n检查 df_dirty 中每列的缺失值数量。\n删除所有包含缺失值的行，并将结果存储在 df_dropped_rows 中。\n使用 col1 的均值填充 col1 中的缺失值。\n使用字符串 ‘Unknown’ 填充 col2 中的缺失值。\n打印处理后的 DataFrame。\n\n处理重复值:\n\n检查 df_dirty 中是否存在完全重复的行。\n删除所有完全重复的行，保留第一次出现的行，存储在 df_no_duplicates 中。\n检查基于 ‘col1’ 和 ‘col2’ 两列是否存在重复行。\n删除基于 ‘col1’ 和 ‘col2’ 的重复行，存储在 df_no_dup_subset 中。\n打印处理后的 DataFrame。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
     ]
   },
   {
@@ -711,7 +766,7 @@
     "text": "练习 5: 特征工程 - 缩放与编码\n目标: 练习对数值和类别特征进行转换。\n\n创建包含数值和类别特征的 DataFrame: python     data_feat = {'Score': [85, 92, 78, 88, 95, 72],                  'Age': [21, 23, 22, 24, 21, 22],                  'Gender': ['Male', 'Female', 'Female', 'Male', 'Female', 'Male'],                  'Grade': ['A', 'A', 'B', 'A', 'A', 'C']} # 假设 Grade 有序 C &lt; B &lt; A     df_feat = pd.DataFrame(data_feat)     print(\"原始特征数据:\\n\", df_feat)\n数值特征缩放:\n\n选择 ‘Score’ 和 ‘Age’ 列。\n使用 StandardScaler 对这两列进行标准化。\n使用 MinMaxScaler 对这两列进行归一化 (缩放到 [0, 1])。\n打印缩放后的结果 (它们将是 Numpy 数组)。\n\n类别特征编码:\n\n标签编码: 对有序特征 ‘Grade’ 使用 LabelEncoder 进行编码。将编码后的结果作为新列 ‘Grade_Encoded’ 添加回 df_feat。\n独热编码: 对无序特征 ‘Gender’ 使用 pd.get_dummies() 进行独热编码。\n独热编码 (sklearn): (可选) 尝试使用 OneHotEncoder 对 ‘Gender’ 列进行独热编码，并理解其用法（需要处理输出格式）。\n打印包含编码后特征的 DataFrame。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
     ]
   },
   {
@@ -722,7 +777,7 @@
     "text": "练习 6: 项目一 - 数据加载与初步探索\n目标: 开始你的第一个机器学习项目，应用本周所学知识。\n\n加载数据: 使用 Pandas 加载你的小组为项目一选择的电商用户行为数据集。\n初步探索:\n\n使用 head(), info(), describe() 等函数初步了解数据。\n识别数据中的数值特征和类别特征。\n检查是否存在时间戳相关的列，如果需要，将其转换为 datetime 类型。\n\n识别预处理需求:\n\n检查每列是否存在缺失值 (isnull().sum())。\n检查是否存在明显的重复行 (duplicated().sum())。\n思考哪些数值特征可能需要缩放？\n思考哪些类别特征需要编码？应该使用哪种编码方式？\n\n记录发现: 在你的项目 Notebook 中，用 Markdown 记录下你对数据的初步观察和需要进行的预处理步骤。\n\n完成这些练习将为你后续的模型构建打下坚实的基础！",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第二周：课堂练习与实验</span>"
     ]
   },
   {
@@ -733,7 +788,7 @@
     "text": "准备工作\n确保导入本周所需的库：",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
     ]
   },
   {
@@ -744,7 +799,7 @@
     "text": "import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.svm import SVC\nfrom sklearn.metrics import (accuracy_score, confusion_matrix, classification_report,\n                             precision_score, recall_score, f1_score,\n                             roc_curve, auc, precision_recall_curve, average_precision_score)\nfrom sklearn.datasets import make_classification, make_moons # 用于生成示例数据\n\n# 设置 matplotlib 绘图样式 (可选)\nplt.style.use('seaborn-v0_8-whitegrid')",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
     ]
   },
   {
@@ -755,7 +810,7 @@
     "text": "练习 1: 逻辑回归实践\n目标: 训练逻辑回归模型并理解其预测。\n\n生成并准备数据:\n\n使用 make_classification 生成一个简单的二分类数据集，设置 n_samples=500, n_features=2, n_redundant=0, n_informative=2, n_clusters_per_class=1, random_state=42。将返回的特征和标签分别赋值给 X_cls, y_cls。\n将数据划分为训练集 (X_train_lr, X_test_lr, y_train_lr, y_test_lr) 和测试集，测试集比例为 30%，记得设置 random_state=42 和 stratify=y_cls。\n初始化一个 StandardScaler。\n使用训练集 X_train_lr 来 fit_transform 标准化器，得到 X_train_scaled。\n使用同一个标准化器对测试集 X_test_lr 进行 transform，得到 X_test_scaled。\n\n训练逻辑回归模型:\n\n创建一个 LogisticRegression 模型实例 (random_state=42)。\n使用标准化后的训练数据 X_train_scaled 和 y_train_lr 训练模型。\n\n进行预测:\n\n使用训练好的模型对标准化后的测试数据 X_test_scaled 进行预测，得到预测类别 y_pred_lr。\n使用 predict_proba() 方法获取模型对测试集样本属于每个类别（特别是正类，通常是索引为 1 的列）的预测概率 y_pred_proba_lr。\n打印出测试集前 10 个样本的真实标签、预测标签和预测为正类的概率。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
     ]
   },
   {
@@ -766,7 +821,7 @@
     "text": "练习 2: 分类模型评估指标计算与解读\n目标: 熟练计算和理解各种分类评估指标。\n使用练习 1 中得到的 y_test_lr (真实标签) 和 y_pred_lr (预测标签)。\n\n准确率 (Accuracy):\n\n使用 accuracy_score() 计算模型的准确率。\n思考：如果数据极度不平衡（例如 95% 是负类，5% 是正类），高准确率是否还能完全代表模型的好坏？为什么？（在 Markdown 单元格中写下你的思考）。\n\n混淆矩阵 (Confusion Matrix):\n\n使用 confusion_matrix() 计算混淆矩阵。\n手动从混淆矩阵中识别 TP, TN, FP, FN 的值（可以在代码注释中写明）。\n使用 seaborn.heatmap() 将混淆矩阵可视化，确保添加标签 (annot=True, fmt=‘d’) 和颜色条 (cmap=‘Blues’)，并设置 x 轴和 y 轴的标签为 ‘Predicted Label’ 和 ‘True Label’。\n\n精确率 (Precision):\n\n使用 precision_score() 计算正类 (通常 pos_label=1) 的精确率。\n在 Markdown 单元格中解释该精确率数值的含义（“在所有被模型预测为正类的样本中…”）。\n\n召回率 (Recall):\n\n使用 recall_score() 计算正类的召回率。\n在 Markdown 单元格中解释该召回率数值的含义（“在所有真实为正类的样本中…”）。\n\nF1 分数 (F1-Score):\n\n使用 f1_score() 计算正类的 F1 分数。\n在 Markdown 单元格中解释 F1 分数综合了哪两个指标？在什么情况下 F1 分数会比较高？\n\n分类报告 (Classification Report):\n\n使用 classification_report() 生成完整的分类报告，并打印出来。\n在 Markdown 单元格中解释报告中 macro avg 和 weighted avg 的主要区别。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
     ]
   },
   {
@@ -777,7 +832,7 @@
     "text": "练习 3: 支持向量机 (SVM) 实践\n目标: 训练 SVM 分类器，并尝试不同的核函数和参数。\n继续使用练习 1 中准备好的标准化数据 (X_train_scaled, y_train_lr, X_test_scaled, y_test_lr)。\n\n训练线性 SVM:\n\n创建一个 SVC 模型实例，设置 kernel='linear', probability=True, random_state=42。\n训练模型。\n进行预测 (y_pred_svm_linear) 和概率预测 (y_pred_proba_svm_linear)。\n评估模型性能（打印准确率和分类报告）。\n\n训练 RBF 核 SVM:\n\n创建一个 SVC 模型实例，设置 kernel='rbf' (默认)，C=1.0 (默认), gamma='scale' (默认), probability=True, random_state=42。\n训练模型。\n进行预测 (y_pred_svm_rbf) 和概率预测 (y_pred_proba_svm_rbf)。\n评估模型性能（打印准确率和分类报告）。\n\n(可选) 尝试不同的 C 和 gamma 值:\n\n保持 kernel='rbf'，尝试增大 C 值 (例如 C=10) 或减小 C 值 (例如 C=0.1)，训练模型并评估，观察对模型性能的影响。\n保持 kernel='rbf' 和 C=1.0，尝试增大 gamma 值 (例如 gamma=1) 或减小 gamma 值 (例如 gamma=0.1)，训练模型并评估，观察对模型性能的影响。（gamma 控制单个样本的影响范围，值越大影响范围越小，模型可能更复杂）。\n在 Markdown 单元格中简单记录不同参数组合下的测试集准确率或 F1 分数，并简述你的观察。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
     ]
   },
   {
@@ -788,7 +843,7 @@
     "text": "练习 4: ROC 曲线与 AUC\n目标: 理解 ROC 曲线和 AUC 的计算与含义。\n使用练习 1 和练习 3 中得到的 y_test_lr (真实标签) 以及 y_pred_proba_lr (逻辑回归正类概率) 和 y_pred_proba_svm_rbf (RBF 核 SVM 正类概率)。\n\n计算 ROC 曲线数据:\n\n使用 roc_curve() 分别计算逻辑回归和 RBF 核 SVM 的 FPR (False Positive Rate) 和 TPR (True Positive Rate)。\n\n计算 AUC 值:\n\n使用 auc() 函数，根据上一步得到的 FPR 和 TPR 计算两个模型的 AUC 值。\n\n绘制 ROC 曲线:\n\n使用 matplotlib.pyplot 绘制 ROC 曲线。\n将逻辑回归和 SVM 的 ROC 曲线绘制在同一张图上。\n添加一条表示随机猜测的对角线 (从 [0,0] 到 [1,1])，用 linestyle='--' 表示。\n在图例 (plt.legend()) 中清晰地显示每个模型的名称及其 AUC 值 (使用 f-string 格式化，例如 f'Logistic Regression (AUC = {roc_auc_lr:.2f})')。\n添加 x 轴标签 (“False Positive Rate (FPR)”)，y 轴标签 (“True Positive Rate (TPR)”) 和图标题 (“ROC Curve Comparison”)。\n显示网格 (plt.grid(True))。\n调用 plt.show() 显示图像。\n\n解读:\n\n在 Markdown 单元格中回答：哪个模型的 AUC 值更高？这通常意味着什么？观察 ROC 曲线，哪个模型更接近左上角？",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
     ]
   },
   {
@@ -799,7 +854,7 @@
     "text": "练习 5: 项目一 - 模型构建与评估\n目标: 将本周所学应用于你的项目一（电商用户行为数据）。\n\n加载预处理数据: 加载你上周完成预处理的项目一数据集。确保特征已缩放，标签已准备好。\n划分数据: 使用 train_test_split 划分训练集和测试集 (stratify=y)。\n训练与评估 LR:\n\n训练逻辑回归模型。\n在测试集上评估，计算准确率、混淆矩阵、分类报告、AUC。绘制 ROC 曲线。\n\n训练与评估 SVM:\n\n训练 SVM 模型 (可以先尝试 kernel='rbf' 和默认参数，记得设置 probability=True)。\n在测试集上评估，计算准确率、混淆矩阵、分类报告、AUC。绘制 ROC 曲线（可以和 LR 绘制在同一张图上）。\n\n结果分析与记录:\n\n在你的项目 Notebook 中，清晰地记录每个模型的训练过程、评估结果和可视化图表。\n在 Markdown 单元格中，比较 LR 和 SVM 在你的数据集上的表现（结合多个指标）。\n根据混淆矩阵分析模型的错误类型，并结合你的业务场景（预测用户是否会购买/点击/流失等）进行解读，讨论哪种错误代价更大。\n记录你对模型表现的初步看法和可能的改进方向。\n\n\n认真完成这些练习，你将对分类模型的训练、评估和比较有更深入的理解！",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>12</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第三周：课堂练习与实验</span>"
     ]
   },
   {
@@ -810,7 +865,7 @@
     "text": "准备工作\n确保导入本周所需的库：",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
     ]
   },
   {
@@ -821,7 +876,7 @@
     "text": "import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.tree import DecisionTreeClassifier, plot_tree\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import accuracy_score, classification_report, confusion_matrix\nfrom sklearn.datasets import make_classification\nfrom sklearn.linear_model import LogisticRegression # For comparison in CV\n\n# 设置 matplotlib 绘图样式 (可选)\nplt.style.use('seaborn-v0_8-whitegrid')\n\n# --- 复用上周的数据准备 ---\n# 生成数据\nX_cls, y_cls = make_classification(n_samples=500, n_features=10, n_informative=5,\n                                   n_redundant=2, n_classes=2, random_state=42)\nfeature_names = [f'feature_{i}' for i in range(X_cls.shape[1])]\n# 划分数据\nX_train, X_test, y_train, y_test = train_test_split(\n    X_cls, y_cls, test_size=0.3, random_state=42, stratify=y_cls\n)\n# 特征缩放 (虽然树模型对缩放不敏感，但保持一致性，且便于后续比较)\nscaler = StandardScaler()\nX_train_scaled = scaler.fit_transform(X_train)\nX_test_scaled = scaler.transform(X_test)",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
     ]
   },
   {
@@ -832,7 +887,7 @@
     "text": "练习 1: 决策树实践与可视化\n目标: 训练决策树模型并理解其结构。\n\n训练决策树:\n\n创建一个 DecisionTreeClassifier 模型实例。为了便于初始可视化，可以先设置一个较小的 max_depth，例如 max_depth=3。设置 random_state=42。\n使用 X_train_scaled 和 y_train 训练模型。\n\n评估模型:\n\n对 X_test_scaled 进行预测。\n计算并打印准确率和分类报告。\n\n可视化决策树:\n\n使用 plot_tree() 函数将训练好的决策树可视化。\n设置 filled=True, rounded=True, class_names=['Class 0', 'Class 1'], feature_names=feature_names。\n调整 figsize 以获得清晰的图像 (例如 figsize=(15, 8))。\n调用 plt.show() 显示图像。\n解读: 尝试追踪几个样本从根节点到叶节点的路径，理解决策过程。在 Markdown 单元格中描述一个样本的决策路径。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
     ]
   },
   {
@@ -843,7 +898,7 @@
     "text": "练习 2: 理解决策树过拟合\n目标: 通过调整 max_depth 理解决策树的过拟合现象。\n\n训练不同深度的树:\n\n创建一个列表存储不同的 max_depth 值：depths = [2, 5, 10, 15, None] (None 表示不限制深度)。\n创建两个空列表 train_accuracies 和 test_accuracies 用于存储准确率。\n使用 for 循环遍历 depths 列表：\n\n在循环内部，创建 DecisionTreeClassifier 实例，设置 max_depth 为当前循环的值，random_state=42。\n训练模型 (fit(X_train_scaled, y_train))。\n计算模型在训练集上的准确率 (score(X_train_scaled, y_train))，并添加到 train_accuracies 列表。\n计算模型在测试集上的准确率 (score(X_test_scaled, y_test))，并添加到 test_accuracies 列表。\n\n\n分析结果:\n\n绘制一个折线图：\n\nx 轴刻度标签可以使用 [str(d) for d in depths] 来处理 None。\ny 轴为准确率。\n绘制训练集准确率曲线 (train_accuracies) 和测试集准确率曲线 (test_accuracies)，并添加图例。\n添加标题 (“Decision Tree Accuracy vs. Max Depth”) 和坐标轴标签 (“Max Depth”, “Accuracy”)。\n调用 plt.show() 显示图像。\n\n观察与思考:\n\n在 Markdown 单元格中描述：随着 max_depth 的增加，训练集准确率和测试集准确率分别如何变化？\n哪个 max_depth 值在测试集上表现最好？\n当 max_depth 非常大或不限制时，训练集和测试集准确率的差距说明了什么？这就是过拟合。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
     ]
   },
   {
@@ -854,7 +909,7 @@
     "text": "练习 3: 随机森林实践与特征重要性\n目标: 训练随机森林模型，评估其性能，并提取特征重要性。\n\n训练随机森林:\n\n创建一个 RandomForestClassifier 模型实例。设置 n_estimators=100, max_depth=10 (可以根据练习 2 的结果选择一个较优的深度), random_state=42, n_jobs=-1。\n使用 X_train_scaled 和 y_train 训练模型。\n\n评估模型:\n\n对 X_test_scaled 进行预测。\n计算并打印准确率和分类报告。\n对比: 在 Markdown 单元格中比较随机森林的测试集准确率与练习 2 中最佳单棵决策树的测试集准确率。随机森林是否有提升？\n\n特征重要性:\n\n获取训练好的随机森林模型的 feature_importances_ 属性。\n创建一个 Pandas DataFrame，包含两列：‘Feature’ (值为 feature_names) 和 ‘Importance’ (值为重要性得分)。\n按 ‘Importance’ 列降序排序该 DataFrame。\n使用 seaborn.barplot() 可视化特征重要性（y 轴为特征名，x 轴为重要性得分）。\n添加标题 (“Feature Importance (Random Forest)”)。\n调用 plt.show() 显示图像。\n解读: 在 Markdown 单元格中列出最重要的 3 个特征。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
     ]
   },
   {
@@ -865,7 +920,7 @@
     "text": "练习 4: 交叉验证 (Cross-Validation)\n目标: 使用交叉验证更可靠地评估模型性能。\n\n对逻辑回归进行交叉验证:\n\n创建一个 LogisticRegression 实例 (random_state=42)。\n使用 cross_val_score() 对该模型在整个训练集 (X_train_scaled, y_train) 上进行 5 折交叉验证 (cv=5)。\n设置 scoring='accuracy'。\n打印返回的包含 5 个准确率得分的列表 lr_cv_scores。\n计算并打印这 5 个得分的平均值和标准差 (lr_cv_scores.mean(), lr_cv_scores.std())。\n\n对随机森林进行交叉验证:\n\n创建一个 RandomForestClassifier 实例（使用练习 3 的参数：n_estimators=100, max_depth=10, random_state=42, n_jobs=-1）。\n同样使用 cross_val_score() 进行 5 折交叉验证，评估准确率。\n打印每次验证的准确率以及平均准确率和标准差。\n\n比较: 在 Markdown 单元格中比较两种模型在交叉验证中的平均性能和稳定性（标准差）。哪个模型看起来更好？",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
     ]
   },
   {
@@ -876,7 +931,7 @@
     "text": "练习 5: 网格搜索 (Grid Search) 调优\n目标: 使用 GridSearchCV 自动寻找随机森林的最佳超参数。\n\n定义参数网格:\n\n为 RandomForestClassifier 创建一个参数字典 param_grid。\n至少包含 n_estimators (例如 [50, 100, 150]), max_depth (例如 [5, 10, None]), min_samples_leaf (例如 [1, 3, 5]) 这几个参数的不同候选值。可以根据计算时间适当调整范围。\n\n创建 GridSearchCV 对象:\n\n实例化 GridSearchCV。\n传入 RandomForestClassifier(random_state=42, n_jobs=-1) 作为 estimator。\n传入 param_grid。\n设置 cv=3 (为了节省时间，实际中可用 5 或 10)。\n设置 scoring='accuracy'。\n设置 verbose=1 以查看搜索过程。\n\n执行搜索:\n\n在训练集 (X_train_scaled, y_train) 上调用 fit() 方法执行网格搜索。注意：这可能需要几分钟时间。\n\n查看结果:\n\n打印 grid_search.best_params_ 查看找到的最佳参数组合。\n打印 grid_search.best_score_ 查看最佳参数组合下的交叉验证平均准确率。\n\n评估最优模型:\n\n获取最佳模型: best_rf = grid_search.best_estimator_。\n使用 best_rf 对测试集 (X_test_scaled) 进行预测。\n计算并打印最优模型在测试集上的准确率和分类报告。\n对比: 在 Markdown 单元格中比较这个最优模型的测试集性能与练习 3 中的随机森林模型（使用默认或手动选择的参数）的性能。网格搜索是否有带来提升？",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
     ]
   },
   {
@@ -887,7 +942,7 @@
     "text": "练习 6: 项目一 - 模型优化与最终报告\n目标: 应用本周所学优化项目一的模型，并准备最终报告。\n\n应用随机森林: 在你的项目一预处理数据上训练随机森林模型。\n交叉验证评估: 使用 cross_val_score 评估随机森林的性能，并与上周的 LR 和 SVM 结果比较（比较交叉验证的平均得分）。\n网格搜索调优:\n\n为你的随机森林模型定义合适的参数网格（可以参考练习 5，但根据你的数据和计算能力调整）。\n使用 GridSearchCV 寻找最佳超参数。记录最佳参数和对应的交叉验证分数。\n\n最终评估与分析:\n\n使用找到的最佳模型在测试集上进行评估（准确率、分类报告、混淆矩阵、ROC AUC）。\n在 Markdown 单元格或报告中，清晰地比较所有尝试过的模型（LR, SVM, 初始 RF, 调优后 RF）在测试集上的最终性能。哪个模型是你最终选择的模型？为什么？\n分析最优模型的特征重要性 (feature_importances_)。哪些特征对预测你的目标变量最重要？\n\n撰写报告:\n\n更新你的 Jupyter Notebook，包含所有优化步骤和分析。\n开始撰写项目一的最终报告（.md 或 .pdf 格式），总结整个项目流程、方法、结果、分析和结论。报告结构可以参考第十六周讲义中的建议。\n\n\n通过本周的练习，你将掌握更强大的模型和优化技巧，为解决更复杂的机器学习问题做好准备！",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>13</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第四周：课堂练习与实验</span>"
     ]
   },
   {
@@ -898,7 +953,7 @@
     "text": "第五周：课堂练习与实验\n本周我们开始学习回归模型，重点练习线性回归、多项式回归以及用于防止过拟合的正则化技术。同时，我们将启动第二个项目：房价预测。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
     ]
   },
   {
@@ -909,7 +964,7 @@
     "text": "准备工作\n确保导入本周所需的库：\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler, PolynomialFeatures\nfrom sklearn.linear_model import LinearRegression, Ridge, Lasso, RidgeCV, LassoCV\nfrom sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score\n# 尝试导入数据集加载函数\ntry:\n    from sklearn.datasets import fetch_california_housing\nexcept ImportError:\n    print(\"Scikit-learn version might be old. Consider updating if California Housing data is needed.\")\n    # Fallback or alternative dataset loading can be placed here\n    fetch_california_housing = None\n\n\n# 设置 matplotlib 绘图样式 (可选)\nplt.style.use('seaborn-v0_8-whitegrid')\n\n# --- 生成线性数据函数 (方便复用) ---\ndef generate_linear_data(n_samples=100, noise=1, random_state=42):\n    np.random.seed(random_state)\n    X = 2 * np.random.rand(n_samples, 1)\n    y = 4 + 3 * X + np.random.randn(n_samples, 1) * noise\n    return X, y.ravel() # Ensure y is 1D\n\n# --- 生成非线性数据函数 (方便复用) ---\ndef generate_nonlinear_data(n_samples=100, noise=1, random_state=42):\n    np.random.seed(random_state)\n    X = 6 * np.random.rand(n_samples, 1) - 3\n    y = 0.5 * X**2 + X + 2 + np.random.randn(n_samples, 1) * noise\n    return X, y.ravel() # 将 y 转换为一维数组\n\n# --- 准备线性数据 ---\nX_lin, y_lin = generate_linear_data()\nX_train_lin, X_test_lin, y_train_lin, y_test_lin = train_test_split(\n    X_lin, y_lin, test_size=0.2, random_state=42\n)\n\n# --- 准备非线性数据 ---\nX_poly_data, y_poly_data = generate_nonlinear_data()\nX_train_poly, X_test_poly, y_train_poly, y_test_poly = train_test_split(\n    X_poly_data, y_poly_data, test_size=0.2, random_state=42\n)",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
     ]
   },
   {
@@ -920,7 +975,7 @@
     "text": "练习 1: 线性回归实践与评估\n目标: 训练线性回归模型并理解回归评估指标。\n\n训练模型:\n\n创建一个 LinearRegression 模型实例。\n使用准备好的线性训练数据 (X_train_lin, y_train_lin) 训练模型。\n打印模型的截距 (intercept_) 和系数 (coef_)。\n\n预测:\n\n使用训练好的模型对测试集 X_test_lin 进行预测，得到 y_pred_lin。\n\n评估:\n\n计算并打印测试集上的 MSE, RMSE, MAE, R²。\n在 Markdown 单元格中解释 RMSE 和 R² 的含义。RMSE 的单位是什么？R²=0.8 意味着什么？\n\n可视化:\n\n绘制散点图展示测试集数据 (X_test_lin, y_test_lin)。\n在同一张图上绘制线性回归的拟合线 (X_test_lin, y_pred_lin)。\n添加图例、标题和坐标轴标签。\n调用 plt.show() 显示图像。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
     ]
   },
   {
@@ -931,7 +986,7 @@
     "text": "练习 2: 多项式回归实践\n目标: 使用多项式特征拟合非线性数据。\n\n特征转换:\n\n创建一个 PolynomialFeatures 实例 (poly_features)，设置 degree=2 和 include_bias=False。\n使用该实例对非线性训练数据 X_train_poly 进行 fit_transform，得到 X_train_poly_deg2。\n使用同一个实例对非线性测试数据 X_test_poly 进行 transform，得到 X_test_poly_deg2。\n打印转换前后训练数据的形状，观察特征数量的变化。\n\n训练模型:\n\n创建一个 LinearRegression 模型实例 (poly_lin_reg)。\n使用转换后的多项式训练特征 X_train_poly_deg2 和对应的 y_train_poly 训练模型。\n\n预测与评估:\n\n使用训练好的模型对转换后的测试特征 X_test_poly_deg2 进行预测，得到 y_pred_poly_deg2。\n计算并打印测试集上的 RMSE 和 R²。\n(可选): 训练一个普通的线性回归模型在 X_train_poly, y_train_poly 上，并在 X_test_poly 上评估，比较 RMSE 和 R² 与多项式回归的结果。\n\n可视化:\n\n绘制原始非线性测试数据散点图 (X_test_poly, y_test_poly)。\n为了绘制拟合曲线，需要生成一些排序后的 x 值：X_new = np.linspace(X_poly_data.min(), X_poly_data.max(), 100).reshape(-1, 1)。\n对 X_new 进行相同的多项式特征转换 X_new_poly = poly_features.transform(X_new)。\n使用训练好的多项式回归模型 poly_lin_reg 预测 y_new_poly = poly_lin_reg.predict(X_new_poly)。\n在散点图上绘制多项式回归拟合曲线 (X_new, y_new_poly)，用红色表示。\n添加图例、标题和坐标轴标签。\n调用 plt.show() 显示图像。\n\n(可选) 探索不同次数:\n\n尝试使用更高的 degree (例如 10 或 20) 重复步骤 1-4。观察拟合曲线的变化以及训练集和测试集上的 RMSE/R² 差异，体会过拟合现象。在 Markdown 单元格中记录你的观察。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
     ]
   },
   {
@@ -942,7 +997,7 @@
     "text": "练习 3: 正则化实践 (Ridge & Lasso)\n目标: 理解 L1 和 L2 正则化如何影响模型系数和性能，特别是在高维或存在共线性（多项式特征可能引入）的情况下。\n我们将使用上一练习中 degree=10 的多项式特征数据进行演示。\n\n准备高次多项式数据:\n\n创建 PolynomialFeatures 实例，degree=10, include_bias=False。\n转换 X_train_poly 和 X_test_poly 得到 X_train_poly_deg10, X_test_poly_deg10。\n重要: 对转换后的特征进行标准化。创建 StandardScaler，在 X_train_poly_deg10 上 fit_transform，在 X_test_poly_deg10 上 transform。得到 X_train_poly_scaled, X_test_poly_scaled。\n\n训练普通线性回归 (对比):\n\n在标准化后的高次多项式训练数据 (X_train_poly_scaled, y_train_poly) 上训练 LinearRegression。\n评估其在测试集 (X_test_poly_scaled, y_test_poly) 上的 RMSE 和 R²。\n打印模型系数 coef_ 的 L2 范数 (平方和的平方根: np.linalg.norm(model.coef_))，观察系数的大小。\n\n训练 Ridge 回归:\n\n创建 Ridge 模型实例。尝试不同的 alpha 值，例如 alphas_ridge = [0.01, 0.1, 1, 10, 100]。\n使用循环遍历 alphas_ridge：\n\n创建 Ridge(alpha=alpha, random_state=42) 实例。\n在标准化后的高次多项式训练数据上训练模型。\n评估模型在测试集上的 RMSE 和 R²。\n打印 alpha 值、RMSE、R² 和系数的 L2 范数。\n\n(可选) 使用 RidgeCV: 创建 RidgeCV(alphas=alphas_ridge, store_cv_values=True) 实例，训练并打印 best_alpha_。\n在 Markdown 单元格中比较 Ridge 回归与普通线性回归的性能和系数大小，以及不同 alpha 对结果的影响。\n\n训练 Lasso 回归:\n\n创建 Lasso 模型实例。尝试不同的 alpha 值，例如 alphas_lasso = [0.001, 0.01, 0.1, 1]。注意：Lasso 对 alpha 更敏感。\n使用循环遍历 alphas_lasso：\n\n创建 Lasso(alpha=alpha, random_state=42, max_iter=10000) 实例 (增加 max_iter 可能有助于收敛)。\n在标准化后的高次多项式训练数据上训练模型。\n评估模型在测试集上的 RMSE 和 R²。\n打印 alpha 值、RMSE、R² 以及非零系数的数量 (np.sum(model.coef_ != 0))。\n\n(可选) 使用 LassoCV: 创建 LassoCV(alphas=alphas_lasso, cv=3, random_state=42, max_iter=10000) 实例，训练并打印 best_alpha_。\n在 Markdown 单元格中比较 Lasso 回归与普通线性回归、Ridge 回归的性能和系数。Lasso 是否实现了特征选择？\n\n分析: 在 Markdown 单元格中总结 Ridge 和 Lasso 的作用，以及它们对模型系数和性能的影响，特别是在处理可能过拟合的高次多项式特征时的表现。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
     ]
   },
   {
@@ -953,7 +1008,7 @@
     "text": "练习 4: 项目二 - 阶段一 (数据准备与基线模型)\n目标: 应用所学知识，开始房价预测项目。\n\n加载数据: 加载老师提供或你找到的房价数据集 (例如 Scikit-learn 自带的 California Housing 数据集)。\n# 尝试加载 California Housing 数据集\ndata_loaded_project = False # Flag to check if data is loaded\ntry:\n    from sklearn.datasets import fetch_california_housing\n    if fetch_california_housing:\n        housing = fetch_california_housing(as_frame=True)\n        df_housing = housing.frame\n        # 分离特征和目标变量\n        X_h = df_housing[housing.feature_names] # 特征\n        y_h = df_housing[housing.target_names[0]] # 目标：房价中位数 (单位：10万美元)\n        print(\"成功加载 California Housing 数据集。\")\n        print(\"数据集形状:\", df_housing.shape)\n        print(df_housing.head())\n        print(df_housing.info())\n        print(df_housing.describe())\n        data_loaded_project = True\n    else:\n         print(\"fetch_california_housing not available.\")\nexcept ImportError:\n    print(\"无法加载 California Housing 数据集。请确保 scikit-learn 已安装或使用其他数据集。\")\nexcept Exception as e:\n    print(f\"加载或处理数据时出错: {e}\")\n\n# 如果未加载示例数据，尝试从本地加载 (需要用户准备 'your_housing_data.csv')\nif not data_loaded_project:\n    try:\n        df_housing = pd.read_csv('your_housing_data.csv') # 用户需要提供此文件\n        # 假设目标列名为 'Price' 或 'SalePrice' 等\n        target_col = 'MedHouseVal' # &lt;---- 修改为你的目标列名\n        if target_col not in df_housing.columns:\n            raise ValueError(f\"目标列 '{target_col}' 不在 CSV 文件中。\")\n        X_h = df_housing.drop(columns=[target_col])\n        y_h = df_housing[target_col]\n        print(\"成功从 CSV 加载数据。\")\n        print(\"数据集形状:\", df_housing.shape)\n        data_loaded_project = True\n    except FileNotFoundError:\n        print(\"未找到 'your_housing_data.csv'。请提供数据集或使用 scikit-learn 数据集。\")\n        X_h, y_h = None, None\n    except Exception as e:\n        print(f\"从 CSV 加载数据时出错: {e}\")\n        X_h, y_h = None, None\n数据探索 (EDA): (仅当 data_loaded_project 为 True 时执行)\n\n检查目标变量 (房价 y_h) 的分布（绘制直方图 y_h.hist(bins=50)）。是否需要进行变换（如对数变换 np.log1p()）使其更接近正态分布？如果需要，创建变换后的目标变量 y_h_log = np.log1p(y_h)。\n检查特征 X_h 中各列的缺失值 (X_h.isnull().sum())。\n识别数值特征和类别特征。\n(可选) 计算特征与目标变量的相关性 (df_housing.corr()[y_h.name].sort_values())。\n(可选) 绘制部分特征与目标变量的散点图。\n\n数据预处理: (仅当 data_loaded_project 为 True 时执行)\n\n处理缺失值: 选择合适的策略（例如，对于数值特征，可以使用中位数填充 X_h = X_h.fillna(X_h.median())）。\n处理类别特征: 如果有类别特征，使用独热编码 (pd.get_dummies)。\n特征缩放: 对所有数值特征使用 StandardScaler 进行标准化。创建 scaler_h = StandardScaler()，然后 X_h_scaled = scaler_h.fit_transform(X_h)。\n\n划分训练/测试集: (仅当 data_loaded_project 为 True 时执行)\n\n将预处理后的特征数据 X_h_scaled 和目标变量 y_h (或变换后的 y_h_log) 划分为训练集和测试集 (test_size=0.2, random_state=42)。\n\n训练基线模型: (仅当 data_loaded_project 为 True 时执行)\n\n在训练集上训练一个 LinearRegression 模型。\n在测试集上进行预测。\n计算并记录基线模型的 MSE, RMSE, MAE, R²。如果目标变量做了对数变换，记得将预测值转换回去 (np.expm1(y_pred_log)) 再与原始测试集目标变量比较。\n\n\n将以上步骤的代码和分析记录在你的项目二 Notebook 中。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
     ]
   },
   {
@@ -964,7 +1019,7 @@
     "text": "练习 5: 项目二 - 初步模型改进\n目标: 尝试使用多项式回归和正则化改进基线模型。\n继续使用项目二的数据和划分好的训练/测试集。确保使用标准化后的特征数据。 (仅当 data_loaded_project 为 True 时执行)\n\n多项式回归:\n\n选择 degree=2。创建 PolynomialFeatures(include_bias=False) 实例。\n对标准化后的训练特征 (X_train_h_scaled) 和测试特征 (X_test_h_scaled) 进行转换。\n在转换后的训练特征上训练 LinearRegression 模型。\n在转换后的测试特征上预测，并评估性能 (RMSE, R²)。与基线模型比较。\n\nRidge 回归:\n\n在标准化后的（原始，非多项式）训练特征上训练 Ridge 模型。\n尝试几个不同的 alpha 值（例如 [0.1, 1, 10, 100]）。可以使用 RidgeCV 自动选择 alpha，或者手动循环尝试。\n评估每个 alpha（或最优 alpha）在测试集上的性能。与基线模型比较。\n\nLasso 回归:\n\n在标准化后的（原始，非多项式）训练特征上训练 Lasso 模型。\n尝试几个不同的 alpha 值（例如 [0.0001, 0.001, 0.01, 0.1, 1]）。可以使用 LassoCV 或手动循环。注意设置 max_iter 可能需要更大（如 5000 或 10000）以保证收敛。\n评估每个 alpha（或最优 alpha）在测试集上的性能。与基线模型比较。观察是否有系数变为 0。\n\n记录与分析:\n\n在项目 Notebook 中记录所有尝试的模型及其在测试集上的性能 (RMSE, R²)。\n比较不同模型的效果，哪个模型目前表现最好？\n多项式回归或正则化是否带来了改进？正则化模型（特别是 Lasso）是否减少了特征的数量？\n\n\n完成本周练习，你将对线性模型及其扩展有更深入的掌握，并为项目二打下良好基础！",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第五周：课堂练习与实验</span>"
     ]
   },
   {
@@ -975,7 +1030,7 @@
     "text": "准备工作\n确保导入本周所需的库，并准备好上周使用的房价数据集（或示例数据）。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
     ]
   },
   {
@@ -986,7 +1041,7 @@
     "text": "import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV\nfrom sklearn.preprocessing import StandardScaler, PolynomialFeatures\nfrom sklearn.linear_model import LinearRegression\n# 检查 xgboost 是否已安装，如果需要安装，取消下一行注释\n# !pip install xgboost\ntry:\n    import xgboost as xgb\nexcept ImportError:\n    print(\"XGBoost not installed. Please install it using: pip install xgboost\")\n    xgb = None # Set to None if import fails\n\nfrom sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score\nfrom scipy.stats import uniform, randint # 用于 RandomizedSearchCV\n\n# 设置 matplotlib 绘图样式 (可选)\nplt.style.use('seaborn-v0_8-whitegrid')\n\n# --- 加载或生成数据 (复用上周项目二的数据准备) ---\n# 假设 X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h 已经从上周的练习中加载并准备好\n# 如果没有，需要重新执行 week5_exercise.qmd 中的数据加载和预处理步骤\n# 例如，加载 California Housing 数据并处理：\ndata_loaded = False\nX_h, y_h = None, None # Initialize to None\nX_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = None, None, None, None\n\ntry:\n    from sklearn.datasets import fetch_california_housing\n    housing = fetch_california_housing(as_frame=True)\n    df_housing = housing.frame\n    X_h = df_housing[housing.feature_names]\n    y_h = df_housing[housing.target_names[0]] # 目标：房价中位数 (单位：10万美元)\n\n    # 简单处理缺失值 (用中位数填充)\n    if X_h.isnull().sum().any(): # 检查是否有任何缺失值\n         X_h = X_h.fillna(X_h.median()) # 使用 fillna 并重新赋值\n\n    # 特征缩放\n    scaler_h = StandardScaler()\n    X_h_scaled = scaler_h.fit_transform(X_h)\n\n    # 划分训练/测试集\n    X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = train_test_split(\n        X_h_scaled, y_h, test_size=0.2, random_state=42\n    )\n    print(\"数据准备完成。\")\n    print(\"训练集形状:\", X_train_h_scaled.shape)\n    print(\"测试集形状:\", X_test_h_scaled.shape)\n    data_loaded = True\nexcept ImportError:\n    print(\"无法加载 California Housing 数据集。请确保 scikit-learn 已安装或使用其他数据集。\")\nexcept Exception as e:\n    print(f\"加载或处理数据时出错: {e}\")\n\nif not data_loaded:\n     print(\"将使用简单生成数据进行后续练习。\")\n     # Fallback to generated data if loading failed\n     def generate_linear_data(n_samples=500, noise=5, random_state=42):\n         np.random.seed(random_state)\n         X = 10 * np.random.rand(n_samples, 3) # 3 features\n         y = 5 + 2*X[:,0] + 0.5*X[:,1] - 1.5*X[:,2] + np.random.randn(n_samples) * noise\n         return X, y\n     X_h, y_h = generate_linear_data()\n     scaler_h = StandardScaler()\n     X_h_scaled = scaler_h.fit_transform(X_h)\n     X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = train_test_split(\n        X_h_scaled, y_h, test_size=0.2, random_state=42\n     )\n     data_loaded = True # Mark as loaded for subsequent steps",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
     ]
   },
   {
@@ -997,7 +1052,7 @@
     "text": "练习 1: XGBoost 回归基础\n目标: 训练一个基础的 XGBoost 回归模型，并与线性回归进行比较。\n使用项目二准备好的训练集和测试集 (X_train_h_scaled, y_train_h, X_test_h_scaled, y_test_h)。\n前置条件检查：确保上一步数据加载和预处理成功，并且 xgboost 库已安装。\nif data_loaded and xgb:\n    # 1. 训练 XGBoost 模型\n    print(\"训练基础 XGBoost 模型...\")\n    xgb_reg_base = xgb.XGBRegressor(objective='reg:squarederror',\n                                    n_estimators=100,\n                                    learning_rate=0.1,\n                                    max_depth=5,\n                                    subsample=0.8,\n                                    colsample_bytree=0.8,\n                                    random_state=42,\n                                    n_jobs=-1) # 使用所有 CPU 核心\n\n    eval_set = [(X_test_h_scaled, y_test_h)] # 使用测试集作为评估集\n    xgb_reg_base.fit(X_train_h_scaled, y_train_h,\n                     eval_set=eval_set,\n                     eval_metric='rmse', # 监控 RMSE\n                     early_stopping_rounds=10, # 如果 10 轮内 RMSE 没有改善则停止\n                     verbose=False) # 设置为 True 可以看到每一轮的评估结果\n\n    # 2. 预测与评估\n    y_pred_xgb_base = xgb_reg_base.predict(X_test_h_scaled)\n    rmse_xgb_base = np.sqrt(mean_squared_error(y_test_h, y_pred_xgb_base))\n    r2_xgb_base = r2_score(y_test_h, y_pred_xgb_base)\n    mae_xgb_base = mean_absolute_error(y_test_h, y_pred_xgb_base)\n    print(\"\\n--- 基础 XGBoost 评估 ---\")\n    print(f\"XGBoost RMSE: {rmse_xgb_base:.4f}\")\n    print(f\"XGBoost MAE: {mae_xgb_base:.4f}\")\n    print(f\"XGBoost R²: {r2_xgb_base:.4f}\")\n\n    # 3. 对比线性回归 (假设 lin_reg 已在上周练习中训练好)\n    # 如果没有，需要重新训练\n    try:\n        # 尝试加载上周训练的线性回归模型或结果\n        # 如果没有保存模型，需要重新训练\n        lin_reg = LinearRegression()\n        lin_reg.fit(X_train_h_scaled, y_train_h)\n        y_pred_lin = lin_reg.predict(X_test_h_scaled)\n        rmse_lin = np.sqrt(mean_squared_error(y_test_h, y_pred_lin))\n        r2_lin = r2_score(y_test_h, y_pred_lin)\n        mae_lin = mean_absolute_error(y_test_h, y_pred_lin)\n        print(\"\\n--- 线性回归评估 (对比) ---\")\n        print(f\"线性回归 RMSE: {rmse_lin:.4f}\")\n        print(f\"线性回归 MAE: {mae_lin:.4f}\")\n        print(f\"线性回归 R²: {r2_lin:.4f}\")\n    except NameError:\n        print(\"\\n线性回归模型未找到，请先运行上周练习或重新训练。\")\n\n    print(\"\\n对比完成。请在 Markdown 单元格中分析 XGBoost 是否比线性回归有显著提升。\")\nelif not xgb:\n    print(\"XGBoost 库未安装，请先安装： pip install xgboost\")\nelse:\n    print(\"数据未加载，无法执行练习 1。\")\n分析:\n\n在 Markdown 单元格中比较基础 XGBoost 和线性回归的性能 (RMSE, MAE, R²)。XGBoost 是否有显著提升？",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1008,7 +1063,7 @@
     "text": "练习 2: XGBoost 参数调优 (Grid Search 或 Randomized Search)\n目标: 使用自动化工具寻找 XGBoost 的更优超参数组合。\n继续使用项目二的数据。\n前置条件检查：确保上一步数据加载和预处理成功，并且 xgboost 库已安装。\nif data_loaded and xgb:\n    # 1. 选择调优方法 (这里以 RandomizedSearchCV 为例，计算量相对较小)\n    print(\"\\n开始 RandomizedSearchCV 调优 (可能需要几分钟)...\")\n\n    # 2. 定义参数空间\n    param_dist = {\n        'n_estimators': randint(100, 600),        # 树的数量范围\n        'learning_rate': uniform(0.01, 0.29),     # 学习率范围 (0.01 到 0.3)\n        'max_depth': randint(3, 11),              # 树的最大深度 (3 到 10)\n        'subsample': uniform(0.6, 0.4),           # 样本采样比例 (0.6 到 1.0)\n        'colsample_bytree': uniform(0.6, 0.4),    # 特征采样比例 (0.6 到 1.0)\n        'gamma': [0, 0.1, 0.5, 1, 1.5, 2],        # 尝试几个 gamma 值\n        'reg_alpha': [0, 0.001, 0.01, 0.1, 1],     # L1 正则化系数\n        'reg_lambda': [0.5, 1, 1.5, 2, 5]         # L2 正则化系数\n    }\n\n    # 3. 创建搜索对象\n    xgb_reg_tune = xgb.XGBRegressor(objective='reg:squarederror', random_state=42, n_jobs=-1)\n\n    # n_iter 控制抽样次数，cv 控制交叉验证折数\n    # 增加 n_iter 和 cv 会提高找到更好参数的可能性，但也会增加时间\n    random_search_xgb = RandomizedSearchCV(estimator=xgb_reg_tune,\n                                           param_distributions=param_dist,\n                                           n_iter=30, # 尝试 30 组随机参数组合 (可根据时间和计算资源调整)\n                                           scoring='neg_root_mean_squared_error', # 使用负 RMSE\n                                           cv=3, # 3 折交叉验证\n                                           verbose=1,\n                                           random_state=42,\n                                           n_jobs=-1) # 使用所有可用 CPU\n\n    # 4. 执行搜索\n    random_search_xgb.fit(X_train_h_scaled, y_train_h)\n\n    # 5. 查看结果\n    print(\"\\n--- RandomizedSearchCV 结果 ---\")\n    print(\"找到的最优超参数:\", random_search_xgb.best_params_)\n    print(f\"最优交叉验证 RMSE: {-random_search_xgb.best_score_:.4f}\") # 注意取负号\n\n    # 6. 评估最优模型\n    best_xgb = random_search_xgb.best_estimator_\n    y_pred_best_xgb = best_xgb.predict(X_test_h_scaled)\n    rmse_best_xgb = np.sqrt(mean_squared_error(y_test_h, y_pred_best_xgb))\n    mae_best_xgb = mean_absolute_error(y_test_h, y_pred_best_xgb)\n    r2_best_xgb = r2_score(y_test_h, y_pred_best_xgb)\n\n    print(\"\\n--- 最优 XGBoost 评估 (测试集) ---\")\n    print(f\"最优 XGBoost RMSE: {rmse_best_xgb:.4f}\")\n    print(f\"最优 XGBoost MAE: {mae_best_xgb:.4f}\")\n    print(f\"最优 XGBoost R²: {r2_best_xgb:.4f}\")\n\n    print(\"\\n调优完成。请在 Markdown 单元格中比较调优后的性能。\")\n\nelif not xgb:\n    print(\"XGBoost 库未安装，无法执行练习 2。\")\nelse:\n    print(\"数据未加载，无法执行练习 2。\")\n分析:\n\n在 Markdown 单元格中比较调优后的 XGBoost 模型与练习 1 中的基础 XGBoost 模型以及线性回归模型的性能 (RMSE, MAE, R²)。调优是否带来了显著提升？",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1019,7 +1074,7 @@
     "text": "练习 3: 项目二 - 模型优化与最终报告\n目标: 完成项目二的 XGBoost 优化和报告撰写。\n\n应用 XGBoost: 将练习 1 和 2 中的 XGBoost 训练和调优过程整合到你的项目二 Notebook 中。确保使用了你的项目数据。\n模型对比: 在 Notebook 中创建一个表格或清晰的列表，总结你为项目二尝试的所有模型（线性回归、多项式回归、Ridge、Lasso、基础 XGBoost、调优后 XGBoost）在测试集上的关键评估指标（RMSE, R², MAE）。\n最终模型选择: 根据评估结果，在 Markdown 单元格中明确指出你选择哪个模型作为最终模型，并解释原因（例如，哪个模型在关键指标上表现最好，或者在性能和复杂度之间取得了较好的平衡）。\n(可选) 特征重要性分析: 如果最终选择了 XGBoost，分析并可视化其特征重要性。\n# 示例：获取并可视化 XGBoost 特征重要性\nif data_loaded and xgb and 'best_xgb' in locals(): # 检查 best_xgb 是否已定义\n    try:\n        importances_xgb = best_xgb.feature_importances_\n        # 确保 X_h 是 DataFrame 以获取列名，如果不是，需要手动提供 feature_names\n        if 'X_h' in locals() and isinstance(X_h, pd.DataFrame):\n             feature_names_h = X_h.columns\n        elif 'feature_names' in locals(): # 如果从 make_classification 生成\n             feature_names_h = feature_names\n        else:\n             # 如果 X_h 不是 DataFrame 或来自其他来源，需要手动提供特征名称列表\n             feature_names_h = [f'feature_{i}' for i in range(X_train_h_scaled.shape[1])] # 备用名称\n\n        feature_importance_xgb_df = pd.DataFrame({'Feature': feature_names_h, 'Importance': importances_xgb})\n        feature_importance_xgb_df = feature_importance_xgb_df.sort_values(by='Importance', ascending=False)\n\n        plt.figure(figsize=(10, max(6, len(feature_names_h) * 0.4))) # 调整大小以适应特征数量\n        sns.barplot(x='Importance', y='Feature', data=feature_importance_xgb_df)\n        plt.title('Feature Importance (Best XGBoost)')\n        plt.tight_layout() # 调整布局防止标签重叠\n        # plt.show()\n        print(\"\\n最优 XGBoost 模型特征重要性:\\n\", feature_importance_xgb_df)\n    except Exception as e:\n        print(f\"计算或绘制特征重要性时出错: {e}\")\nelse:\n    print(\"\\n无法计算特征重要性，数据未加载、XGBoost未安装或最优模型未训练。\")\n在 Markdown 单元格中解释哪些特征对房价预测最重要，这是否符合你的直觉或领域知识？\n撰写报告:\n\n完成项目二的最终报告（.md 或 .pdf）。\n结构建议:\n\n引言: 项目目标（预测房价），数据集描述。\n数据探索与预处理: 主要的 EDA 发现，缺失值处理，特征工程（如缩放、编码、多项式特征），训练/测试集划分。\n模型构建与选择:\n\n介绍尝试过的模型（线性回归、正则化、XGBoost 等）。\n描述模型评估方法（指标、交叉验证、调优过程 - 包括参数范围和选择方法）。\n清晰展示和比较各模型在测试集上的性能（建议使用表格）。\n说明最终选择的模型及其理由。\n\n(可选) 特征重要性分析: 如果适用，展示并解释特征重要性结果。\n结论与讨论: 总结模型性能，讨论模型的优点和局限性，以及未来可能的改进方向（例如，尝试其他模型、更复杂的特征工程、收集更多数据等）。\n附录: (可选) 包含关键代码片段或额外的详细图表。\n\n确保报告逻辑清晰，图表规范，结论明确。\n\n\n提交项目二的最终 Notebook 和报告。\n下周我们将进入无监督学习，探索如何从未标记数据中发现模式！",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第六周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1030,7 +1085,7 @@
     "text": "第七周：课堂练习与实验\n本周我们进入无监督学习的世界，重点练习 K-Means 聚类算法，学习如何选择合适的簇数量 K，并开始我们的用户分群项目。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1041,7 +1096,7 @@
     "text": "准备工作\n确保导入本周所需的库：\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.datasets import make_blobs, make_moons # 导入生成数据的函数\nfrom sklearn.preprocessing import StandardScaler # 导入数据缩放器\nfrom sklearn.cluster import KMeans # 导入KMeans聚类算法\nfrom sklearn.metrics import silhouette_score, davies_bouldin_score # 导入评估指标\nfrom sklearn.decomposition import PCA # 导入PCA\nfrom sklearn.manifold import t_SNE # 导入t-SNE，用于可视化\n\n# 设置 matplotlib 绘图样式 (可选)\nplt.style.use('seaborn-v0_8-whitegrid')\n# %matplotlib inline # 如果在 Jupyter 环境中需要取消注释",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1052,7 +1107,7 @@
     "text": "练习 1: K-Means 基础实践\n目标: 熟悉 K-Means 算法的基本使用和结果可视化。\n\n生成数据:\n\n使用 make_blobs 生成包含 4 个簇的二维数据集。设置 n_samples=400, centers=4, cluster_std=0.6, random_state=0。将特征赋值给 X, 真实标签赋值给 y_true (虽然 K-Means 是无监督的，但真实标签有助于我们后续评估 K 值选择的效果)。\n绘制散点图观察生成的数据分布。\n\n数据缩放:\n\n初始化 StandardScaler。\n对特征数据 X 进行 fit_transform，得到 X_scaled。\n\n训练 K-Means:\n\n创建一个 KMeans 实例，设置 n_clusters=4 (假设我们已知或猜对了簇数), init='k-means++', n_init='auto', random_state=42。\n使用缩放后的数据 X_scaled 训练模型 (fit() 方法)。\n\n获取结果:\n\n获取模型预测的簇标签 kmeans_labels = kmeans.labels_。\n获取簇中心点坐标 centroids = kmeans.cluster_centers_。\n\n可视化结果:\n\n绘制散点图，使用 X_scaled 作为坐标，并根据 kmeans_labels 对点进行着色 (c=kmeans_labels, cmap='viridis')。\n在同一图上，用不同的标记（例如红色 ‘X’）绘制簇中心点 centroids。\n添加标题和坐标轴标签。\n调用 plt.show()。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1063,7 +1118,7 @@
     "text": "练习 2: 选择最佳 K 值\n目标: 应用肘部法则和轮廓系数来为 K-Means 选择合适的 K 值。\n继续使用练习 1 中的 X_scaled 数据。\n\n肘部法则 (Elbow Method):\n\n创建一个空列表 inertia_list 用于存储 inertia 值。\n设置一个 K 值的范围，例如 k_range = range(1, 11)。\n使用 for 循环遍历 k_range：\n\n在循环内，创建 KMeans 实例，设置 n_clusters=k, init='k-means++', n_init='auto', random_state=42。\n用 X_scaled 训练模型。\n将模型的 inertia_ 属性值添加到 inertia_list 中。\n\n绘制 K 值 (k_range) 与 Inertia (inertia_list) 的关系图。\n添加标题 (“Elbow Method for Optimal K”)、坐标轴标签 (“Number of Clusters (K)”, “Inertia”) 和网格线。\n调用 plt.show()。\n分析: 在 Markdown 单元格中指出你观察到的“肘部”大约在哪个 K 值。\n\n轮廓系数 (Silhouette Score):\n\n创建一个空列表 silhouette_list。\n设置 K 值的范围，从 2 开始，例如 k_range_sil = range(2, 11)。\n使用 for 循环遍历 k_range_sil：\n\n创建 KMeans 实例，设置 n_clusters=k, init='k-means++', n_init='auto', random_state=42。\n训练模型并获取预测标签 labels = kmeans.fit_predict(X_scaled)。\n使用 silhouette_score(X_scaled, labels) 计算该 K 值对应的平均轮廓系数，并添加到 silhouette_list。\n\n绘制 K 值 (k_range_sil) 与轮廓系数 (silhouette_list) 的关系图。\n添加标题 (“Silhouette Score for Optimal K”)、坐标轴标签 (“Number of Clusters (K)”, “Average Silhouette Score”) 和网格线。\n调用 plt.show()。\n分析: 在 Markdown 单元格中指出哪个 K 值对应的轮廓系数最高。\n\n确定 K: 结合肘部法则和轮廓系数的结果，以及我们生成数据时已知的真实簇数 (4)，在 Markdown 单元格中讨论并确定最合适的 K 值。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1074,7 +1129,7 @@
     "text": "练习 3: 聚类评估与可视化 (使用选定的 K)\n目标: 使用选定的 K 值进行最终聚类，并评估和可视化结果。\n\n最终聚类:\n\n使用练习 2 中确定的最佳 K 值（应该是 4）重新创建一个 KMeans 实例。\n用 X_scaled 训练模型并获取最终的聚类标签 final_labels。\n\n评估:\n\n计算并打印最终聚类的轮廓系数 (silhouette_score)。\n计算并打印最终聚类的戴维斯-布尔丁指数 (davies_bouldin_score)。\n\n可视化 (PCA):\n\n创建一个 PCA 实例，设置 n_components=2, random_state=42。\n对 X_scaled 进行 fit_transform 得到 X_pca。\n绘制散点图，x 轴为 PCA 第一个主成分，y 轴为第二个主成分，用 final_labels 进行着色。\n添加标题和坐标轴标签。\n调用 plt.show()。\n\n(可选) 可视化 (t-SNE):\n\n创建一个 t_SNE 实例，设置 n_components=2, perplexity=30 (或其他合适的值), random_state=42。\n对 X_scaled 进行 fit_transform 得到 X_tsne。\n绘制散点图，x 轴为 t-SNE 第一个维度，y 轴为第二个维度，用 final_labels 进行着色。\n添加标题和坐标轴标签。\n调用 plt.show()。\n在 Markdown 单元格中比较 PCA 和 t-SNE 的可视化效果。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1085,7 +1140,7 @@
     "text": "练习 4: 项目三 - 阶段一 (K-Means & K 选择)\n目标: 将 K-Means 应用于你的用户分群项目数据。\n\n加载与预处理:\n\n加载你的项目三数据集。\n选择用于聚类的相关特征（通常是用户的行为或属性数据，如购买频率、消费金额、访问时长、年龄等）。\n进行必要的预处理：处理缺失值、对类别特征进行编码（如果需要）。\n对所有选定的数值特征进行标准化 (StandardScaler)。将处理后的数据存为 X_project_scaled。\n\n选择 K 值:\n\n应用肘部法则：计算不同 K 值 (例如 1 到 15 或 20) 对应的 Inertia，并绘制肘部图。\n应用轮廓系数法：计算不同 K 值 (例如 2 到 15 或 20) 对应的平均轮廓系数，并绘制轮廓系数图。\n分析: 在 Markdown 单元格中结合两个图表，以及你对业务的理解（你期望用户大致可以分为几类？），选择一个或几个最可能的 K 值。\n\n执行聚类:\n\n使用你选择的最佳 K 值，创建并训练 KMeans 模型。\n获取聚类标签。\n\n初步可视化 (如果特征维度 &gt; 2):\n\n使用 PCA 或 t-SNE 将你的 X_project_scaled 数据降维到 2 维。\n绘制降维后的散点图，并根据聚类标签着色。\n观察聚类效果。\n\n\n将以上步骤的代码、图表和分析记录在你的项目三 Notebook 中。这是项目三第一阶段的核心内容。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第七周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1096,7 +1151,7 @@
     "text": "准备工作\n确保导入本周所需的库，并准备好上周使用的聚类数据（或示例数据）。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1107,7 +1162,7 @@
     "text": "import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom sklearn.datasets import make_blobs, make_moons # 导入生成数据的函数\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.cluster import KMeans, DBSCAN # 导入 DBSCAN\nfrom sklearn.metrics import silhouette_score, davies_bouldin_score\nfrom sklearn.decomposition import PCA\nfrom sklearn.manifold import t_SNE # 可选，用于可视化\nfrom sklearn.neighbors import NearestNeighbors # 用于 K-distance plot\n\n# 设置 matplotlib 绘图样式 (可选)\nplt.style.use('seaborn-v0_8-whitegrid')\n# %matplotlib inline # 如果在 Jupyter 环境中需要取消注释\n\n# --- 生成用于比较的数据 ---\n# 1. Blobs (适合 K-Means)\nX_blobs, y_blobs_true = make_blobs(n_samples=400, centers=4, cluster_std=0.6, random_state=0)\nscaler_blobs = StandardScaler()\nX_blobs_scaled = scaler_blobs.fit_transform(X_blobs)\ndf_blobs_original = pd.DataFrame(X_blobs, columns=['Feature1', 'Feature2']) # 保存原始数据用于解读\n\n# 2. Moons (适合 DBSCAN)\nX_moons, y_moons_true = make_moons(n_samples=300, noise=0.08, random_state=42)\nscaler_moons = StandardScaler()\nX_moons_scaled = scaler_moons.fit_transform(X_moons)",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1118,7 +1173,7 @@
     "text": "练习 1: DBSCAN 实践\n目标: 理解 DBSCAN 的原理，练习使用 DBSCAN 并观察参数 eps 和 min_samples 的影响。\n使用 X_moons_scaled 数据集。\n\n初步尝试 DBSCAN:\n\n创建一个 DBSCAN 实例，尝试不同的 eps 和 min_samples 组合，例如：\n\neps=0.2, min_samples=5\neps=0.3, min_samples=5\neps=0.3, min_samples=10\neps=0.5, min_samples=5\n\n对于每种组合，使用 fit_predict() 获取聚类标签。\n打印出每种组合下找到的簇数量（不包括噪声点 -1）和噪声点的数量。\n绘制散点图可视化聚类结果，用不同颜色表示簇，用特定标记（如小黑点 . 或 x，颜色设为黑色）表示噪声点 (labels == -1)。\n在 Markdown 单元格中描述 eps 和 min_samples 的变化对聚类结果（簇的数量、形状、噪声点）的影响。\n\n使用 K-距离图选择 eps:\n\n选择一个 min_samples 值（例如，对于二维数据，可以从 3 或 5 开始）。\n使用 sklearn.neighbors.NearestNeighbors 找到每个点到其第 k = min_samples 个最近邻的距离 (注意：sklearn kneighbors 包含自身，所以查第 k 个邻居)。 python     k = 5 # Example: min_samples = 5     nbrs = NearestNeighbors(n_neighbors=k).fit(X_moons_scaled)     distances, indices = nbrs.kneighbors(X_moons_scaled)     # 获取每个点的 k-距离 (第 k 个邻居的距离，即 distances 数组的最后一列)     k_distances = np.sort(distances[:, k-1], axis=0)\n绘制 K-距离图 (plt.plot(k_distances))。\n添加标题和坐标轴标签。\n观察图像中的“拐点”（斜率急剧变化的点），估计一个合适的 eps 值。\n在 Markdown 单元格中记录你选择的 eps 值以及理由。\n使用你选择的 min_samples 和估计的 eps 再次运行 DBSCAN 并可视化结果。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1129,7 +1184,7 @@
     "text": "练习 2: K-Means vs. DBSCAN 对比\n目标: 对比 K-Means 和 DBSCAN 在不同类型数据上的表现。\n\n在 Moons 数据上运行 K-Means:\n\n使用 X_moons_scaled 数据。\n训练一个 KMeans 模型，设置 n_clusters=2 (因为我们知道 Moons 数据有 2 个半月形), n_init='auto', random_state=42。\n获取聚类标签。\n可视化 K-Means 的聚类结果。\n\n在 Blobs 数据上运行 DBSCAN:\n\n使用 X_blobs_scaled 数据。\n首先使用 K-距离图（例如 min_samples=5）为 Blobs 数据估计一个合适的 eps 值。\n使用估计的 eps 和 min_samples 训练 DBSCAN 模型。\n获取聚类标签。\n可视化 DBSCAN 的聚类结果（注意可能存在的噪声点）。\n\n对比分析:\n\n在 Markdown 单元格中，比较 K-Means 和 DBSCAN 在 Moons 数据集上的表现。哪个算法更适合这种非球状分布？\n比较 K-Means (使用 K=4) 和 DBSCAN 在 Blobs 数据集上的表现。哪个算法更适合这种球状分布？DBSCAN 是否将一些点识别为噪声？这些噪声点合理吗？\n总结 K-Means 和 DBSCAN 的主要区别和适用场景。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1140,7 +1195,7 @@
     "text": "练习 3: 聚类结果的业务解读 (示例)\n目标: 练习从聚类结果中提取业务洞察。\n假设我们对 X_blobs_scaled 数据运行 K-Means (K=4) 得到了 final_labels_blobs。现在我们将这些标签与原始（未缩放）特征关联起来进行分析。\n\n合并标签与原始数据:\n\n创建一个包含原始特征 df_blobs_original 和聚类标签 final_labels_blobs 的 DataFrame df_analysis。\n\n# 确保 kmeans_final 和 final_labels 来自 K=4 的 K-Means 运行\nkmeans_blobs = KMeans(n_clusters=4, init='k-means++', n_init='auto', random_state=42)\nfinal_labels_blobs = kmeans_blobs.fit_predict(X_blobs_scaled)\n\ndf_analysis = df_blobs_original.copy() # 使用包含原始特征的DataFrame\ndf_analysis['Cluster'] = final_labels_blobs\nprint(df_analysis.head())\n分析各簇特征:\n\n使用 groupby('Cluster').mean() 计算每个簇中各特征的平均值。\n使用 groupby('Cluster').size() 或 df_analysis['Cluster'].value_counts() 查看每个簇的大小。\n使用 groupby('Cluster').describe() 查看更详细的统计信息，关注均值、标准差、最小值、最大值等。\n解读: 在 Markdown 单元格中描述每个簇的特征。例如：“簇 0 的 Feature1 值较低，Feature2 值较高”，“簇 2 的样本数量最少”等。\n\n可视化特征分布:\n\n使用 seaborn.boxplot 或 seaborn.violinplot 绘制每个特征在不同簇中的分布情况。\n\nplt.figure(figsize=(12, 5))\nplt.subplot(1, 2, 1)\nsns.boxplot(x='Cluster', y='Feature1', data=df_analysis)\nplt.title('Feature1 Distribution by Cluster')\nplt.subplot(1, 2, 2)\nsns.boxplot(x='Cluster', y='Feature2', data=df_analysis)\nplt.title('Feature2 Distribution by Cluster')\nplt.tight_layout()\nplt.show()\n\n解读: 结合统计数据和可视化结果，更深入地理解每个簇的特点。\n\n给簇贴标签 (Profiling):\n\n根据你对各簇特征的分析，在 Markdown 单元格中为每个簇（0, 1, 2, 3）起一个描述性的标签（例如：“高 F1 低 F2 群体”、“低 F1 低 F2 群体”等）。\n\n提出商业建议 (假设场景):\n\n假设 Feature1 代表“最近购买间隔（天数）”，Feature2 代表“平均订单金额”。\n针对你为每个簇打的标签，提出至少一条具体的商业建议。例如：\n\n对于“高价值近期活跃客户”（假设是高 F2 低 F1 的簇），可以推荐新品、提供 VIP 服务。\n对于“低价值近期流失风险客户”（假设是低 F2 高 F1 的簇），可以发送召回优惠券、进行用户调研。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
     ]
   },
   {
@@ -1151,7 +1206,491 @@
     "text": "练习 4: 项目三 - 优化与业务解读\n目标: 完成用户分群项目，重点进行业务解读。\n\n(可选) 尝试 DBSCAN:\n\n在你的项目三预处理数据 (X_project_scaled) 上运行 DBSCAN。\n使用 K-距离图等方法尝试找到合适的 eps 和 min_samples。\n可视化 DBSCAN 的结果（可以使用 PCA 或 t-SNE 降维）。\n与上周的 K-Means 结果进行比较。DBSCAN 是否提供了不同的视角或发现了噪声点？\n\n选择最终模型:\n\n基于 K-Means 和 DBSCAN（如果尝试了）的结果，结合轮廓系数、DBI 指数、可视化效果以及你对业务的理解，确定最终使用的聚类模型和参数（例如，最终决定使用 K-Means 且 K=5）。在 Notebook 中说明你的选择理由。\n\n深入业务解读 (核心):\n\n将最终选定模型的聚类标签合并回包含原始特征（未缩放）的 DataFrame。\n详细分析每个簇的特征:\n\n计算各簇在人口统计学特征（年龄、性别、地区等，如果可用）上的分布。\n计算各簇在关键业务行为特征（如购买频率、最近购买时间、平均订单价值、浏览时长、购买品类偏好等）上的平均值、中位数等统计量。\n使用合适的图表（箱线图、条形图、饼图等）可视化这些特征在不同簇之间的差异。\n\n用户画像 (Profiling): 基于上述分析，为每个簇（包括可能的噪声簇）创建清晰的用户画像，并打上简洁明了的标签（例如：“高价值忠诚客户”、“价格敏感型学生”、“低频高价值客户”、“流失风险客户”等）。\n商业建议: 针对每个用户画像，提出 2-3 条具体的、可操作的商业建议或营销策略。例如：\n\n针对“高价值忠诚客户”：推出会员忠诚度计划、新品优先体验。\n针对“价格敏感型学生”：推送促销活动信息、提供学生折扣。\n针对“流失风险客户”：进行召回营销、调研流失原因。\n\n\n撰写报告:\n\n完成项目三的最终报告\n重点突出业务解读部分: 详细描述每个簇的用户画像、特征差异以及对应的商业建议。使用图表辅助说明。\n报告结构参考第十六周讲义。\n\n\n提交项目三的最终代码和报告。\n下周我们将学习更高级的模型评估方法和处理不平衡数据的技巧。",
     "crumbs": [
       "实验",
-      "<span class='chapter-number'>17</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>第八周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html",
+    "href": "week9_exercise.html",
+    "title": "第九周：课堂练习与实验",
+    "section": "",
+    "text": "准备工作\n确保导入本周所需的库：",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html#准备工作",
+    "href": "week9_exercise.html#准备工作",
+    "title": "第九周：课堂练习与实验",
+    "section": "",
+    "text": "import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom collections import Counter\n\nfrom sklearn.datasets import make_classification\nfrom sklearn.model_selection import train_test_split, StratifiedKFold, KFold, cross_val_score\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.svm import SVC\nfrom sklearn.metrics import (accuracy_score, confusion_matrix, classification_report,\n                             precision_recall_curve, average_precision_score,\n                             roc_curve, auc, f1_score)\n\n# 检查 imbalanced-learn 是否已安装\ntry:\n    from imblearn.over_sampling import SMOTE\n    from imblearn.under_sampling import RandomUnderSampler # 引入欠采样示例\n    from imblearn.pipeline import Pipeline as ImbPipeline # 使用 imblearn 的 Pipeline\n    from sklearn.pipeline import Pipeline # Scikit-learn Pipeline for comparison\n    imblearn_installed = True\nexcept ImportError:\n    print(\"imbalanced-learn is not installed. Run 'pip install imbalanced-learn' or 'conda install -c conda-forge imbalanced-learn'\")\n    imblearn_installed = False\n    SMOTE, RandomUnderSampler, ImbPipeline, Pipeline = None, None, None, None # Placeholder\n\n# 设置 matplotlib 绘图样式 (可选)\nplt.style.use('seaborn-v0_8-whitegrid')\n# %matplotlib inline # 取消注释以便在 Jupyter 环境中显示绘图\n\n# --- 生成不平衡的示例数据 ---\n# weights=[0.95, 0.05] 表示类别 0 占 95%，类别 1 (正类/少数类) 占 5%\nX_imb, y_imb = make_classification(n_samples=2000, n_features=20, n_informative=5,\n                               n_redundant=10, n_classes=2, weights=[0.95, 0.05],\n                               flip_y=0.01, random_state=42)\n\n# --- 数据预处理和划分 ---\nscaler = StandardScaler()\nX_imb_scaled = scaler.fit_transform(X_imb)\nX_train_imb, X_test_imb, y_train_imb, y_test_imb = train_test_split(\n    X_imb_scaled, y_imb, test_size=0.3, random_state=42, stratify=y_imb # 使用 stratify 很重要\n)\n\nprint(\"原始训练集类别分布:\", Counter(y_train_imb))\nprint(\"测试集类别分布:\", Counter(y_test_imb))\n\n# --- 训练一个基线模型 (例如逻辑回归) ---\nlr_imb = LogisticRegression(solver='liblinear', random_state=42)\nlr_imb.fit(X_train_imb, y_train_imb)\ny_pred_imb = lr_imb.predict(X_test_imb)\ny_pred_proba_imb = lr_imb.predict_proba(X_test_imb)[:, 1] # 获取正类的预测概率\n\nprint(\"\\n--- 原始逻辑回归评估 (测试集) ---\")\nprint(classification_report(y_test_imb, y_pred_imb, target_names=['Class 0', 'Class 1']))\nap_score = average_precision_score(y_test_imb, y_pred_proba_imb)\nprint(f\"原始 Average Precision (AP) Score: {ap_score:.4f}\")\nfpr_lr, tpr_lr, _ = roc_curve(y_test_imb, y_pred_proba_imb)\nroc_auc_lr = auc(fpr_lr, tpr_lr)\nprint(f\"原始 ROC AUC Score: {roc_auc_lr:.4f}\")",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html#练习-1-p-r-曲线-vs.-roc-曲线-不平衡数据",
+    "href": "week9_exercise.html#练习-1-p-r-曲线-vs.-roc-曲线-不平衡数据",
+    "title": "第九周：课堂练习与实验",
+    "section": "练习 1: P-R 曲线 vs. ROC 曲线 (不平衡数据)",
+    "text": "练习 1: P-R 曲线 vs. ROC 曲线 (不平衡数据)\n目标: 在不平衡数据集上直观比较 P-R 曲线和 ROC 曲线对模型性能的反映。\n使用练习准备工作中生成的不平衡数据和训练好的 lr_imb 模型。\n\n计算与绘制 P-R 曲线:\n\n使用 precision_recall_curve() 计算精确率和召回率。\n使用 average_precision_score() 计算 AP 分数 (已在准备工作中计算)。\n绘制 P-R 曲线，在图例中显示 AP 分数。添加标题和坐标轴标签。\n\nprecision, recall, thresholds = precision_recall_curve(y_test_imb, y_pred_proba_imb)\nplt.figure(figsize=(8, 6))\nplt.plot(recall, precision, marker='.', label=f'Logistic Regression (AP = {ap_score:.2f})')\nplt.xlabel('Recall')\nplt.ylabel('Precision')\nplt.title('Precision-Recall Curve (Imbalanced Data)')\nplt.legend()\nplt.grid(True)\nplt.show()\n计算与绘制 ROC 曲线:\n\n使用 roc_curve() 计算 FPR 和 TPR (已在准备工作中计算)。\n使用 auc() 计算 AUC 分数 (已在准备工作中计算)。\n绘制 ROC 曲线，在图例中显示 AUC 分数。添加标题和坐标轴标签。\n\nplt.figure(figsize=(8, 6))\nplt.plot(fpr_lr, tpr_lr, color='darkorange', lw=2, label=f'Logistic Regression (AUC = {roc_auc_lr:.2f})')\nplt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Guess')\nplt.xlim([0.0, 1.0])\nplt.ylim([0.0, 1.05])\nplt.xlabel('False Positive Rate (FPR)')\nplt.ylabel('True Positive Rate (TPR)')\nplt.title('ROC Curve (Imbalanced Data)')\nplt.legend(loc=\"lower right\")\nplt.grid(True)\nplt.show()\n分析:\n\n在 Markdown 单元格中比较两个图。对于这个不平衡数据集，哪个图更能揭示模型在识别少数类（类别 1）方面的潜在问题？为什么？\n查看原始逻辑回归的分类报告（准备工作中已打印），结合 P-R 曲线和 ROC 曲线，讨论为什么 AUC 可能看起来还不错，但 P-R 曲线和少数类的 F1 分数更能反映实际问题。",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html#练习-2-stratified-k-fold-交叉验证",
+    "href": "week9_exercise.html#练习-2-stratified-k-fold-交叉验证",
+    "title": "第九周：课堂练习与实验",
+    "section": "练习 2: Stratified K-Fold 交叉验证",
+    "text": "练习 2: Stratified K-Fold 交叉验证\n目标: 理解分层 K 折交叉验证在不平衡数据上评估的稳定性。\n继续使用练习准备工作中的不平衡数据集 (X_imb_scaled, y_imb)。\n\n使用普通 K-Fold:\n\n创建一个 KFold 实例 (kf)，设置 n_splits=5, shuffle=True, random_state=42。\n创建一个 LogisticRegression 模型实例 (lr_cv = LogisticRegression(solver='liblinear', random_state=42))。\n使用 cross_val_score，将 cv=kf，评估模型在 X_imb_scaled, y_imb 上的 f1_macro 得分（宏平均 F1 更关注少数类）。\n打印每一折的 f1_macro 得分和平均得分。\n检查类别分布 (可选但推荐): 循环遍历 kf.split(X_imb_scaled, y_imb)，打印每一折训练集和验证集中的类别比例 (Counter(y_imb[train_index]), Counter(y_imb[test_index]))，观察是否均衡。\n\n使用 Stratified K-Fold:\n\n创建一个 StratifiedKFold 实例 (skf)，设置 n_splits=5, shuffle=True, random_state=42。\n使用相同的 LogisticRegression 模型实例 (lr_cv)。\n使用 cross_val_score，将 cv=skf，评估模型在 X_imb_scaled, y_imb 上的 f1_macro 得分。\n打印每一折的 f1_macro 得分和平均得分。\n检查类别分布 (可选但推荐): 循环遍历 skf.split(X_imb_scaled, y_imb)，打印每一折训练集和验证集中的类别比例，观察是否均衡。\n\n分析: 在 Markdown 单元格中比较两种 K-Fold 方法得到的 F1 分数的稳定性和平均值。解释为什么 Stratified K-Fold 在不平衡数据上通常是更好的选择。",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html#练习-3-多分类评估",
+    "href": "week9_exercise.html#练习-3-多分类评估",
+    "title": "第九周：课堂练习与实验",
+    "section": "练习 3: 多分类评估",
+    "text": "练习 3: 多分类评估\n目标: 练习评估多分类模型的性能。\n\n生成多分类数据:\n\n使用 make_classification 生成一个三分类数据集，设置 n_samples=1500, n_features=20, n_informative=10, n_redundant=5, n_classes=3, n_clusters_per_class=1, weights=[0.6, 0.3, 0.1], random_state=42 (创建一个稍微不平衡的三分类问题)。\n划分训练集和测试集 (test_size=0.3, random_state=42, stratify=y)。\n进行特征缩放。\n\n训练模型:\n\n训练一个 SVC 模型 (decision_function_shape='ovr', random_state=42)。\n\n评估:\n\n对测试集进行预测。\n使用 classification_report() 打印分类报告，设置 target_names=['Class A', 'Class B', 'Class C']。\n解读: 在 Markdown 单元格中解释报告中 ‘macro avg’ 和 ‘weighted avg’ 的 F1 分数。如果这两个分数差异较大，可能是什么原因？哪个更能反映模型在少数类（Class C）上的表现？",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html#练习-4-使用-smote-处理不平衡数据",
+    "href": "week9_exercise.html#练习-4-使用-smote-处理不平衡数据",
+    "title": "第九周：课堂练习与实验",
+    "section": "练习 4: 使用 SMOTE 处理不平衡数据",
+    "text": "练习 4: 使用 SMOTE 处理不平衡数据\n目标: 应用 SMOTE 过采样技术来改善模型在少数类上的性能。\n继续使用练习 1 生成的不平衡数据集 (X_train_imb, y_train_imb, X_test_imb, y_test_imb) 和原始逻辑回归模型 lr_imb 的评估结果。\n前置条件检查：确保 imblearn 库已安装。\nif imblearn_installed:\n    # 1. 应用 SMOTE\n    print(\"应用 SMOTE...\")\n    smote = SMOTE(random_state=42)\n    X_train_resampled, y_train_resampled = smote.fit_resample(X_train_imb, y_train_imb) # 注意只对训练集重采样\n    print(\"原始训练集类别分布:\", Counter(y_train_imb))\n    print(\"SMOTE 重采样后训练集类别分布:\", Counter(y_train_resampled))\n\n    # 2. 训练新模型\n    lr_smote = LogisticRegression(solver='liblinear', random_state=42)\n    lr_smote.fit(X_train_resampled, y_train_resampled)\n\n    # 3. 评估新模型\n    y_pred_smote = lr_smote.predict(X_test_imb)\n    y_pred_proba_smote = lr_smote.predict_proba(X_test_imb)[:, 1]\n\n    print(\"\\n--- SMOTE 后逻辑回归评估 (测试集) ---\")\n    print(classification_report(y_test_imb, y_pred_smote, target_names=['Class 0', 'Class 1']))\n\n    ap_score_smote = average_precision_score(y_test_imb, y_pred_proba_smote)\n    print(f\"SMOTE 后 Average Precision (AP) Score: {ap_score_smote:.4f}\")\n\n    # 4. 绘制 P-R 曲线对比\n    precision_smote, recall_smote, _ = precision_recall_curve(y_test_imb, y_pred_proba_smote)\n    # 获取原始模型的 precision 和 recall (在练习1中已计算)\n    # precision, recall, _ = precision_recall_curve(y_test_imb, y_pred_proba_imb)\n    # ap_score = average_precision_score(y_test_imb, y_pred_proba_imb) # 已在准备工作中计算\n\n\n    plt.figure(figsize=(8, 6))\n    plt.plot(recall, precision, marker='.', label=f'Original LR (AP = {ap_score:.2f})') # 使用练习1的结果\n    plt.plot(recall_smote, precision_smote, marker='.', label=f'LR with SMOTE (AP = {ap_score_smote:.2f})') # Corrected variable name\n    plt.xlabel('Recall')\n    plt.ylabel('Precision')\n    plt.title('P-R Curve Comparison: Original vs. SMOTE')\n    plt.legend()\n    plt.grid(True)\n    # plt.show()\n\nelse:\n    print(\"imblearn 库未安装，无法执行 SMOTE 练习。\")\n分析:\n\n在 Markdown 单元格中比较应用 SMOTE 前后模型在测试集上的分类报告（特别是少数类的 Precision, Recall, F1）和 AP 分数。SMOTE 是否改善了模型对少数类的识别能力？",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html#练习-5-使用代价敏感学习处理不平衡数据",
+    "href": "week9_exercise.html#练习-5-使用代价敏感学习处理不平衡数据",
+    "title": "第九周：课堂练习与实验",
+    "section": "练习 5: 使用代价敏感学习处理不平衡数据",
+    "text": "练习 5: 使用代价敏感学习处理不平衡数据\n目标: 应用 class_weight='balanced' 来处理不平衡数据。\n继续使用练习 1 生成的不平衡数据集 (X_train_imb, y_train_imb, X_test_imb, y_test_imb) 和原始逻辑回归模型 lr_imb 的评估结果。\n\n训练代价敏感模型:\n\n创建一个 LogisticRegression 实例，设置 solver='liblinear', class_weight='balanced', random_state=42。\n在原始不平衡训练集 (X_train_imb, y_train_imb) 上训练模型。\n\n评估模型:\n\n对测试集 X_test_imb 进行预测 (y_pred_balanced) 和概率预测 (y_pred_proba_balanced)。\n打印分类报告。\n计算并打印 AP 分数 (average_precision_score)。\n\n对比分析:\n\n在 Markdown 单元格中比较使用 class_weight='balanced' 的模型与原始模型、SMOTE 模型（如果已完成练习 4）在测试集上的性能（关注少数类的指标和 AP 分数）。哪种方法在这个数据集上效果更好？",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html#练习-6-可选-结合-pipeline-使用-smote",
+    "href": "week9_exercise.html#练习-6-可选-结合-pipeline-使用-smote",
+    "title": "第九周：课堂练习与实验",
+    "section": "练习 6: (可选) 结合 Pipeline 使用 SMOTE",
+    "text": "练习 6: (可选) 结合 Pipeline 使用 SMOTE\n目标: 学习如何在交叉验证或网格搜索中正确使用 SMOTE，避免数据泄露。\n背景: 直接对整个数据集进行 SMOTE 然后再交叉验证是错误的，因为验证集的信息会泄露到训练过程中。正确的做法是在交叉验证的每一折内部，仅对该折的训练数据进行 SMOTE。imblearn 库的 Pipeline 可以方便地实现这一点。\n前置条件检查：确保 imblearn 库已安装。\nif imblearn_installed:\n    from sklearn.pipeline import Pipeline # 导入 scikit-learn 的 Pipeline\n    # 创建一个包含 SMOTE 和 Logistic Regression 的 Pipeline (使用 imblearn Pipeline)\n    imb_pipeline = ImbPipeline([\n        # ('scaler', StandardScaler()), # 注意：如果需要缩放，应在 SMOTE 之前或之后进行，取决于策略\n                                        # 这里假设 X_train_imb, X_test_imb 已经是缩放过的\n        ('oversample', SMOTE(random_state=42)),\n        ('classification', LogisticRegression(solver='liblinear', random_state=42))\n    ])\n\n    # 使用 StratifiedKFold 进行交叉验证\n    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)\n\n    # 使用 cross_val_score 评估 Pipeline\n    # 使用 X_train_imb, y_train_imb 进行交叉验证评估\n    cv_scores_pipeline = cross_val_score(imb_pipeline, X_train_imb, y_train_imb, cv=skf, scoring='average_precision', n_jobs=-1)\n\n    print(\"\\n--- Pipeline (SMOTE + LR) 5折交叉验证 AP 分数 ---\")\n    print(f\"Scores: {cv_scores_pipeline}\")\n    print(f\"Mean AP: {cv_scores_pipeline.mean():.4f} (+/- {cv_scores_pipeline.std() * 2:.4f})\")\n\n    # 对比不使用 SMOTE 的 Pipeline (仅 LR)\n    # 注意：如果数据需要缩放，这里也应该包含 Scaler\n    pipeline_no_smote = Pipeline([\n        # ('scaler', StandardScaler()), # 假设 X_train_imb 已缩放\n        ('classification', LogisticRegression(solver='liblinear', random_state=42))\n    ])\n    cv_scores_no_smote = cross_val_score(pipeline_no_smote, X_train_imb, y_train_imb, cv=skf, scoring='average_precision', n_jobs=-1)\n    print(\"\\n--- Pipeline (LR only) 5折交叉验证 AP 分数 ---\")\n    print(f\"Scores: {cv_scores_no_smote}\")\n    print(f\"Mean AP: {cv_scores_no_smote.mean():.4f} (+/- {cv_scores_no_smote.std() * 2:.4f})\")\n\nelse:\n    print(\"imblearn 库未安装，无法执行 Pipeline 练习。\")\n分析:\n\n比较使用 SMOTE 的 Pipeline 和不使用 SMOTE 的 Pipeline 的交叉验证结果 (平均 AP 分数)。SMOTE 是否在交叉验证中稳定地提升了性能？",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "week9_exercise.html#练习-7-可选-项目回顾与应用",
+    "href": "week9_exercise.html#练习-7-可选-项目回顾与应用",
+    "title": "第九周：课堂练习与实验",
+    "section": "练习 7: (可选) 项目回顾与应用",
+    "text": "练习 7: (可选) 项目回顾与应用\n目标: 将不平衡数据处理技术应用到之前的项目中。\n\n选择项目: 回顾你的项目一（分类任务）。检查目标变量的类别分布是否不平衡。\n应用技术: 如果存在不平衡：\n\n尝试使用 class_weight='balanced' 参数重新训练你表现最好的模型（例如，调优后的随机森林）。\n尝试使用 imblearn.pipeline.Pipeline 结合 SMOTE 和你的最佳模型，并使用 GridSearchCV 或 RandomizedSearchCV 对 Pipeline 中的模型参数进行调优（注意参数名称前缀，如 classification__n_estimators）。\n\n重新评估: 使用 P-R 曲线、AUC-PR (Average Precision) 或 F1-Macro 等适合不平衡数据的指标，评估应用了处理技术后的模型性能，并与原始模型进行比较。\n记录发现: 在项目一的 Notebook 中补充这部分内容，记录你的发现和分析。\n\n掌握处理不平衡数据的方法对于解决许多现实世界的分类问题至关重要。",
+    "crumbs": [
+      "实验",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>第九周：课堂练习与实验</span>"
+    ]
+  },
+  {
+    "objectID": "project1_task.html",
+    "href": "project1_task.html",
+    "title": "项目一：电商用户行为分析与购买预测",
+    "section": "",
+    "text": "项目背景\n电子商务平台积累了大量的用户行为数据，包括浏览、收藏、加购物车和购买等行为。通过分析这些数据并建立预测模型，可以帮助平台更好地理解用户行为模式，预测用户的购买意向，从而优化营销策略和用户体验。",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>项目一：电商用户行为分析与购买预测</span>"
+    ]
+  },
+  {
+    "objectID": "project1_task.html#项目目标",
+    "href": "project1_task.html#项目目标",
+    "title": "项目一：电商用户行为分析与购买预测",
+    "section": "项目目标",
+    "text": "项目目标\n\n对电商用户行为数据进行探索性分析（EDA）\n构建和评估用户购买预测模型（二分类问题）\n使用多种分类算法并比较其性能\n提供基于模型的业务洞察",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>项目一：电商用户行为分析与购买预测</span>"
+    ]
+  },
+  {
+    "objectID": "project1_task.html#项目阶段",
+    "href": "project1_task.html#项目阶段",
+    "title": "项目一：电商用户行为分析与购买预测",
+    "section": "项目阶段",
+    "text": "项目阶段\n\n第一阶段：数据探索与预处理（第二周）\n\n数据理解与探索\n\n了解数据集结构和字段含义\n基本统计分析\n数据可视化探索\n\n数据预处理\n\n使用 Pandas 进行数据清洗\n处理缺失值和异常值\n特征工程（数值缩放、类别编码）\n使用 scikit-learn 预处理模块\n\n\n\n\n第二阶段：模型构建与评估（第三-四周）\n\n基础模型实现\n\n实现逻辑回归（Logistic Regression）\n实现支持向量机（SVM）\n初步评估模型效果\n\n模型优化与扩展\n\n实现随机森林（Random Forest）\n处理类别不平衡问题\n模型调优与验证\n比较不同模型性能\n\n模型评估\n\n使用混淆矩阵\n计算准确率、精确率、召回率、F1分数\n绘制 ROC 曲线和计算 AUC\n交叉验证",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>项目一：电商用户行为分析与购买预测</span>"
+    ]
+  },
+  {
+    "objectID": "project1_task.html#提交要求",
+    "href": "project1_task.html#提交要求",
+    "title": "项目一：电商用户行为分析与购买预测",
+    "section": "提交要求",
+    "text": "提交要求\n\n代码文件\n\n完整的 Jupyter Notebook（.ipynb）\n包含数据处理、可视化、建模的所有代码\n清晰的代码注释\n完整的运行结果\n\n\n\n项目报告\n\n数据分析部分\n\n数据集描述\nEDA 发现与见解\n预处理步骤说明\n\n建模部分\n\n模型选择依据\n参数调优过程\n详细的评估结果\n模型比较分析\n\n业务洞察\n\n关键发现总结\n实际应用建议\n模型局限性分析",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>项目一：电商用户行为分析与购买预测</span>"
+    ]
+  },
+  {
+    "objectID": "project1_task.html#评分标准",
+    "href": "project1_task.html#评分标准",
+    "title": "项目一：电商用户行为分析与购买预测",
+    "section": "评分标准",
+    "text": "评分标准\n\n数据分析（30%）：EDA 的深度和洞察\n模型实现（40%）：算法实现的正确性和完整性\n评估与优化（20%）：评估方法的合理性和优化效果\n报告质量（10%）：结构和表达",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>项目一：电商用户行为分析与购买预测</span>"
+    ]
+  },
+  {
+    "objectID": "project1_task.html#截止时间",
+    "href": "project1_task.html#截止时间",
+    "title": "项目一：电商用户行为分析与购买预测",
+    "section": "截止时间",
+    "text": "截止时间\n第五周第一次课前提交",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>项目一：电商用户行为分析与购买预测</span>"
+    ]
+  },
+  {
+    "objectID": "project2_task.html",
+    "href": "project2_task.html",
+    "title": "项目二：房价预测模型构建与优化",
+    "section": "",
+    "text": "项目背景\n房价预测是一个典型的回归问题，涉及多个特征变量对目标变量（房价）的影响。通过构建准确的预测模型，可以帮助房地产行业相关方做出更好的决策。",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>项目二：房价预测模型构建与优化</span>"
+    ]
+  },
+  {
+    "objectID": "project2_task.html#项目目标",
+    "href": "project2_task.html#项目目标",
+    "title": "项目二：房价预测模型构建与优化",
+    "section": "项目目标",
+    "text": "项目目标\n\n实现并比较多种回归算法\n深入理解特征工程和模型优化\n评估和解释模型性能\n提供可行的业务应用建议",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>项目二：房价预测模型构建与优化</span>"
+    ]
+  },
+  {
+    "objectID": "project2_task.html#项目阶段",
+    "href": "project2_task.html#项目阶段",
+    "title": "项目二：房价预测模型构建与优化",
+    "section": "项目阶段",
+    "text": "项目阶段\n\n第一阶段：基础回归模型（第五周）\n\n数据准备\n\n数据清洗和预处理\n特征选择与工程\n数据集划分（训练集、验证集、测试集）\n\n基础模型实现\n\n线性回归（Linear Regression）\n多项式回归（Polynomial Regression）\n模型评估与比较\n\n\n\n\n第二阶段：进阶模型与优化（第六周）\n\n正则化模型\n\nRidge 回归（L2正则化）\nLasso 回归（L1正则化）\n参数调优（网格搜索/交叉验证）\n\n集成学习模型\n\nXGBoost 实现\n特征重要性分析\n模型优化与调参\n\n模型评估与选择\n\nMSE、RMSE、MAE 计算\nR² 得分评估\n残差分析\n最终模型选择",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>项目二：房价预测模型构建与优化</span>"
+    ]
+  },
+  {
+    "objectID": "project2_task.html#提交要求",
+    "href": "project2_task.html#提交要求",
+    "title": "项目二：房价预测模型构建与优化",
+    "section": "提交要求",
+    "text": "提交要求\n\n代码文件\n\n完整的 Jupyter Notebook\n包含所有模型实现代码\n详细的注释说明\n可视化结果\n\n\n\n项目报告\n\n方法论\n\n数据预处理策略\n特征工程方法\n模型选择理由\n\n实验结果\n\n各模型性能对比\n参数调优过程\n特征重要性分析\n可视化展示\n\n业务应用\n\n模型应用场景\n预测结果解释\n实施建议",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>项目二：房价预测模型构建与优化</span>"
+    ]
+  },
+  {
+    "objectID": "project2_task.html#评分标准",
+    "href": "project2_task.html#评分标准",
+    "title": "项目二：房价预测模型构建与优化",
+    "section": "评分标准",
+    "text": "评分标准\n\n技术实现（40%）：代码质量、模型实现的正确性\n模型优化（30%）：特征工程和参数调优的效果\n结果分析（20%）：评估的完整性和解释的合理性\n报告质量（10%）：结构和表达",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>项目二：房价预测模型构建与优化</span>"
+    ]
+  },
+  {
+    "objectID": "project2_task.html#截止时间",
+    "href": "project2_task.html#截止时间",
+    "title": "项目二：房价预测模型构建与优化",
+    "section": "截止时间",
+    "text": "截止时间\n第七周第一次课前提交",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>项目二：房价预测模型构建与优化</span>"
+    ]
+  },
+  {
+    "objectID": "project2_task.html#注意事项",
+    "href": "project2_task.html#注意事项",
+    "title": "项目二：房价预测模型构建与优化",
+    "section": "注意事项",
+    "text": "注意事项\n\n特别关注特征工程的影响\n详细记录参数调优过程\n注意模型预测结果的实际应用价值\n可以尝试其他回归算法，但需要充分说明选择理由",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>项目二：房价预测模型构建与优化</span>"
+    ]
+  },
+  {
+    "objectID": "project3_task.html",
+    "href": "project3_task.html",
+    "title": "项目三：用户分群分析与业务策略制定",
+    "section": "",
+    "text": "项目背景\n在商业分析中，用户分群（Customer Segmentation）是一种将用户基于其特征和行为模式划分为不同群体的方法。通过聚类分析，我们可以发现用户的自然分组，从而制定差异化的营销策略和服务方案。",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>项目三：用户分群分析与业务策略制定</span>"
+    ]
+  },
+  {
+    "objectID": "project3_task.html#项目目标",
+    "href": "project3_task.html#项目目标",
+    "title": "项目三：用户分群分析与业务策略制定",
+    "section": "项目目标",
+    "text": "项目目标\n\n应用 K-Means 和 DBSCAN 聚类算法进行用户分群\n评估和优化聚类效果\n对不同用户群体进行特征分析\n提出基于数据的商业策略建议",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>项目三：用户分群分析与业务策略制定</span>"
+    ]
+  },
+  {
+    "objectID": "project3_task.html#项目阶段",
+    "href": "project3_task.html#项目阶段",
+    "title": "项目三：用户分群分析与业务策略制定",
+    "section": "项目阶段",
+    "text": "项目阶段\n\n第一阶段：K-Means 聚类（第七周）\n\n数据预处理\n\n特征选择与工程\n处理缺失值和异常值\n特征标准化（使用 StandardScaler）\n\nK 值选择\n\n使用肘部法则（Elbow Method）\n计算轮廓系数（Silhouette Score）\n结合业务理解确定最终 K 值\n\n初步聚类\n\n使用选定的 K 值进行 K-Means 聚类\n使用 PCA 或 t-SNE 进行可视化\n初步评估聚类效果\n\n\n\n\n第二阶段：优化与深入分析（第八周）\n\nDBSCAN 尝试（可选）\n\n使用 K-距离图选择 eps 和 min_samples\n运行 DBSCAN 并评估结果\n与 K-Means 结果对比\n\n最终模型选择\n\n对比 K-Means 和 DBSCAN 结果\n基于评估指标选择最终模型\n确定最终的聚类方案\n\n深入业务解读（核心）\n\n分析各簇的特征分布\n计算关键统计指标\n可视化簇间差异\n创建用户画像\n提出商业建议",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>项目三：用户分群分析与业务策略制定</span>"
+    ]
+  },
+  {
+    "objectID": "project3_task.html#提交要求",
+    "href": "project3_task.html#提交要求",
+    "title": "项目三：用户分群分析与业务策略制定",
+    "section": "提交要求",
+    "text": "提交要求\n\n代码文件\n\n完整的文档\n包含所有数据处理、建模和分析代码\n代码需有清晰的注释\n必须包含可视化结果\n\n\n\n项目报告\n\n项目概述\n\n背景和目标\n数据描述\n方法论\n\n技术实现\n\n预处理步骤\nK 值/参数选择过程\n模型评估结果\n\n业务分析（重点）\n\n各用户群体特征描述\n详细的用户画像\n具体的商业建议\n可视化支持\n\n结论与建议\n\n主要发现\n实施建议\n后续改进方向",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>项目三：用户分群分析与业务策略制定</span>"
+    ]
+  },
+  {
+    "objectID": "project3_task.html#评分标准",
+    "href": "project3_task.html#评分标准",
+    "title": "项目三：用户分群分析与业务策略制定",
+    "section": "评分标准",
+    "text": "评分标准\n\n技术实现（30%）：代码质量、方法使用的正确性\n分析深度（40%）：用户画像的深度、业务建议的可行性\n可视化（20%）：图表的清晰度和信息量\n报告质量（10%）：结构完整性、表达清晰度",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>项目三：用户分群分析与业务策略制定</span>"
+    ]
+  },
+  {
+    "objectID": "project3_task.html#截止时间",
+    "href": "project3_task.html#截止时间",
+    "title": "项目三：用户分群分析与业务策略制定",
+    "section": "截止时间",
+    "text": "截止时间\n第九周第一次课前提交",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>项目三：用户分群分析与业务策略制定</span>"
+    ]
+  },
+  {
+    "objectID": "project3_task.html#注意事项",
+    "href": "project3_task.html#注意事项",
+    "title": "项目三：用户分群分析与业务策略制定",
+    "section": "注意事项",
+    "text": "注意事项\n\n重点关注业务解读部分，确保分析有深度和实用价值\n可视化需要清晰、专业，并能支持你的分析结论\n商业建议需要具体、可行，并与数据分析结果相关联",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>项目三：用户分群分析与业务策略制定</span>"
+    ]
+  },
+  {
+    "objectID": "project4_task.html",
+    "href": "project4_task.html",
+    "title": "项目四：时间序列预测与业务应用",
+    "section": "",
+    "text": "项目背景\n时间序列预测在商业分析中具有重要应用，如销售预测、需求预测、库存管理等。通过构建 ARIMA 等时间序列模型，我们可以基于历史数据对未来趋势进行预测，为业务决策提供数据支持。",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>项目四：时间序列预测与业务应用</span>"
+    ]
+  },
+  {
+    "objectID": "project4_task.html#项目目标",
+    "href": "project4_task.html#项目目标",
+    "title": "项目四：时间序列预测与业务应用",
+    "section": "项目目标",
+    "text": "项目目标\n\n掌握时间序列数据的基本处理方法\n理解并应用时间序列分析的核心概念\n构建 ARIMA 模型进行预测\n评估预测效果并提供业务建议",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>项目四：时间序列预测与业务应用</span>"
+    ]
+  },
+  {
+    "objectID": "project4_task.html#项目阶段",
+    "href": "project4_task.html#项目阶段",
+    "title": "项目四：时间序列预测与业务应用",
+    "section": "项目阶段",
+    "text": "项目阶段\n\n第一阶段：时间序列基础分析\n\n数据预处理\n\n时间索引处理\n缺失值和异常值处理\n数据重采样（如有需要）\n\n时间序列特征分析\n\n趋势分析\n季节性检验\n平稳性检验（ADF测试）\n自相关分析（ACF/PACF）\n\n时间序列分解\n\n趋势分量提取\n季节性分量分析\n残差分析\n\n\n\n\n第二阶段：模型构建与预测\n\nARIMA 模型构建\n\n模型参数选择 (p,d,q)\n模型训练与诊断\n残差分析\n\n预测与评估\n\n样本内预测\n样本外预测\n预测区间计算\n模型评估（MAE, RMSE, MAPE）\n\n业务应用分析\n\n预测结果解读\n业务影响分析\n决策建议制定",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>项目四：时间序列预测与业务应用</span>"
+    ]
+  },
+  {
+    "objectID": "project4_task.html#提交要求",
+    "href": "project4_task.html#提交要求",
+    "title": "项目四：时间序列预测与业务应用",
+    "section": "提交要求",
+    "text": "提交要求\n\n代码文件\n\n完整的 Jupyter Notebook 或 Quarto 文档\n包含所有数据处理和建模代码\n清晰的代码注释\n完整的可视化结果\n\n\n\n项目报告\n\n数据分析\n\n数据集描述\n时间序列特征分析结果\n预处理步骤说明\n\n建模过程\n\n模型选择依据\n参数确定过程\n模型诊断结果\n预测效果评估\n\n业务应用\n\n预测结果解读\n实际应用建议\n模型局限性说明\n改进建议",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>项目四：时间序列预测与业务应用</span>"
+    ]
+  },
+  {
+    "objectID": "project4_task.html#评分标准",
+    "href": "project4_task.html#评分标准",
+    "title": "项目四：时间序列预测与业务应用",
+    "section": "评分标准",
+    "text": "评分标准\n\n数据分析（30%）：时间序列特征分析的完整性和准确性\n模型实现（30%）：ARIMA模型实现的正确性和预测效果\n业务应用（30%）：预测结果的实用性和建议的可行性\n报告质量（10%）：结构完整性和表达清晰度",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>项目四：时间序列预测与业务应用</span>"
+    ]
+  },
+  {
+    "objectID": "project4_task.html#截止时间",
+    "href": "project4_task.html#截止时间",
+    "title": "项目四：时间序列预测与业务应用",
+    "section": "截止时间",
+    "text": "截止时间\n第十四周第一次课前提交",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>项目四：时间序列预测与业务应用</span>"
+    ]
+  },
+  {
+    "objectID": "project4_task.html#注意事项",
+    "href": "project4_task.html#注意事项",
+    "title": "项目四：时间序列预测与业务应用",
+    "section": "注意事项",
+    "text": "注意事项\n\n重点关注时间序列的特征分析和模型诊断\n确保预测结果的可解释性\n注意将技术发现转化为实际的业务建议\n可以尝试其他时间序列模型，但需要充分说明选择理由",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>项目四：时间序列预测与业务应用</span>"
+    ]
+  },
+  {
+    "objectID": "final_project_task.html",
+    "href": "final_project_task.html",
+    "title": "小组综合项目：机器学习技术融合应用",
+    "section": "",
+    "text": "项目背景\n作为课程的收官项目，小组综合项目旨在让学生团队将本学期所学的多种机器学习技术（数据预处理、分类、回归、聚类、时间序列、模型可解释性等）融会贯通，解决一个真实或模拟的开放式商业问题。",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>小组综合项目：机器学习技术融合应用</span>"
+    ]
+  },
+  {
+    "objectID": "final_project_task.html#项目目标",
+    "href": "final_project_task.html#项目目标",
+    "title": "小组综合项目：机器学习技术融合应用",
+    "section": "项目目标",
+    "text": "项目目标\n\n融合应用多种机器学习技术\n完整经历机器学习项目全流程\n将技术成果转化为实际商业价值\n锻炼团队协作能力",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>小组综合项目：机器学习技术融合应用</span>"
+    ]
+  },
+  {
+    "objectID": "final_project_task.html#建议选题方向",
+    "href": "final_project_task.html#建议选题方向",
+    "title": "小组综合项目：机器学习技术融合应用",
+    "section": "建议选题方向",
+    "text": "建议选题方向\n\n1. 用户行为分析与预测\n\n结合用户分群（聚类）与流失预测（分类+不平衡处理）\n应用 XAI 技术解释预测结果\n\n\n\n2. 销售预测与优化\n\n结合销量预测（时间序列）与影响因素分析（回归+XAI）\n细分市场分析（聚类）与个性化预测\n\n\n\n3. 风险控制与异常检测\n\n交易异常检测（无监督/监督学习）\n风险评分模型（分类/回归）\n\n\n\n4. 产品推荐与个性化营销\n\n用户画像构建（聚类）\n购买倾向预测（分类）\n个性化推荐策略",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>小组综合项目：机器学习技术融合应用</span>"
+    ]
+  },
+  {
+    "objectID": "final_project_task.html#项目开发流程",
+    "href": "final_project_task.html#项目开发流程",
+    "title": "小组综合项目：机器学习技术融合应用",
+    "section": "项目开发流程",
+    "text": "项目开发流程\n\n第一阶段：项目启动（第14周）\n\n问题定义\n\n确定业务场景\n明确项目目标\n设计解决方案\n\n数据准备\n\n数据收集/获取\n数据理解与探索\n初步预处理\n\n\n\n\n第二阶段：模型开发（第15周）\n\n特征工程\n\n特征提取与选择\n特征变换与组合\n数据清洗与标准化\n\n模型构建\n\n实现多个机器学习模型\n模型集成与融合\n参数优化与调试\n\n中期检查\n\n项目进度汇报\n技术难点讨论\n方向调整建议\n\n\n\n\n第三阶段：完善与展示（第16周）\n\n模型评估与优化\n\n全面的性能评估\n模型可解释性分析\n最终优化调整\n\n结果展示与答辩\n\n项目展示准备\n成果汇报\n答辩问题准备",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>小组综合项目：机器学习技术融合应用</span>"
+    ]
+  },
+  {
+    "objectID": "final_project_task.html#提交要求",
+    "href": "final_project_task.html#提交要求",
+    "title": "小组综合项目：机器学习技术融合应用",
+    "section": "提交要求",
+    "text": "提交要求\n\n1. 项目代码\n\n完整的 Jupyter Notebook/Quarto 文档（.ipynb/.qmd）\n包含所有数据处理、建模代码\n详细的注释和说明\n可重现的运行结果\n\n\n\n2. 项目报告\n\n项目背景与目标\n\n业务场景描述\n问题定义\n解决方案设计\n\n技术实现\n\n数据处理流程\n特征工程方法\n模型构建过程\n评估与优化结果\n\n业务价值\n\n模型效果分析\n商业价值转化\n实施建议\n未来展望\n\n\n\n\n3. 展示文稿\n\n项目背景与目标\n技术方案概述\n关键结果展示\n商业价值阐述\n团队分工说明",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>小组综合项目：机器学习技术融合应用</span>"
+    ]
+  },
+  {
+    "objectID": "final_project_task.html#评分标准",
+    "href": "final_project_task.html#评分标准",
+    "title": "小组综合项目：机器学习技术融合应用",
+    "section": "评分标准",
+    "text": "评分标准\n\n技术融合（30%）：多种ML技术的合理运用\n实现质量（30%）：代码实现和模型效果\n商业价值（20%）：解决方案的实用性\n展示效果（20%）：报告质量和答辩表现",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>小组综合项目：机器学习技术融合应用</span>"
+    ]
+  },
+  {
+    "objectID": "final_project_task.html#时间节点",
+    "href": "final_project_task.html#时间节点",
+    "title": "小组综合项目：机器学习技术融合应用",
+    "section": "时间节点",
+    "text": "时间节点\n\n第14周：项目启动和方案设计\n第15周：中期检查\n第16周第一次课：最终展示与答辩\n第16周第一次课前：提交所有材料",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>小组综合项目：机器学习技术融合应用</span>"
+    ]
+  },
+  {
+    "objectID": "final_project_task.html#注意事项",
+    "href": "final_project_task.html#注意事项",
+    "title": "小组综合项目：机器学习技术融合应用",
+    "section": "注意事项",
+    "text": "注意事项\n\n重视技术的融合应用，不要仅使用单一算法\n注重项目的实际商业价值\n合理分工，充分发挥团队协作\n积极利用AI辅助工具提高开发效率\n重视模型的可解释性分析",
+    "crumbs": [
+      "项目",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>小组综合项目：机器学习技术融合应用</span>"
     ]
   }
 ]

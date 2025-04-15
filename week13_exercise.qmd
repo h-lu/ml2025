@@ -1,0 +1,649 @@
+---
+title: "第十三周：课堂练习与实验"
+subtitle: "模型可解释性 (XAI) 初探"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+---
+
+# 第十三周：课堂练习与实验
+
+本周我们开始探索模型可解释性 (Explainable AI, XAI) 的重要性与常用技术。我们将学习并实践全局解释方法（如特征重要性、部分依赖图）和局部解释方法（如 LIME、SHAP），以理解“黑箱”模型的决策过程。
+
+## 准备工作
+
+确保导入本周所需的库，并准备好一个训练好的模型和相应的数据集。我们将以**第六周的项目二（房价预测）中训练好的 XGBoost 模型**为例。如果该模型未保存或训练，需要重新运行相关代码。
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.inspection import permutation_importance, PartialDependenceDisplay
+from sklearn.metrics import mean_squared_error, r2_score
+import joblib # 用于加载模型
+import warnings
+warnings.filterwarnings("ignore")
+
+# 检查相关库是否安装
+try:
+    import xgboost as xgb
+    xgboost_installed = True
+except ImportError:
+    print("XGBoost not installed. Run 'pip install xgboost'")
+    xgboost_installed = False
+    xgb = None
+
+try:
+    import shap
+    shap_installed = True
+except ImportError:
+    print("SHAP is not installed. Run 'pip install shap'")
+    shap_installed = False
+    shap = None
+
+try:
+    import lime
+    import lime.lime_tabular
+    lime_installed = True
+except ImportError:
+    print("LIME is not installed. Run 'pip install lime'")
+    lime_installed = False
+    lime = None
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+# %matplotlib inline
+
+# --- 加载数据 (复用项目二的数据) ---
+data_loaded = False
+model_loaded = False
+X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = [None] * 4
+X_h = None # To store original feature names if available
+feature_names_h = None
+best_xgb = None # Initialize model variable
+
+try:
+    from sklearn.datasets import fetch_california_housing
+    housing = fetch_california_housing(as_frame=True)
+    df_housing = housing.frame
+    X_h = df_housing[housing.feature_names]
+    y_h = df_housing[housing.target_names[0]]
+    feature_names_h = housing.feature_names # Store feature names
+
+    if X_h.isnull().sum().any():
+         X_h = X_h.fillna(X_h.median())
+
+    scaler_h = StandardScaler()
+    X_h_scaled = scaler_h.fit_transform(X_h)
+
+    X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = train_test_split(
+        X_h_scaled, y_h, test_size=0.2, random_state=42
+    )
+    # Create DataFrame versions for SHAP/LIME if needed later
+    X_train_df = pd.DataFrame(X_train_h_scaled, columns=feature_names_h)
+    X_test_df = pd.DataFrame(X_test_h_scaled, columns=feature_names_h)
+
+    print("数据准备完成。")
+    data_loaded = True
+
+    # --- 加载或重新训练模型 (假设最优 XGBoost 模型来自 Week 6/12) ---
+    # 尝试加载之前保存的模型
+    try:
+        best_xgb = joblib.load('best_xgb_model.pkl') # 假设模型已保存
+        print("已加载之前训练好的 XGBoost 模型。")
+        model_loaded = True
+    except FileNotFoundError:
+        print("未找到已保存的模型 'best_xgb_model.pkl'。将重新训练一个基础 XGBoost 模型。")
+        if xgboost_installed:
+            best_xgb = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42, n_jobs=-1)
+            best_xgb.fit(X_train_h_scaled, y_train_h)
+            # Optionally save the trained model
+            # joblib.dump(best_xgb, 'best_xgb_model.pkl')
+            print("已训练基础 XGBoost 模型。")
+            model_loaded = True
+        else:
+            print("XGBoost 未安装，无法训练模型。")
+
+except Exception as e:
+    print(f"加载或处理数据时出错: {e}")
+
+if model_loaded:
+    y_pred_test = best_xgb.predict(X_test_h_scaled)
+    rmse_test = np.sqrt(mean_squared_error(y_test_h, y_pred_test))
+    r2_test = r2_score(y_test_h, y_pred_test)
+    print(f"\n模型在测试集上的性能: RMSE={rmse_test:.4f}, R2={r2_test:.4f}")
+
+```
+
+::: {.callout-warning}
+**注意:** 以下练习依赖于成功加载数据和模型。如果准备工作步骤失败，后续代码可能无法运行或产生无意义的结果。确保你已经运行了之前的项目代码或有可用的数据集和模型文件（如 `best_xgb_model.pkl`）。
+:::
+
+## 练习 1: 全局可解释性 - 特征重要性
+
+**目标:** 理解不同类型的特征重要性计算方法。
+
+**使用训练好的 `best_xgb` 模型和测试数据 `X_test_h_scaled`, `y_test_h`。**
+
+1.  **内置特征重要性 (Gain/Weight/Cover):**
+    *   如果你的 `best_xgb` 是 XGBoost 模型，它有内置的 `feature_importances_` 属性（通常基于 'gain'）。
+    *   获取这些重要性值，并创建一个 DataFrame 将其与特征名称关联起来。
+    *   按重要性降序排序并打印前 10 个最重要的特征。
+    *   绘制条形图展示前 10 个特征的重要性。
+    *   **思考:** XGBoost 还提供其他重要性类型（如 'weight', 'cover'）。尝试获取并比较它们。（提示：`xgb.plot_importance(best_xgb, importance_type='weight')`）
+
+2.  **排列重要性 (Permutation Importance):**
+    *   使用 `sklearn.inspection.permutation_importance` 计算模型在**测试集**上的排列重要性。
+    *   设置 `n_repeats` (例如 10) 以获得更稳定的结果，`random_state=42`, `n_jobs=-1`。
+    *   将结果（`importances_mean`, `importances_std`）整理到 DataFrame 中，与特征名称关联。
+    *   按平均重要性降序排序并打印前 10 个特征。
+    *   绘制条形图展示前 10 个特征的平均重要性及其标准差。
+    *   **分析:** 在 Markdown 单元格中比较内置重要性（如 gain）和排列重要性的结果。它们是否一致？为什么可能会有差异？排列重要性的优点是什么？
+
+## 练习 2: 全局可解释性 - 部分依赖图 (PDP)
+
+**目标:** 理解和绘制部分依赖图，探索特征与预测之间的平均关系。
+
+**使用训练好的 `best_xgb` 模型和训练数据 `X_train_df` (或其子集)。**
+
+1.  **绘制一维 PDP:**
+    *   选择练习 1 中识别出的 1-2 个最重要的特征。获取它们的索引或名称。
+    *   使用 `PartialDependenceDisplay.from_estimator` 绘制这些特征的 PDP。
+    *   `estimator`: `best_xgb`
+    *   `X`: `X_train_df` (使用 DataFrame 以便自动获取特征名，可以使用子样本 `X_train_df.sample(500, random_state=42)` 加快速度)
+    *   `features`: 选定特征的名称列表。
+    *   `grid_resolution`: 控制计算点的数量，例如 50。
+    *   添加标题。
+    *   调用 `plt.show()`。
+    *   **分析:** 在 Markdown 单元格中解释 PDP 图揭示了所选特征与目标变量（房价）之间怎样的平均关系（例如，是线性、单调还是更复杂的关系）？
+
+2.  **绘制二维 PDP (交互作用):**
+    *   选择练习 1 中识别出的最重要的两个特征。
+    *   使用 `PartialDependenceDisplay.from_estimator` 绘制这两个特征的交互 PDP。
+    *   `features`: 包含两个特征名称的列表或元组。
+    *   其他参数同上。
+    *   添加标题。
+    *   调用 `plt.show()`。
+    *   **分析:** 在 Markdown 单元格中描述这两个特征之间是否存在明显的交互效应。交互效应意味着一个特征对预测的影响方式取决于另一个特征的值。
+
+## 练习 3: 局部可解释性 - LIME
+
+**目标:** 使用 LIME 解释单个预测。
+
+**使用训练好的 `best_xgb` 模型、训练数据 `X_train_h_scaled` (NumPy array) 和测试数据 `X_test_h_scaled`。**
+
+*前置条件检查：确保 `lime` 库已安装。*
+
+```python
+if lime_installed and model_loaded and data_loaded:
+    print("\n设置 LIME Explainer...")
+    # 创建 LIME Tabular Explainer
+    # 需要原始训练数据的 NumPy 数组、特征名称、类别名称（对于回归，可以省略或设为 None）和模式
+    lime_explainer = lime.lime_tabular.LimeTabularExplainer(
+        training_data=X_train_h_scaled, # LIME 需要 numpy array
+        feature_names=feature_names_h,
+        class_names=['price'], # 可以自定义
+        mode='regression' # 重要：指定为回归任务
+    )
+
+    # 选择一个测试实例进行解释
+    instance_index = 10 # 选择测试集中的第 11 个样本
+    instance = X_test_h_scaled[instance_index]
+    true_value = y_test_h.iloc[instance_index] # 获取真实值
+    pred_value = best_xgb.predict(instance.reshape(1, -1))[0] # 获取模型预测值
+
+    print(f"\n解释实例 {instance_index}:")
+    print(f"  真实值: {true_value:.4f}")
+    print(f"  预测值: {pred_value:.4f}")
+
+    # 生成解释
+    # num_features 指定显示多少个最重要的特征
+    lime_explanation = lime_explainer.explain_instance(
+        data_row=instance,
+        predict_fn=best_xgb.predict, # 传入模型的 predict 方法
+        num_features=5 # 显示最重要的 5 个特征
+    )
+
+    # 可视化解释
+    lime_explanation.show_in_notebook(show_table=True, show_all=False)
+    # 或者保存为 HTML 文件
+    # lime_explanation.save_to_file('lime_explanation_instance_10.html')
+
+else:
+    print("LIME 未安装、模型未加载或数据未加载，无法执行练习 3。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中，解读 LIME 为所选实例生成的解释。哪些特征对这个特定预测的贡献最大（正向或负向）？这与全局特征重要性是否一致？
+
+## 练习 4: 局部可解释性 - SHAP
+
+**目标:** 使用 SHAP 值解释模型的全局和局部行为。
+
+**使用训练好的 `best_xgb` 模型、训练数据 `X_train_df` 和测试数据 `X_test_df` (Pandas DataFrames)。**
+
+*前置条件检查：确保 `shap` 库已安装。*
+
+```python
+if shap_installed and model_loaded and data_loaded:
+    print("\n计算 SHAP 值 (可能需要一些时间)...")
+    # 对于 XGBoost，使用 TreeExplainer 效率更高
+    shap_explainer = shap.TreeExplainer(best_xgb)
+    # 计算测试集的 SHAP 值 (可以使用部分数据加速，例如 X_test_df.sample(100, random_state=42))
+    shap_values = shap_explainer.shap_values(X_test_df)
+
+    # 1. SHAP Summary Plot (Bar) - 全局重要性
+    print("\n绘制 SHAP Summary Plot (Bar)...")
+    shap.summary_plot(shap_values, X_test_df, plot_type="bar", show=False)
+    plt.title("SHAP Feature Importance (Bar)")
+    plt.tight_layout()
+    plt.show()
+
+    # 2. SHAP Summary Plot (Dot/Beeswarm) - 全局重要性与特征值关系
+    print("\n绘制 SHAP Summary Plot (Dot/Beeswarm)...")
+    shap.summary_plot(shap_values, X_test_df, show=False)
+    # plt.title("SHAP Summary Plot") # summary_plot 默认会添加标题
+    plt.tight_layout()
+    plt.show()
+
+    # 3. SHAP Dependence Plot - 单个特征的影响
+    # 选择一个重要特征的名称，例如 'MedInc' (Median Income)
+    feature_to_plot = 'MedInc'
+    if feature_to_plot in feature_names_h:
+        print(f"\n绘制 SHAP Dependence Plot for {feature_to_plot}...")
+        shap.dependence_plot(feature_to_plot, shap_values, X_test_df, interaction_index=None, show=False)
+        plt.title(f"SHAP Dependence Plot: {feature_to_plot}")
+        plt.tight_layout()
+        plt.show()
+
+        # (可选) 探索交互作用
+        print(f"\n绘制 SHAP Dependence Plot for {feature_to_plot} with interaction...")
+        shap.dependence_plot(feature_to_plot, shap_values, X_test_df, interaction_index='auto', show=False) # 'auto' 会尝试找到最强的交互特征
+        plt.title(f"SHAP Dependence Plot with Interaction: {feature_to_plot}")
+        plt.tight_layout()
+        plt.show()
+    else:
+        print(f"特征 '{feature_to_plot}' 不在数据中，无法绘制依赖图。")
+
+
+    # 4. SHAP Force Plot - 单个预测的解释
+    print("\n绘制 SHAP Force Plot (单个实例)...")
+    # 需要初始化 JS 环境 (通常在 notebook 环境自动完成)
+    shap.initjs()
+    instance_index = 10 # 选择与 LIME 相同的实例
+    # shap.force_plot(shap_explainer.expected_value, shap_values[instance_index,:], X_test_df.iloc[instance_index,:])
+    # 为了在 Quarto/Jupyter 中正确显示，使用 display
+    display(shap.force_plot(shap_explainer.expected_value, shap_values[instance_index,:], X_test_df.iloc[instance_index,:]))
+
+    # (可选) 绘制多个样本的 Force Plot (瀑布图形式更清晰)
+    print("\n绘制 SHAP Waterfall Plot (单个实例)...")
+    shap.plots.waterfall(shap_values[instance_index], max_display=10, show=False)
+    plt.title(f"SHAP Waterfall Plot for Instance {instance_index}")
+    plt.tight_layout()
+    plt.show()
+
+
+else:
+    print("SHAP 未安装、模型未加载或数据未加载，无法执行练习 4。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中，解释 SHAP 条形图和点状图（beeswarm plot）分别展示了哪些信息？它们与 Permutation Importance 的结果是否一致？
+*   解释你选择的特征的 SHAP 依赖图。它如何展示该特征值与模型输出变化之间的关系？交互图（如果绘制了）揭示了什么？
+*   解释单个实例的 SHAP 力图 (force plot) 或瀑布图 (waterfall plot)。哪些特征将预测值推高？哪些将其拉低？
+
+## 练习 5: (可选) 项目应用与讨论
+
+**目标:** 将 XAI 技术应用到你之前的项目中，并思考其价值。
+
+1.  **选择模型和实例:** 选择你之前项目（项目一、二或三）中训练的一个模型（最好是较复杂的模型，如 RandomForest 或 XGBoost）和对应的数据集。挑选几个你感兴趣的预测实例（例如，预测错误、预测正确但置信度低、具有代表性的不同类别/簇的实例）。
+2.  **应用 LIME 或 SHAP:**
+    *   使用 LIME 或 SHAP (或两者都用) 来解释你选择的实例的预测结果。
+    *   生成并展示相应的可视化图（LIME 的 `show_in_notebook` 或 SHAP 的 `force_plot`/`waterfall_plot`）。
+3.  **全局分析 (SHAP):**
+    *   如果使用 SHAP，计算整个测试集（或一个足够大的样本）的 SHAP 值。
+    *   生成 `summary_plot` (bar 和 dot 类型) 来理解全局特征重要性。
+    *   生成 `dependence_plot` 来探索关键特征与模型输出的关系。
+4.  **讨论:**
+    *   在 Markdown 单元格中，总结你的发现。这些解释是否符合你对模型或数据的理解？
+    *   这些解释如何帮助你信任（或质疑）你的模型？
+    *   基于这些解释，你能提出哪些改进模型或改进业务决策的建议？
+
+**理解模型为何做出特定预测是建立信任、调试模型和将模型应用于实际业务的关键一步。**
+```
+<write_to_file>
+<path>week13_exercise.qmd</path>
+<content>
+---
+title: "第十三周：课堂练习与实验"
+subtitle: "模型可解释性 (XAI) 初探"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+---
+
+# 第十三周：课堂练习与实验
+
+本周我们开始探索模型可解释性 (Explainable AI, XAI) 的重要性与常用技术。我们将学习并实践全局解释方法（如特征重要性、部分依赖图）和局部解释方法（如 LIME、SHAP），以理解“黑箱”模型的决策过程。
+
+## 准备工作
+
+确保导入本周所需的库，并准备好一个训练好的模型和相应的数据集。我们将以**第六周的项目二（房价预测）中训练好的 XGBoost 模型**为例。如果该模型未保存或训练，需要重新运行相关代码。
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.inspection import permutation_importance, PartialDependenceDisplay
+from sklearn.metrics import mean_squared_error, r2_score
+import joblib # 用于加载模型
+import warnings
+warnings.filterwarnings("ignore")
+
+# 检查相关库是否安装
+try:
+    import xgboost as xgb
+    xgboost_installed = True
+except ImportError:
+    print("XGBoost not installed. Run 'pip install xgboost'")
+    xgboost_installed = False
+    xgb = None
+
+try:
+    import shap
+    shap_installed = True
+except ImportError:
+    print("SHAP is not installed. Run 'pip install shap'")
+    shap_installed = False
+    shap = None
+
+try:
+    import lime
+    import lime.lime_tabular
+    lime_installed = True
+except ImportError:
+    print("LIME is not installed. Run 'pip install lime'")
+    lime_installed = False
+    lime = None
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+# %matplotlib inline
+
+# --- 加载数据 (复用项目二的数据) ---
+data_loaded = False
+model_loaded = False
+X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = [None] * 4
+X_h = None # To store original feature names if available
+feature_names_h = None
+best_xgb = None # Initialize model variable
+
+try:
+    from sklearn.datasets import fetch_california_housing
+    housing = fetch_california_housing(as_frame=True)
+    df_housing = housing.frame
+    X_h = df_housing[housing.feature_names]
+    y_h = df_housing[housing.target_names[0]]
+    feature_names_h = housing.feature_names # Store feature names
+
+    if X_h.isnull().sum().any():
+         X_h = X_h.fillna(X_h.median())
+
+    scaler_h = StandardScaler()
+    X_h_scaled = scaler_h.fit_transform(X_h)
+
+    X_train_h_scaled, X_test_h_scaled, y_train_h, y_test_h = train_test_split(
+        X_h_scaled, y_h, test_size=0.2, random_state=42
+    )
+    # Create DataFrame versions for SHAP/LIME if needed later
+    X_train_df = pd.DataFrame(X_train_h_scaled, columns=feature_names_h)
+    X_test_df = pd.DataFrame(X_test_h_scaled, columns=feature_names_h)
+
+    print("数据准备完成。")
+    data_loaded = True
+
+    # --- 加载或重新训练模型 (假设最优 XGBoost 模型来自 Week 6/12) ---
+    # 尝试加载之前保存的模型
+    try:
+        best_xgb = joblib.load('best_xgb_model.pkl') # 假设模型已保存
+        print("已加载之前训练好的 XGBoost 模型。")
+        model_loaded = True
+    except FileNotFoundError:
+        print("未找到已保存的模型 'best_xgb_model.pkl'。将重新训练一个基础 XGBoost 模型。")
+        if xgboost_installed:
+            best_xgb = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42, n_jobs=-1)
+            best_xgb.fit(X_train_h_scaled, y_train_h)
+            # Optionally save the trained model
+            # joblib.dump(best_xgb, 'best_xgb_model.pkl')
+            print("已训练基础 XGBoost 模型。")
+            model_loaded = True
+        else:
+            print("XGBoost 未安装，无法训练模型。")
+
+except Exception as e:
+    print(f"加载或处理数据时出错: {e}")
+
+if model_loaded:
+    y_pred_test = best_xgb.predict(X_test_h_scaled)
+    rmse_test = np.sqrt(mean_squared_error(y_test_h, y_pred_test))
+    r2_test = r2_score(y_test_h, y_pred_test)
+    print(f"\n模型在测试集上的性能: RMSE={rmse_test:.4f}, R2={r2_test:.4f}")
+
+```
+
+::: {.callout-warning}
+**注意:** 以下练习依赖于成功加载数据和模型。如果准备工作步骤失败，后续代码可能无法运行或产生无意义的结果。确保你已经运行了之前的项目代码或有可用的数据集和模型文件（如 `best_xgb_model.pkl`）。
+:::
+
+## 练习 1: 全局可解释性 - 特征重要性
+
+**目标:** 理解不同类型的特征重要性计算方法。
+
+**使用训练好的 `best_xgb` 模型和测试数据 `X_test_h_scaled`, `y_test_h`。**
+
+1.  **内置特征重要性 (Gain/Weight/Cover):**
+    *   如果你的 `best_xgb` 是 XGBoost 模型，它有内置的 `feature_importances_` 属性（通常基于 'gain'）。
+    *   获取这些重要性值，并创建一个 DataFrame 将其与特征名称关联起来。
+    *   按重要性降序排序并打印前 10 个最重要的特征。
+    *   绘制条形图展示前 10 个特征的重要性。
+    *   **思考:** XGBoost 还提供其他重要性类型（如 'weight', 'cover'）。尝试获取并比较它们。（提示：`xgb.plot_importance(best_xgb, importance_type='weight')`）
+
+2.  **排列重要性 (Permutation Importance):**
+    *   使用 `sklearn.inspection.permutation_importance` 计算模型在**测试集**上的排列重要性。
+    *   设置 `n_repeats` (例如 10) 以获得更稳定的结果，`random_state=42`, `n_jobs=-1`。
+    *   将结果（`importances_mean`, `importances_std`）整理到 DataFrame 中，与特征名称关联。
+    *   按平均重要性降序排序并打印前 10 个特征。
+    *   绘制条形图展示前 10 个特征的平均重要性及其标准差。
+    *   **分析:** 在 Markdown 单元格中比较内置重要性（如 gain）和排列重要性的结果。它们是否一致？为什么可能会有差异？排列重要性的优点是什么？
+
+## 练习 2: 全局可解释性 - 部分依赖图 (PDP)
+
+**目标:** 理解和绘制部分依赖图，探索特征与预测之间的平均关系。
+
+**使用训练好的 `best_xgb` 模型和训练数据 `X_train_df` (或其子集)。**
+
+1.  **绘制一维 PDP:**
+    *   选择练习 1 中识别出的 1-2 个最重要的特征。获取它们的索引或名称。
+    *   使用 `PartialDependenceDisplay.from_estimator` 绘制这些特征的 PDP。
+    *   `estimator`: `best_xgb`
+    *   `X`: `X_train_df` (使用 DataFrame 以便自动获取特征名，可以使用子样本 `X_train_df.sample(500, random_state=42)` 加快速度)
+    *   `features`: 选定特征的名称列表。
+    *   `grid_resolution`: 控制计算点的数量，例如 50。
+    *   添加标题。
+    *   调用 `plt.show()`。
+    *   **分析:** 在 Markdown 单元格中解释 PDP 图揭示了所选特征与目标变量（房价）之间怎样的平均关系（例如，是线性、单调还是更复杂的关系）？
+
+2.  **绘制二维 PDP (交互作用):**
+    *   选择练习 1 中识别出的最重要的两个特征。
+    *   使用 `PartialDependenceDisplay.from_estimator` 绘制这两个特征的交互 PDP。
+    *   `features`: 包含两个特征名称的列表或元组。
+    *   其他参数同上。
+    *   添加标题。
+    *   调用 `plt.show()`。
+    *   **分析:** 在 Markdown 单元格中描述这两个特征之间是否存在明显的交互效应。交互效应意味着一个特征对预测的影响方式取决于另一个特征的值。
+
+## 练习 3: 局部可解释性 - LIME
+
+**目标:** 使用 LIME 解释单个预测。
+
+**使用训练好的 `best_xgb` 模型、训练数据 `X_train_h_scaled` (NumPy array) 和测试数据 `X_test_h_scaled`。**
+
+*前置条件检查：确保 `lime` 库已安装。*
+
+```python
+if lime_installed and model_loaded and data_loaded:
+    print("\n设置 LIME Explainer...")
+    # 创建 LIME Tabular Explainer
+    # 需要原始训练数据的 NumPy 数组、特征名称、类别名称（对于回归，可以省略或设为 None）和模式
+    lime_explainer = lime.lime_tabular.LimeTabularExplainer(
+        training_data=X_train_h_scaled, # LIME 需要 numpy array
+        feature_names=feature_names_h,
+        class_names=['price'], # 可以自定义
+        mode='regression' # 重要：指定为回归任务
+    )
+
+    # 选择一个测试实例进行解释
+    instance_index = 10 # 选择测试集中的第 11 个样本
+    instance = X_test_h_scaled[instance_index]
+    true_value = y_test_h.iloc[instance_index] # 获取真实值
+    pred_value = best_xgb.predict(instance.reshape(1, -1))[0] # 获取模型预测值
+
+    print(f"\n解释实例 {instance_index}:")
+    print(f"  真实值: {true_value:.4f}")
+    print(f"  预测值: {pred_value:.4f}")
+
+    # 生成解释
+    # num_features 指定显示多少个最重要的特征
+    lime_explanation = lime_explainer.explain_instance(
+        data_row=instance,
+        predict_fn=best_xgb.predict, # 传入模型的 predict 方法
+        num_features=5 # 显示最重要的 5 个特征
+    )
+
+    # 可视化解释
+    lime_explanation.show_in_notebook(show_table=True, show_all=False)
+    # 或者保存为 HTML 文件
+    # lime_explanation.save_to_file('lime_explanation_instance_10.html')
+
+else:
+    print("LIME 未安装、模型未加载或数据未加载，无法执行练习 3。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中，解读 LIME 为所选实例生成的解释。哪些特征对这个特定预测的贡献最大（正向或负向）？这与全局特征重要性是否一致？
+
+## 练习 4: 局部可解释性 - SHAP
+
+**目标:** 使用 SHAP 值解释模型的全局和局部行为。
+
+**使用训练好的 `best_xgb` 模型、训练数据 `X_train_df` 和测试数据 `X_test_df` (Pandas DataFrames)。**
+
+*前置条件检查：确保 `shap` 库已安装。*
+
+```python
+if shap_installed and model_loaded and data_loaded:
+    print("\n计算 SHAP 值 (可能需要一些时间)...")
+    # 对于 XGBoost，使用 TreeExplainer 效率更高
+    shap_explainer = shap.TreeExplainer(best_xgb)
+    # 计算测试集的 SHAP 值 (可以使用部分数据加速，例如 X_test_df.sample(100, random_state=42))
+    shap_values = shap_explainer.shap_values(X_test_df)
+
+    # 1. SHAP Summary Plot (Bar) - 全局重要性
+    print("\n绘制 SHAP Summary Plot (Bar)...")
+    shap.summary_plot(shap_values, X_test_df, plot_type="bar", show=False)
+    plt.title("SHAP Feature Importance (Bar)")
+    plt.tight_layout()
+    plt.show()
+
+    # 2. SHAP Summary Plot (Dot/Beeswarm) - 全局重要性与特征值关系
+    print("\n绘制 SHAP Summary Plot (Dot/Beeswarm)...")
+    shap.summary_plot(shap_values, X_test_df, show=False)
+    # plt.title("SHAP Summary Plot") # summary_plot 默认会添加标题
+    plt.tight_layout()
+    plt.show()
+
+    # 3. SHAP Dependence Plot - 单个特征的影响
+    # 选择一个重要特征的名称，例如 'MedInc' (Median Income)
+    feature_to_plot = 'MedInc'
+    if feature_to_plot in feature_names_h:
+        print(f"\n绘制 SHAP Dependence Plot for {feature_to_plot}...")
+        shap.dependence_plot(feature_to_plot, shap_values, X_test_df, interaction_index=None, show=False)
+        plt.title(f"SHAP Dependence Plot: {feature_to_plot}")
+        plt.tight_layout()
+        plt.show()
+
+        # (可选) 探索交互作用
+        print(f"\n绘制 SHAP Dependence Plot for {feature_to_plot} with interaction...")
+        shap.dependence_plot(feature_to_plot, shap_values, X_test_df, interaction_index='auto', show=False) # 'auto' 会尝试找到最强的交互特征
+        plt.title(f"SHAP Dependence Plot with Interaction: {feature_to_plot}")
+        plt.tight_layout()
+        plt.show()
+    else:
+        print(f"特征 '{feature_to_plot}' 不在数据中，无法绘制依赖图。")
+
+
+    # 4. SHAP Force Plot - 单个预测的解释
+    print("\n绘制 SHAP Force Plot (单个实例)...")
+    # 需要初始化 JS 环境 (通常在 notebook 环境自动完成)
+    shap.initjs()
+    instance_index = 10 # 选择与 LIME 相同的实例
+    # shap.force_plot(shap_explainer.expected_value, shap_values[instance_index,:], X_test_df.iloc[instance_index,:])
+    # 为了在 Quarto/Jupyter 中正确显示，使用 display
+    from IPython.display import display # 需要导入 display
+    display(shap.force_plot(shap_explainer.expected_value, shap_values[instance_index,:], X_test_df.iloc[instance_index,:]))
+
+    # (可选) 绘制多个样本的 Force Plot (瀑布图形式更清晰)
+    print("\n绘制 SHAP Waterfall Plot (单个实例)...")
+    shap.plots.waterfall(shap_values[instance_index], max_display=10, show=False)
+    plt.title(f"SHAP Waterfall Plot for Instance {instance_index}")
+    plt.tight_layout()
+    plt.show()
+
+
+else:
+    print("SHAP 未安装、模型未加载或数据未加载，无法执行练习 4。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中，解释 SHAP 条形图和点状图（beeswarm plot）分别展示了哪些信息？它们与 Permutation Importance 的结果是否一致？
+*   解释你选择的特征的 SHAP 依赖图。它如何展示该特征值与模型输出变化之间的关系？交互图（如果绘制了）揭示了什么？
+*   解释单个实例的 SHAP 力图 (force plot) 或瀑布图 (waterfall plot)。哪些特征将预测值推高？哪些将其拉低？
+
+## 练习 5: (可选) 项目应用与讨论
+
+**目标:** 将 XAI 技术应用到你之前的项目中，并思考其价值。
+
+1.  **选择模型和实例:** 选择你之前项目（项目一、二或三）中训练的一个模型（最好是较复杂的模型，如 RandomForest 或 XGBoost）和对应的数据集。挑选几个你感兴趣的预测实例（例如，预测错误、预测正确但置信度低、具有代表性的不同类别/簇的实例）。
+2.  **应用 LIME 或 SHAP:**
+    *   使用 LIME 或 SHAP (或两者都用) 来解释你选择的实例的预测结果。
+    *   生成并展示相应的可视化图（LIME 的 `show_in_notebook` 或 SHAP 的 `force_plot`/`waterfall_plot`）。
+3.  **全局分析 (SHAP):**
+    *   如果使用 SHAP，计算整个测试集（或一个足够大的样本）的 SHAP 值。
+    *   生成 `summary_plot` (bar 和 dot 类型) 来理解全局特征重要性。
+    *   生成 `dependence_plot` 来探索关键特征与模型输出的关系。
+4.  **讨论:**
+    *   在 Markdown 单元格中，总结你的发现。这些解释是否符合你对模型或数据的理解？
+    *   这些解释如何帮助你信任（或质疑）你的模型？
+    *   基于这些解释，你能提出哪些改进模型或改进业务决策的建议？
+
+**理解模型为何做出特定预测是建立信任、调试模型和将模型应用于实际业务的关键一步。**

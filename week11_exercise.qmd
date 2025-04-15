@@ -1,0 +1,237 @@
+---
+title: "第十一周：课堂练习与实验"
+subtitle: "时间序列数据处理与探索"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+---
+
+# 第十一周：课堂练习与实验
+
+本周我们开始探索时间序列数据。练习的重点是使用 Pandas 处理时间序列数据，包括时间索引、重采样、滚动窗口计算，以及识别时间序列的基本特征（趋势、季节性）和检验平稳性。同时，启动项目四。
+
+## 准备工作
+
+确保导入本周所需的库：
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+# 检查 statsmodels 是否已安装
+try:
+    from statsmodels.tsa.seasonal import seasonal_decompose
+    from statsmodels.tsa.stattools import adfuller
+    statsmodels_installed = True
+except ImportError:
+    print("statsmodels is not installed. Run 'pip install statsmodels'")
+    statsmodels_installed = False
+    seasonal_decompose, adfuller = None, None # Placeholder
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+# %matplotlib inline # 取消注释以便在 Jupyter 环境中显示绘图
+
+# --- 生成示例时间序列数据 ---
+# 生成一个稍微复杂的时间序列，包含趋势、季节性和噪声
+np.random.seed(42)
+n_samples = 365 * 3 # 3 年的日数据
+time = np.arange(n_samples)
+trend = 0.02 * time + 0.0001 * time**2
+seasonal = 10 * np.sin(2 * np.pi * time / 365.25) + 5 * np.sin(2 * np.pi * time / (365.25/4)) # 年和季度季节性
+noise = np.random.normal(0, 2, n_samples)
+y = 50 + trend + seasonal + noise
+
+# 创建 Pandas Series，使用 DatetimeIndex
+dates = pd.date_range(start='2021-01-01', periods=n_samples, freq='D')
+ts_data = pd.Series(y, index=dates, name='Value')
+
+print("示例时间序列数据 (前 5 行):")
+print(ts_data.head())
+
+# 绘制示例数据
+plt.figure(figsize=(12, 6))
+ts_data.plot(title='Generated Time Series Data')
+plt.ylabel('Value')
+plt.show()
+
+# --- 定义 ADF 检验函数 (复用) ---
+def test_stationarity(timeseries, window=12, plot_rolling=True):
+    """
+    Performs Dickey-Fuller test and plots rolling statistics.
+    """
+    if timeseries is None or timeseries.empty:
+        print("Input timeseries is empty or None.")
+        return
+
+    # Calculate rolling statistics
+    rolmean = timeseries.rolling(window=window).mean()
+    rolstd = timeseries.rolling(window=window).std()
+
+    # Plot rolling statistics
+    if plot_rolling:
+        plt.figure(figsize=(12, 4))
+        orig = plt.plot(timeseries, color='blue', label='Original')
+        mean = plt.plot(rolmean, color='red', label=f'Rolling Mean (w={window})')
+        std = plt.plot(rolstd, color='black', label=f'Rolling Std (w={window})')
+        plt.legend(loc='best')
+        plt.title('Rolling Mean & Standard Deviation')
+        plt.show()
+
+    # Perform Dickey-Fuller test
+    print('Results of Dickey-Fuller Test:')
+    try:
+        # Drop NA values that might result from differencing or rolling calculations
+        dftest = adfuller(timeseries.dropna(), autolag='AIC')
+        dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+        for key, value in dftest[4].items():
+            dfoutput['Critical Value (%s)' % key] = value
+        print(dfoutput)
+
+        # Interpret the result
+        if dftest[1] <= 0.05 and dftest[0] < dftest[4]['5%']:
+            print("=> Conclusion: Reject H0, the series is likely stationary.")
+        else:
+            print("=> Conclusion: Fail to reject H0, the series is likely non-stationary.")
+    except Exception as e:
+        print(f"Error during ADF test: {e}")
+
+```
+
+## 练习 1: 时间索引与切片
+
+**目标:** 熟练使用 DatetimeIndex 进行数据选择。
+
+**使用准备工作中生成的 `ts_data`。**
+
+1.  **选择特定日期/时间:**
+    *   选择并打印 '2021-05-15' 的数据。
+    *   选择并打印 '2022-07-01' 到 '2022-07-15' 的数据。
+    *   选择并打印 2022 年全年的数据。
+    *   选择并打印 2023 年 3 月的数据。
+
+## 练习 2: 重采样 (Resampling)
+
+**目标:** 练习改变时间序列的频率。
+
+**使用准备工作中生成的 `ts_data`。**
+
+1.  **降采样:**
+    *   将日度数据 `ts_data` 重采样为**月度 (Month End 'M')** 数据，计算每个月的**平均值**。打印结果。
+    *   将日度数据 `ts_data` 重采样为**季度 (Quarter End 'Q')** 数据，计算每个季度的**最大值**。打印结果。
+    *   将日度数据 `ts_data` 重采样为**年度 (Year End 'A' 或 'Y')** 数据，计算每年的**总和**。打印结果。
+
+2.  **升采样:**
+    *   将日度数据 `ts_data` 升采样为**12 小时 ('12H')** 频率的数据。
+    *   尝试使用 `asfreq()`，打印前 10 行，观察产生的 NaN 值。
+    *   尝试使用 `ffill()` (向前填充) 处理 NaN 值，打印前 20 行。
+    *   尝试使用 `bfill()` (向后填充) 处理 NaN 值，打印前 20 行。
+    *   (可选) 尝试使用 `interpolate()` 进行线性插值填充，打印前 20 行。
+
+## 练习 3: 滚动窗口计算 (Rolling Window)
+
+**目标:** 计算和可视化移动平均。
+
+**使用准备工作中生成的 `ts_data`。**
+
+1.  **计算移动平均:**
+    *   计算 `ts_data` 的 30 天移动平均值 (`rolling_mean_30d`)。
+    *   计算 `ts_data` 的 90 天移动平均值 (`rolling_mean_90d`)。
+
+2.  **可视化:**
+    *   在同一张图上绘制原始时间序列 `ts_data` (可以设置 `alpha=0.5` 使其半透明)。
+    *   在同一张图上绘制 30 天移动平均线 `rolling_mean_30d`。
+    *   在同一张图上绘制 90 天移动平均线 `rolling_mean_90d`。
+    *   添加图例、标题和坐标轴标签。
+    *   调用 `plt.show()`。
+    *   **分析:** 在 Markdown 单元格中描述移动平均线如何帮助平滑数据并显示趋势。比较 30 天和 90 天移动平均线的平滑程度。
+
+## 练习 4: 时间序列分解与平稳性检验
+
+**目标:** 分解时间序列，识别其组成部分，并检验平稳性。
+
+**使用准备工作中生成的 `ts_data`。**
+
+*前置条件检查：确保 `statsmodels` 库已安装。*
+
+```python
+if statsmodels_installed:
+    # 1. 时间序列分解
+    print("执行时间序列分解...")
+    # 使用 period=365 假设年季节性
+    # 注意：对于真实数据，period 需要根据实际季节性周期设置，例如 7（周）、12（月）
+    # 使用 try-except 以防数据长度不足一个周期
+    try:
+        decomposition = seasonal_decompose(ts_data, model='additive', period=365)
+
+        # 获取分解结果
+        trend = decomposition.trend
+        seasonal = decomposition.seasonal
+        residual = decomposition.resid
+
+        # 绘制分解结果
+        fig = decomposition.plot()
+        fig.set_size_inches(12, 8)
+        plt.tight_layout()
+        plt.show()
+    except ValueError as e:
+        print(f"无法执行分解，可能数据长度不足一个周期: {e}")
+        trend, seasonal, residual = None, None, None # Set to None if decomposition fails
+
+    # 2. 平稳性检验 (可视化)
+    print("\n进行可视化平稳性检验...")
+    test_stationarity(ts_data, window=30) # 使用定义的函数
+
+    # 3. 平稳性检验 (ADF Test)
+    print("\n执行 ADF 检验...")
+    test_stationarity(ts_data, plot_rolling=False) # 只输出 ADF 结果
+
+    # 4. 使序列平稳 (差分)
+    print("\n--- 尝试一阶差分 ---")
+    ts_diff1 = ts_data.diff().dropna() # dropna() 移除第一个 NaN 值
+    # plt.figure(figsize=(12, 4))
+    # ts_diff1.plot(title='First Order Differencing')
+    # plt.show()
+    test_stationarity(ts_diff1)
+
+    # (可选) 如果一阶差分后仍不平稳，尝试二阶差分
+    # print("\n--- 尝试二阶差分 ---")
+    # ts_diff2 = ts_data.diff().diff().dropna()
+    # test_stationarity(ts_diff2)
+
+else:
+    print("statsmodels 库未安装，无法执行练习 4。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中描述你从分解图中观察到的趋势和季节性模式。残差看起来像随机噪声吗？
+*   根据滚动统计量的图形判断原始序列是否平稳，并说明理由。
+*   根据 ADF 检验结果（比较 Test Statistic 和 Critical Values，或看 p-value）判断原始序列是否平稳，并说明理由。
+*   判断一阶差分后的序列是否平稳。如果不平稳，是否需要二阶差分？
+
+## 练习 5: 项目四 - 阶段一 (EDA 与平稳性处理)
+
+**目标:** 对你的项目四数据进行探索性分析和必要的平稳性处理。
+
+1.  **加载与初步处理:** 确保你的项目数据集已加载，时间索引已设置正确，并进行了基本的缺失值/异常值处理。
+2.  **EDA 与模式识别:**
+    *   绘制你的目标时间序列的完整图表。
+    *   仔细观察是否存在明显的**长期趋势**（上升/下降/平稳）？
+    *   是否存在明显的**季节性模式**？如果存在，周期大约是多长（例如，按年、月、周）？ **提示:** 如果是月度数据，年周期是 12；如果是日度数据，周周期是 7，年周期是 365。
+    *   计算并绘制不同窗口大小（例如，7天、30天、90天，根据你的数据频率调整）的移动平均线，辅助判断趋势。
+3.  **时间序列分解:**
+    *   根据你观察到的季节性周期（如果没有明显季节性，可以省略或尝试不同周期，例如对于月度数据 `period=12`），使用 `seasonal_decompose` 分解你的时间序列。
+    *   绘制分解图，分析趋势、季节性和残差成分。
+4.  **平稳性检验与处理:**
+    *   对你的原始目标序列进行平稳性检验（可视化滚动统计量 + ADF 检验，可以使用上面定义的 `test_stationarity` 函数）。
+    *   如果非平稳，尝试进行差分（可能需要结合对数变换 `np.log1p()`，如果方差看起来不稳定）。**注意：** 如果数据有明显的季节性，可能需要进行**季节性差分** (`ts_data.diff(periods=m).dropna()`，其中 `m` 是季节周期) 或者先分解去除季节性成分再差分。
+    *   对转换后的序列再次进行平稳性检验，直到序列看起来平稳。记录你使用的差分次数 `d`（以及是否进行了季节性差分或对数变换）。
+5.  **记录:** 在你的项目 Notebook 中详细记录 EDA 的发现、分解结果、平稳性检验过程和结果，以及为使序列平稳所做的转换。
+
+**完成这些练习，你将具备处理和分析时间序列数据的基本能力，为下周的 ARIMA 建模做好准备。**

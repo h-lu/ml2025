@@ -18,6 +18,7 @@ book:
         - week6_lecture.qmd
         - week7_lecture.qmd
         - week8_lecture.qmd
+        - week9_lecture.qmd
     - part: "实验"
       chapters:
         - week1_exercise.qmd
@@ -28,6 +29,14 @@ book:
         - week6_exercise.qmd
         - week7_exercise.qmd
         - week8_exercise.qmd
+        - week9_exercise.qmd
+    - part: "项目"
+      chapters:
+        - project1_task.qmd
+        - project2_task.qmd
+        - project3_task.qmd
+        - project4_task.qmd
+        - final_project_task.qmd
 
 execute:
   echo: true

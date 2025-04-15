@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="陆海波">
-<meta name="dcterms.date" content="2025-04-15">
 
-<title>机器学习Python</title>
+<title>项目四：时间序列预测与业务应用 – 机器学习Python</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -32,7 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./week1_lecture.html" rel="next">
+<link href="./final_project_task.html" rel="next">
+<link href="./project3_task.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -83,7 +82,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html"><span class="chapter-title">index.html</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./project1_task.html">项目</a></li><li class="breadcrumb-item"><a href="./project4_task.html"><span class="chapter-title">项目四：时间序列预测与业务应用</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -110,7 +109,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">index.html</span></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -251,7 +250,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./project4_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目四：时间序列预测与业务应用</span></a>
+  <a href="./project4_task.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">项目四：时间序列预测与业务应用</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -266,34 +265,42 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#项目背景" id="toc-项目背景" class="nav-link active" data-scroll-target="#项目背景">项目背景</a></li>
+  <li><a href="#项目目标" id="toc-项目目标" class="nav-link" data-scroll-target="#项目目标">项目目标</a></li>
+  <li><a href="#项目阶段" id="toc-项目阶段" class="nav-link" data-scroll-target="#项目阶段">项目阶段</a>
+  <ul class="collapse">
+  <li><a href="#第一阶段时间序列基础分析" id="toc-第一阶段时间序列基础分析" class="nav-link" data-scroll-target="#第一阶段时间序列基础分析">第一阶段：时间序列基础分析</a></li>
+  <li><a href="#第二阶段模型构建与预测" id="toc-第二阶段模型构建与预测" class="nav-link" data-scroll-target="#第二阶段模型构建与预测">第二阶段：模型构建与预测</a></li>
+  </ul></li>
+  <li><a href="#提交要求" id="toc-提交要求" class="nav-link" data-scroll-target="#提交要求">提交要求</a>
+  <ul class="collapse">
+  <li><a href="#代码文件" id="toc-代码文件" class="nav-link" data-scroll-target="#代码文件">代码文件</a></li>
+  <li><a href="#项目报告" id="toc-项目报告" class="nav-link" data-scroll-target="#项目报告">项目报告</a></li>
+  </ul></li>
+  <li><a href="#评分标准" id="toc-评分标准" class="nav-link" data-scroll-target="#评分标准">评分标准</a></li>
+  <li><a href="#截止时间" id="toc-截止时间" class="nav-link" data-scroll-target="#截止时间">截止时间</a></li>
+  <li><a href="#注意事项" id="toc-注意事项" class="nav-link" data-scroll-target="#注意事项">注意事项</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./project1_task.html">项目</a></li><li class="breadcrumb-item"><a href="./project4_task.html"><span class="chapter-title">项目四：时间序列预测与业务应用</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">机器学习Python</h1>
+<h1 class="title"><span class="chapter-title">项目四：时间序列预测与业务应用</span></h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>陆海波 </p>
-          </div>
-  </div>
     
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">April 15, 2025</p>
-    </div>
-  </div>
   
     
   </div>
@@ -303,8 +310,131 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="项目背景" class="level2">
+<h2 class="anchored" data-anchor-id="项目背景">项目背景</h2>
+<p>时间序列预测在商业分析中具有重要应用，如销售预测、需求预测、库存管理等。通过构建 ARIMA 等时间序列模型，我们可以基于历史数据对未来趋势进行预测，为业务决策提供数据支持。</p>
+</section>
+<section id="项目目标" class="level2">
+<h2 class="anchored" data-anchor-id="项目目标">项目目标</h2>
+<ol type="1">
+<li>掌握时间序列数据的基本处理方法</li>
+<li>理解并应用时间序列分析的核心概念</li>
+<li>构建 ARIMA 模型进行预测</li>
+<li>评估预测效果并提供业务建议</li>
+</ol>
+</section>
+<section id="项目阶段" class="level2">
+<h2 class="anchored" data-anchor-id="项目阶段">项目阶段</h2>
+<section id="第一阶段时间序列基础分析" class="level3">
+<h3 class="anchored" data-anchor-id="第一阶段时间序列基础分析">第一阶段：时间序列基础分析</h3>
+<ol type="1">
+<li><strong>数据预处理</strong>
+<ul>
+<li>时间索引处理</li>
+<li>缺失值和异常值处理</li>
+<li>数据重采样（如有需要）</li>
+</ul></li>
+<li><strong>时间序列特征分析</strong>
+<ul>
+<li>趋势分析</li>
+<li>季节性检验</li>
+<li>平稳性检验（ADF测试）</li>
+<li>自相关分析（ACF/PACF）</li>
+</ul></li>
+<li><strong>时间序列分解</strong>
+<ul>
+<li>趋势分量提取</li>
+<li>季节性分量分析</li>
+<li>残差分析</li>
+</ul></li>
+</ol>
+</section>
+<section id="第二阶段模型构建与预测" class="level3">
+<h3 class="anchored" data-anchor-id="第二阶段模型构建与预测">第二阶段：模型构建与预测</h3>
+<ol type="1">
+<li><strong>ARIMA 模型构建</strong>
+<ul>
+<li>模型参数选择 (p,d,q)</li>
+<li>模型训练与诊断</li>
+<li>残差分析</li>
+</ul></li>
+<li><strong>预测与评估</strong>
+<ul>
+<li>样本内预测</li>
+<li>样本外预测</li>
+<li>预测区间计算</li>
+<li>模型评估（MAE, RMSE, MAPE）</li>
+</ul></li>
+<li><strong>业务应用分析</strong>
+<ul>
+<li>预测结果解读</li>
+<li>业务影响分析</li>
+<li>决策建议制定</li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="提交要求" class="level2">
+<h2 class="anchored" data-anchor-id="提交要求">提交要求</h2>
+<section id="代码文件" class="level3">
+<h3 class="anchored" data-anchor-id="代码文件">代码文件</h3>
+<ul>
+<li>完整的 Jupyter Notebook 或 Quarto 文档</li>
+<li>包含所有数据处理和建模代码</li>
+<li>清晰的代码注释</li>
+<li>完整的可视化结果</li>
+</ul>
+</section>
+<section id="项目报告" class="level3">
+<h3 class="anchored" data-anchor-id="项目报告">项目报告</h3>
+<ol type="1">
+<li><strong>数据分析</strong>
+<ul>
+<li>数据集描述</li>
+<li>时间序列特征分析结果</li>
+<li>预处理步骤说明</li>
+</ul></li>
+<li><strong>建模过程</strong>
+<ul>
+<li>模型选择依据</li>
+<li>参数确定过程</li>
+<li>模型诊断结果</li>
+<li>预测效果评估</li>
+</ul></li>
+<li><strong>业务应用</strong>
+<ul>
+<li>预测结果解读</li>
+<li>实际应用建议</li>
+<li>模型局限性说明</li>
+<li>改进建议</li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="评分标准" class="level2">
+<h2 class="anchored" data-anchor-id="评分标准">评分标准</h2>
+<ul>
+<li>数据分析（30%）：时间序列特征分析的完整性和准确性</li>
+<li>模型实现（30%）：ARIMA模型实现的正确性和预测效果</li>
+<li>业务应用（30%）：预测结果的实用性和建议的可行性</li>
+<li>报告质量（10%）：结构完整性和表达清晰度</li>
+</ul>
+</section>
+<section id="截止时间" class="level2">
+<h2 class="anchored" data-anchor-id="截止时间">截止时间</h2>
+<p>第十四周第一次课前提交</p>
+</section>
+<section id="注意事项" class="level2">
+<h2 class="anchored" data-anchor-id="注意事项">注意事项</h2>
+<ol type="1">
+<li>重点关注时间序列的特征分析和模型诊断</li>
+<li>确保预测结果的可解释性</li>
+<li>注意将技术发现转化为实际的业务建议</li>
+<li>可以尝试其他时间序列模型，但需要充分说明选择理由</li>
+</ol>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -729,10 +859,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="./project3_task.html" class="pagination-link" aria-label="项目三：用户分群分析与业务策略制定">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./week1_lecture.html" class="pagination-link" aria-label="第一周：机器学习世界初探与工具准备">
-        <span class="nav-page-text"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./final_project_task.html" class="pagination-link" aria-label="小组综合项目：机器学习技术融合应用">
+        <span class="nav-page-text"><span class="chapter-title">小组综合项目：机器学习技术融合应用</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

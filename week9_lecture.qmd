@@ -1,16 +1,8 @@
 ---
 title: "第九周：模型评估深化与不平衡数据处理"
 subtitle: "掌握高级评估技巧，攻克数据不平衡难题"
-format:
-  html:
-    toc: true
-    toc-location: left
-    code-fold: show
-    theme: cosmo
-    number-sections: true
 ---
 
-# 第九周：模型评估深化与不平衡数据处理
 
 前几周我们学习了多种分类和回归算法，并掌握了基本的模型评估方法。然而，在实际应用中，我们常常会遇到更复杂的情况，例如数据类别分布极不均衡，或者需要更精细地评估模型在特定方面的表现。本周，我们将深入探讨**模型评估**的技巧，学习 **P-R 曲线**、**交叉验证策略**以及**多分类评估**方法。同时，我们将重点关注一个常见且棘手的挑战——**处理不平衡数据 (Imbalanced Data)**，学习常用的应对策略，如 **SMOTE 过采样**和**代价敏感学习**。
 
@@ -26,6 +18,10 @@ format:
 
 我们在第三周学习了 ROC 曲线和 AUC 值，它们是评估二分类模型性能的常用工具。但在某些场景下，特别是当**我们更关注正类别（少数类）的识别性能**，且**数据严重不平衡**时，P-R 曲线通常能提供更有价值的信息。
 
+::: {.callout-note title="P-R 曲线与不平衡数据"}
+当负样本（多数类）数量远大于正样本（少数类）时，即使模型将大量负样本错误地预测为正样本（高 FP），FPR (FP / (FP + TN)) 的值也可能很低，导致 ROC 曲线看起来很好。而 P-R 曲线中的精确率 (TP / (TP + FP)) 对 FP 更敏感，能更真实地反映模型在识别少数类时的查准能力。
+:::
+
 *   **回顾:**
     *   **精确率 (Precision):** TP / (TP + FP) - 预测为正的样本中有多少是真的正。
     *   **召回率 (Recall):** TP / (TP + FN) - 真实为正的样本中有多少被预测出来了。
@@ -38,7 +34,7 @@ format:
     *   曲线下的面积 (Area Under the P-R Curve, **AUC-PR** 或 **AP - Average Precision**) 可以作为 P-R 曲线的整体性能度量，值越接近 1 越好。
     *   相比 ROC 曲线，P-R 曲线对正类别（少数类）的性能变化更敏感。如果模型在识别少数类方面表现不佳，P-R 曲线会更明显地反映出来。
 
-```python
+```{python}
 from sklearn.metrics import precision_recall_curve, average_precision_score
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -49,22 +45,37 @@ import numpy as np
 from collections import Counter # 后面会用到
 
 # --- 生成不平衡的示例数据 ---
-# weights=[0.95, 0.05] 表示类别 0 占 95%，类别 1 (正类/少数类) 占 5%
-X_imb, y_imb = make_classification(n_samples=1000, n_features=20, n_informative=2,
-                               n_redundant=10, n_clusters_per_class=1, weights=[0.95, 0.05],
-                               flip_y=0, random_state=42)
+# n_samples=1000: 生成1000个样本
+# n_features=10: 每个样本有10个特征
+# n_informative=2: 其中2个是信息特征（对分类有贡献）
+# n_redundant=0: 没有冗余特征（线性组合的信息特征）
+# n_repeated=0: 没有重复特征
+# n_classes=2: 二分类问题
+# n_clusters_per_class=1: 每个类别只有一个簇
+# weights=[0.9, 0.1]: 类别分布为90%负类，10%正类（不平衡数据）
+# flip_y=0.01: 随机噪声，1%的标签会被翻转
+# class_sep=1.0: 类别之间的分离程度，值越大类别越容易区分
+# random_state=42: 随机种子，确保结果可复现
+X_imb, y_imb = make_classification(n_samples=1000, n_features=10, n_informative=2,
+                               n_redundant=0, n_repeated=0, n_classes=2, n_clusters_per_class=1,
+                               weights=[0.9, 0.1], flip_y=0.01, class_sep=1.0, random_state=42)
+
 
 # --- 数据预处理和划分 ---
 scaler = StandardScaler()
 X_imb_scaled = scaler.fit_transform(X_imb)
+# 使用 stratify=y_imb 参数确保训练集和测试集中类别比例与原始数据集一致
+# 这对于不平衡数据集尤为重要，可以避免某个类别在划分后比例失调
 X_train_imb, X_test_imb, y_train_imb, y_test_imb = train_test_split(
     X_imb_scaled, y_imb, test_size=0.3, random_state=42, stratify=y_imb
 )
 
 # --- 训练一个模型 (例如逻辑回归) ---
-lr_imb = LogisticRegression(solver='liblinear', random_state=42)
+# 使用适当的正则化，帮助模型在不平衡数据上有更好的泛化能力
+lr_imb = LogisticRegression(solver='liblinear', C=0.1, random_state=42)
 lr_imb.fit(X_train_imb, y_train_imb)
 y_pred_proba_imb = lr_imb.predict_proba(X_test_imb)[:, 1] # 获取正类的预测概率
+
 
 # --- 计算并绘制 P-R 曲线 ---
 precision, recall, thresholds = precision_recall_curve(y_test_imb, y_pred_proba_imb)
@@ -87,9 +98,17 @@ plt.grid(True)
 print(f"Average Precision (AP) Score: {ap_score:.4f}")
 ```
 
+::: {.callout-tip title="理解 `make_classification`"}
+`make_classification` 是生成模拟分类数据的强大工具。通过调整 `weights` 参数可以轻松创建不平衡数据集，`class_sep` 控制类别区分度，`flip_y` 引入噪声，有助于测试模型在不同数据特性下的鲁棒性。
+:::
+
+::: {.callout-note title="预测概率的重要性"}
+P-R 曲线和 ROC 曲线都需要模型输出属于正类的概率（`predict_proba` 返回的第二列），而不是直接的类别预测（`predict`）。这是因为曲线是通过改变分类阈值来绘制的，而阈值是作用在概率上的。
+:::
+
 ::: {.callout-note title="ROC vs. P-R"}
-*   **ROC 曲线:** 对类别分布不敏感，能较好地反映模型整体区分正负类的能力。当正负样本数量接近，或两者都重要时常用。
-*   **P-R 曲线:** 对少数类的性能更敏感。当数据严重不平衡，且你更关心少数类（正类）的查准率和查全率时，P-R 曲线通常更有用（例如欺诈检测、罕见病诊断）。
+*   **ROC 曲线:** 对类别分布不敏感，能较好地反映模型整体区分正负类的能力。当正负样本数量接近，或两者都重要时常用。ROC 曲线以假正率（False Positive Rate, FPR）为横轴，真正率（True Positive Rate, TPR，即召回率）为纵轴绘制。与P-R曲线不同，ROC曲线同时考虑了正类和负类的表现，而P-R曲线则更专注于正类的精确率和召回率。
+*   **P-R 曲线:** 对少数类的性能更敏感。当数据严重不平衡，且你更关心少数类（正类）的精确率和召回率时，P-R 曲线通常更有用（例如欺诈检测、罕见病诊断）。P-R 曲线以召回率为横轴，精确率为纵轴绘制。
 :::
 
 ### 1.2 交叉验证策略深化
@@ -101,6 +120,10 @@ print(f"Average Precision (AP) Score: {ap_score:.4f}")
     *   **原理:** 在划分 K 个折时，确保每个折中的**类别比例**与原始训练数据集中的类别比例大致相同。
     *   **优点:** 保证了每个验证集都能代表整体数据的类别分布，评估结果更可靠。
     *   **实现:** `sklearn.model_selection.StratifiedKFold`。`cross_val_score` 在处理分类问题时通常默认使用它。
+
+::: {.callout-important title="分层抽样的必要性"}
+在处理不平衡数据时，使用普通 K-Fold 可能导致某些折中几乎没有少数类样本，使得该折的评估结果失去意义。分层 K-Fold 确保了每个折都能反映原始数据的类别分布，是处理不平衡分类问题交叉验证的标准做法。
+:::
 *   **(概念) 嵌套交叉验证 (Nested Cross-Validation):**
     *   **适用场景:** 当你需要同时进行**超参数调优**和**模型性能评估**时，为了避免信息泄露（即用测试集信息来选择超参数），需要使用嵌套 CV。
     *   **原理:**
@@ -111,6 +134,10 @@ print(f"Average Precision (AP) Score: {ap_score:.4f}")
     *   **优点:** 提供了对模型泛化能力**更无偏**的估计，因为它严格分开了超参数选择和最终评估所用的数据。
     *   **缺点:** 计算成本非常高。
     *   **实现:** 通常需要手动编写嵌套循环，结合 `GridSearchCV`/`RandomizedSearchCV` 和 `cross_val_score` 或 `StratifiedKFold`。
+
+::: {.callout-warning title="嵌套交叉验证与信息泄露"}
+如果在整个数据集上进行超参数调优（如 GridSearchCV），然后用 K-Fold 评估选定超参数的模型，那么测试集的信息实际上已经间接参与了超参数的选择过程，导致评估结果过于乐观。嵌套交叉验证通过内外两层循环严格分离了调优和评估数据，避免了这种信息泄露。
+:::
 
 ### 1.3 多分类评估指标
 
@@ -126,9 +153,15 @@ print(f"Average Precision (AP) Score: {ap_score:.4f}")
     *   **计算方式:** 独立计算每个类别的指标，然后根据每个类别的**样本数量（支持度 Support）进行加权平均**。
     *   **特点:** 考虑了类别不平衡。样本多的类别对最终指标的贡献更大。
 
+::: {.callout-tip title="如何选择平均策略？"}
+- **宏平均 (Macro):** 当你平等关心所有类别的性能时使用，即使是小类别。
+- **微平均 (Micro):** 当你关心整体的分类准确性时使用（在多分类中等于 Accuracy）。
+- **加权平均 (Weighted):** 当你想考虑类别不平衡，让样本多的类别有更大影响时使用。
+:::
+
 `sklearn.metrics.classification_report` 会同时报告这三种平均值。
 
-```python
+```{python}
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -191,9 +224,13 @@ print("多分类报告:\n", report_multi)
         *   **缺点:** 可能生成噪声样本（如果少数类样本分布分散或与其他类重叠）；对高维数据效果可能减弱。
         *   **实现:** `imbalanced-learn` 库中的 `SMOTE` 类。
 
+::: {.callout-note title="SMOTE 的变种"}
+除了基础的 SMOTE，还有一些改进版本，如 Borderline-SMOTE（更关注边界上的少数类样本）和 ADASYN（Adaptive Synthetic Sampling，根据学习难度自适应地为不同少数类样本生成不同数量的合成样本）。这些可以在 `imbalanced-learn` 库中找到。
+:::
+
 **使用 `imbalanced-learn` (需要先安装: `pip install imbalanced-learn`)**
 
-```python
+```{python}
 # 检查 imbalanced-learn 是否已安装，如果需要安装，取消下一行注释
 # !pip install imbalanced-learn
 
@@ -204,15 +241,18 @@ from collections import Counter # 用于查看类别计数
 print("原始训练集类别分布:", Counter(y_train_imb))
 
 # --- 应用 SMOTE ---
-# k_neighbors: 选择近邻的数量
+# k_neighbors: 选择近邻的数量，对于少数类样本较少的情况，需要选择适当的k值
 # random_state: 保证结果可复现
 smote = SMOTE(k_neighbors=5, random_state=42)
 X_train_resampled, y_train_resampled = smote.fit_resample(X_train_imb, y_train_imb)
 
 print("SMOTE 重采样后训练集类别分布:", Counter(y_train_resampled)) # 类别数量应相等
 
+
+
 # --- 在重采样后的数据上训练模型 ---
-lr_smote = LogisticRegression(solver='liblinear', random_state=42)
+# 使用与原始模型相同的参数
+lr_smote = LogisticRegression(solver='liblinear', C=0.1, random_state=42)
 lr_smote.fit(X_train_resampled, y_train_resampled)
 y_pred_smote = lr_smote.predict(X_test_imb) # 评估仍在原始测试集上进行
 y_pred_proba_smote = lr_smote.predict_proba(X_test_imb)[:, 1]
@@ -228,17 +268,29 @@ print(f"SMOTE 后 Average Precision (AP) Score: {ap_score_smote:.4f}")
 
 # --- 绘制对比 P-R 曲线 ---
 plt.figure(figsize=(8, 6))
-plt.plot(recall, precision, marker='.', label=f'Original LR (AP = {ap_score:.2f})')
-plt.plot(recall_smote, precision_smote, marker='.', label=f'LR with SMOTE (AP = {ap_score_smote:.2f})')
+plt.plot(recall, precision, marker='.', label=f'Original LR (AP = {ap_score:.2f})') 
+plt.plot(recall_smote, precision_smote, marker='.', label=f'LR with SMOTE (AP = {ap_score_smote:.2f})') 
 plt.xlabel('Recall')
 plt.ylabel('Precision')
 plt.title('Precision-Recall Curve Comparison')
 plt.legend()
 plt.grid(True)
-# plt.show()
+plt.show()
 ```
 
-**观察:** 使用 SMOTE 后，模型的召回率通常会有显著提升（能找出更多少数类样本），AP 分数也可能提高。
+::: {.callout-important title="重采样只应用于训练集！"}
+过采样（如 SMOTE）或欠采样应该**只应用于训练数据** (`fit_resample(X_train, y_train)`)。测试集必须保持原始分布，以模拟模型在真实未见数据上的表现。如果在整个数据集或测试集上进行重采样，会人为地改变评估环境，导致评估结果不可靠。
+:::
+
+::: {.callout-warning title="使用 SMOTE 后 AP 一定会改善吗？"}
+*   **不一定**。虽然 SMOTE 通常能改善模型对少数类的识别能力，但 AP 是否提升取决于多个因素：
+    *   **数据分布特征:** 如果少数类样本在特征空间中分布过于稀疏或离散，SMOTE 生成的合成样本可能质量不高，反而会引入噪声。
+    *   **k 值选择:** 如果 k_neighbors 参数设置不当，可能导致生成的样本偏离真实分布。
+    *   **模型特性:** 某些模型对数据分布变化更敏感，可能无法有效利用 SMOTE 生成的新样本。
+    *   **过拟合风险:** 过度使用 SMOTE 可能导致模型在训练集上表现很好，但在测试集上泛化能力下降。
+*   **建议:** 在使用 SMOTE 后，务必通过交叉验证等方式评估模型在测试集上的表现，而不仅仅是训练集。同时，可以尝试不同的 k 值，或结合其他方法（如 class_weight='balanced'）来获得更好的效果。
+:::
+
 
 #### 2.1.2 算法层面方法：代价敏感学习 (Cost-Sensitive Learning)
 
@@ -247,9 +299,14 @@ plt.grid(True)
     *   设置为字典 `{class_label: weight}`，手动指定每个类别的权重。
     *   设置为 `'balanced'`，算法会自动根据样本数量反比地调整权重，即**少数类获得更高的权重**。这是最常用的方式。
 
-```python
+::: {.callout-note title="`class_weight='balanced'` 如何计算权重？"}
+当设置 `class_weight='balanced'` 时，每个类别的权重计算公式通常是 `n_samples / (n_classes * n_samples_j)`，其中 `n_samples` 是总样本数，`n_classes` 是类别数量，`n_samples_j` 是类别 j 的样本数。这样，样本数较少的类别会获得更高的权重。
+:::
+
+```{python}
 # --- 使用 class_weight='balanced' ---
-lr_balanced = LogisticRegression(solver='liblinear', class_weight='balanced', random_state=42)
+# 保持与其他模型相同的C参数
+lr_balanced = LogisticRegression(solver='liblinear', C=0.1, class_weight='balanced', random_state=42)
 lr_balanced.fit(X_train_imb, y_train_imb) # 在原始不平衡数据上训练
 y_pred_balanced = lr_balanced.predict(X_test_imb)
 y_pred_proba_balanced = lr_balanced.predict_proba(X_test_imb)[:, 1]
@@ -260,7 +317,7 @@ print(classification_report(y_test_imb, y_pred_balanced))
 
 precision_balanced, recall_balanced, _ = precision_recall_curve(y_test_imb, y_pred_proba_balanced)
 ap_score_balanced = average_precision_score(y_test_imb, y_pred_proba_balanced)
-print(f"class_weight='balanced' 后 Average Precision (AP) Score: {ap_score_balanced:.4f}")
+print(f"class_weight='balanced' 后 Average Precision (AP) Score: {ap_score_balanced:.4f}") 
 
 # --- 绘制对比 P-R 曲线 ---
 plt.figure(figsize=(8, 6))
@@ -272,10 +329,12 @@ plt.ylabel('Precision')
 plt.title('Precision-Recall Curve Comparison')
 plt.legend()
 plt.grid(True)
-# plt.show()
+plt.show()
 ```
 
-**观察:** 使用 `class_weight='balanced'` 通常也能有效提高模型对少数类的识别能力（召回率），效果与 SMOTE 类似或各有优劣，计算成本通常更低。
+::: {.callout-note title="观察"}
+使用 `class_weight='balanced'` 通常也能有效提高模型对少数类的识别能力（召回率），效果与 SMOTE 类似或各有优劣，计算成本通常更低。
+:::
 
 ### 2.2 如何选择策略？
 
@@ -284,6 +343,10 @@ plt.grid(True)
 *   如果 `class_weight='balanced'` 效果不佳，可以尝试 **SMOTE** 或其他过采样/欠采样方法。
 *   **评估指标的选择至关重要:** 对于不平衡数据，应重点关注 **Recall, Precision, F1-Score (特别是 Macro Avg 或针对少数类的), P-R 曲线, AUC-PR**，而不是 Accuracy。
 *   **结合业务场景:** 思考哪种错误（FP 或 FN）的代价更高，选择能更好控制该类错误的策略和评估指标。
+
+::: {.callout-success title="评估是关键"}
+处理不平衡数据的核心在于**选择正确的评估指标**并**结合业务需求**。没有一种方法是万能的，需要不断实验、评估（使用 P-R 曲线、AUC-PR、F1 Macro 等）并理解不同策略对模型行为的影响，才能找到最适合当前问题的解决方案。
+:::
 
 ::: {.callout-tip title="AI 辅助处理不平衡数据"}
 *   "解释为什么准确率在不平衡数据集上是具有误导性的指标？"

@@ -64,7 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./week1_exercise.html" rel="next">
+<link href="./week9_lecture.html" rel="next">
 <link href="./week7_lecture.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -195,6 +195,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <a href="./week8_lecture.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第八周：深入聚类 - DBSCAN 与业务解读</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week9_lecture.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第九周：模型评估深化与不平衡数据处理</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -244,6 +249,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./week8_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第八周：课堂练习与实验</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./week9_exercise.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第九周：课堂练习与实验</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">项目</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project1_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目一：电商用户行为分析与购买预测</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project2_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目二：房价预测模型构建与优化</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project3_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project4_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目四：时间序列预测与业务应用</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./final_project_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">小组综合项目：机器学习技术融合应用</span></a>
   </div>
 </li>
       </ul>
@@ -322,7 +368,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>sklearn.metrics.davies_bouldin_score</code></li>
 </ul></li>
 </ul>
-<div id="acd8b1be" class="cell" data-execution_count="1">
+<div id="c7e185ec" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> davies_bouldin_score</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
@@ -359,7 +405,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>主成分分析 (PCA - Principal Component Analysis):</strong> 由 Karl Pearson (1901) 提出的一种经典线性降维方法，通过找到数据方差最大的方向（主成分），将高维数据投影到这些主成分方向上，从而实现降维。我们将在后续章节详细探讨其数学原理和应用。</li>
 <li><strong>t-分布随机邻域嵌入 (t-SNE - t-distributed Stochastic Neighbor Embedding):</strong> 由 Laurens van der Maaten 和 Geoffrey Hinton (2008) 提出的一种非线性降维方法，特别擅长将高维数据映射到二维或三维空间进行可视化，能较好地保持数据的局部结构（相似的点在低维空间中也靠近）。计算成本较高。</li>
 </ul>
-<div id="341f4f28" class="cell" data-execution_count="2">
+<div id="3b7b0d0b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.manifold <span class="im">import</span> TSNE <span class="im">as</span> t_SNE</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -483,7 +529,7 @@ AI 辅助可视化
 <p>DBSCAN 同样基于距离计算，因此<strong>必须进行特征缩放</strong>。</p>
 </div>
 </div>
-<div id="8b9bb55f" class="cell" data-execution_count="3">
+<div id="b493ceb3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> DBSCAN</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons <span class="co"># 用于生成非球状测试数据</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -572,7 +618,7 @@ DBSCAN 发现的噪声点数量: 1</code></pre>
 <li>寻找图中曲线<strong>斜率急剧变化</strong>的“拐点 (knee/elbow)”。该拐点对应的距离值可以作为 <code>eps</code> 的一个候选值。</li>
 </ul></li>
 </ul>
-<div id="38ddb87b" class="cell" data-execution_count="4">
+<div id="3da733dc" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> NearestNeighbors</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- K-距离图辅助选择 eps ---</span></span>
@@ -1261,8 +1307,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./week1_exercise.html" class="pagination-link" aria-label="第一周：课堂练习与实验">
-        <span class="nav-page-text"><span class="chapter-title">第一周：课堂练习与实验</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./week9_lecture.html" class="pagination-link" aria-label="第九周：模型评估深化与不平衡数据处理">
+        <span class="nav-page-text"><span class="chapter-title">第九周：模型评估深化与不平衡数据处理</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -1,0 +1,378 @@
+---
+title: "第十二周：课堂练习与实验"
+subtitle: "时间序列预测模型 (ARIMA)"
+format:
+  html:
+    toc: true
+    toc-location: left
+    code-fold: show
+    theme: cosmo
+---
+
+# 第十二周：课堂练习与实验
+
+本周我们将专注于构建和评估经典的时间序列预测模型 ARIMA。我们将首先建立基准模型，然后学习如何通过 ACF/PACF 图来确定 ARIMA 模型的阶数，并使用 `statsmodels` 库进行实践。
+
+## 准备工作
+
+确保导入本周所需的库，并准备好上周使用的平稳化后的时间序列数据（或示例数据）。
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+import statsmodels.api as sm # For Ljung-Box test
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.arima.model import ARIMA
+# 检查 pmdarima 是否已安装
+try:
+    import pmdarima as pm
+    pmdarima_installed = True
+except ImportError:
+    print("pmdarima is not installed. Run 'pip install pmdarima'")
+    pmdarima_installed = False
+    pm = None # Placeholder
+
+import warnings
+warnings.filterwarnings("ignore") # 忽略拟合过程中的一些警告
+
+# 设置 matplotlib 绘图样式 (可选)
+plt.style.use('seaborn-v0_8-whitegrid')
+# %matplotlib inline # 取消注释以便在 Jupyter 环境中显示绘图
+
+# --- 加载或生成数据 (复用上周的数据准备) ---
+# 假设 ts_data 是上周准备好的原始时间序列 (Pandas Series)
+# 如果没有，需要重新执行 week11_exercise.qmd 中的数据生成/加载步骤
+data_loaded = False
+try:
+    # 尝试重新生成示例数据 (如果需要)
+    np.random.seed(42)
+    n_samples = 365 * 3 # 3 年的日数据
+    time = np.arange(n_samples)
+    trend = 0.02 * time + 0.0001 * time**2
+    seasonal = 10 * np.sin(2 * np.pi * time / 365.25) + 5 * np.sin(2 * np.pi * time / (365.25/4)) # 年和季度季节性
+    noise = np.random.normal(0, 2, n_samples)
+    y = 50 + trend + seasonal + noise
+    dates = pd.date_range(start='2021-01-01', periods=n_samples, freq='D')
+    ts_data = pd.Series(y, index=dates, name='Value')
+    print("示例时间序列数据已准备好。")
+    data_loaded = True
+
+    # 划分训练集和测试集
+    train_size = int(len(ts_data) * 0.8)
+    train_data = ts_data[:train_size]
+    test_data = ts_data[train_size:]
+    print(f"训练集大小: {len(train_data)}, 测试集大小: {len(test_data)}")
+
+    # 准备平稳序列 (假设上周确定一阶差分即可平稳)
+    train_diff = train_data.diff().dropna()
+    # 再次确认平稳性 (可选)
+    # test_stationarity(train_diff, plot_rolling=False)
+
+except Exception as e:
+    print(f"准备数据时出错: {e}")
+    train_data, test_data, train_diff = None, None, None
+
+# --- 定义 MAPE 函数 (复用上周) ---
+def mean_absolute_percentage_error(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    mask = y_true != 0
+    if not np.any(mask):
+        return 0.0
+    # 避免除以非常小的值导致结果爆炸
+    y_true_masked = y_true[mask]
+    y_pred_masked = y_pred[mask]
+    return np.mean(np.abs((y_true_masked - y_pred_masked) / y_true_masked)) * 100
+
+# --- 定义 ADF 检验函数 (复用上周) ---
+def test_stationarity(timeseries, window=12, plot_rolling=True):
+    """
+    Performs Dickey-Fuller test and plots rolling statistics.
+    """
+    if timeseries is None or timeseries.empty:
+        print("Input timeseries is empty or None.")
+        return
+
+    # Calculate rolling statistics
+    rolmean = timeseries.rolling(window=window).mean()
+    rolstd = timeseries.rolling(window=window).std()
+
+    # Plot rolling statistics
+    if plot_rolling:
+        plt.figure(figsize=(12, 4))
+        orig = plt.plot(timeseries, color='blue', label='Original')
+        mean = plt.plot(rolmean, color='red', label=f'Rolling Mean (w={window})')
+        std = plt.plot(rolstd, color='black', label=f'Rolling Std (w={window})')
+        plt.legend(loc='best')
+        plt.title('Rolling Mean & Standard Deviation')
+        plt.show()
+
+    # Perform Dickey-Fuller test
+    print('Results of Dickey-Fuller Test:')
+    try:
+        # Drop NA values that might result from differencing or rolling calculations
+        dftest = adfuller(timeseries.dropna(), autolag='AIC')
+        dfoutput = pd.Series(dftest[0:4], index=['Test Statistic', 'p-value', '#Lags Used', 'Number of Observations Used'])
+        for key, value in dftest[4].items():
+            dfoutput['Critical Value (%s)' % key] = value
+        print(dfoutput)
+
+        # Interpret the result
+        if dftest[1] <= 0.05 and dftest[0] < dftest[4]['5%']:
+            print("=> Conclusion: Reject H0, the series is likely stationary.")
+        else:
+            print("=> Conclusion: Fail to reject H0, the series is likely non-stationary.")
+    except Exception as e:
+        print(f"Error during ADF test: {e}")
+
+```
+
+## 练习 1: 基准模型评估
+
+**目标:** 建立基准预测，为评估 ARIMA 模型提供参考。
+
+**使用 `train_data` 和 `test_data`。**
+
+1.  **计算基准预测:**
+    *   计算**平均值模型**在 `test_data` 上的预测值 `mean_pred` (预测值是训练集的均值)。
+    *   计算**朴素模型**在 `test_data` 上的预测值 `naive_pred` (预测值是训练集的最后一个值)。
+    *   计算**季节性朴素模型**在 `test_data` 上的预测值 `seasonal_naive_pred` (选择合适的季节周期 `m`，例如对于示例的日度数据，可以尝试 `m=7` 或 `m=365`，根据上周 EDA 判断)。
+2.  **评估基准模型:**
+    *   对于每个基准模型，计算其在 `test_data` 上的 RMSE, MAE, 和 MAPE。
+    *   打印各基准模型的评估结果。
+3.  **可视化:**
+    *   绘制训练数据 `train_data`。
+    *   在同一图上绘制测试数据 `test_data` (真实值)。
+    *   在同一图上绘制三个基准模型的预测值。
+    *   添加图例，包含各模型的 RMSE。
+    *   添加标题和坐标轴标签。
+    *   调用 `plt.show()`。
+
+## 练习 2: ACF 和 PACF 图分析
+
+**目标:** 利用 ACF 和 PACF 图为 ARIMA 模型定阶 (p, q)。
+
+**使用平稳化的训练数据 `train_diff` (如果你的数据需要不同阶差分或变换，请使用相应的平稳序列)。**
+
+*前置条件检查：确保 `train_diff` 存在且非空。*
+
+```python
+if data_loaded and train_diff is not None and not train_diff.empty:
+    print("\n绘制平稳序列的 ACF 和 PACF 图...")
+    fig, axes = plt.subplots(1, 2, figsize=(16, 4))
+
+    # ACF 图
+    plot_acf(train_diff, ax=axes[0], lags=40) # lags 指定最大滞后阶数
+    axes[0].set_title('Autocorrelation Function (ACF)')
+
+    # PACF 图
+    plot_pacf(train_diff, ax=axes[1], lags=40, method='ywm') # method='ols' 或 'ywm'
+    axes[1].set_title('Partial Autocorrelation Function (PACF)')
+
+    plt.tight_layout()
+    plt.show()
+else:
+    print("无法绘制 ACF/PACF 图，平稳数据未准备好。")
+```
+
+**分析:**
+
+*   **ACF 图:** 观察自相关系数是否在某个滞后阶数 `q` 后“截尾”（落入蓝色置信区间内）？还是呈现“拖尾”（缓慢衰减）？
+*   **PACF 图:** 观察偏自相关系数是否在某个滞后阶数 `p` 后“截尾”？还是呈现“拖尾”？
+*   **定阶:** 根据讲义中提供的规则（AR(p) -> PACF 截尾, ACF 拖尾; MA(q) -> ACF 截尾, PACF 拖尾; ARMA(p,q) -> ACF/PACF 皆拖尾），在 Markdown 单元格中写下你初步判断的 p 和 q 的值（或可能的几组值）。对于示例数据，可能需要尝试不同的 (p, q) 组合。
+
+## 练习 3: ARIMA 模型拟合与诊断
+
+**目标:** 使用 `statsmodels` 拟合 ARIMA 模型并进行诊断。
+
+**使用原始训练数据 `train_data`。**
+
+*前置条件检查：确保 `statsmodels` 库已安装且数据已加载。*
+
+```python
+if statsmodels_installed and data_loaded:
+    # 1. 选择阶数 (p, d, q)
+    # 根据上周平稳性检验和本周 ACF/PACF 分析确定
+    # 示例值，需要根据你的分析调整
+    p, d, q = 1, 1, 1 # 初始猜测，可能需要调整
+    print(f"\n尝试拟合 ARIMA({p},{d},{q}) 模型...")
+
+    # 2. 拟合模型
+    try:
+        model = ARIMA(train_data, order=(p, d, q))
+        model_fit = model.fit()
+
+        # 3. 查看模型摘要
+        print(f"\n--- ARIMA({p},{d},{q}) 模型摘要 ---")
+        print(model_fit.summary())
+
+        # 4. 残差诊断
+        print("\n进行残差诊断...")
+        residuals = model_fit.resid
+        fig, ax = plt.subplots(2, 1, figsize=(10, 6))
+        residuals.plot(title="Residuals", ax=ax[0])
+        plot_acf(residuals, ax=ax[1], title="Residuals ACF", lags=40)
+        plt.tight_layout()
+        plt.show()
+
+        # Ljung-Box 检验
+        lb_test = sm.stats.acorr_ljungbox(residuals, lags=[10], return_df=True) # 检查前10个滞后的自相关
+        print("\nLjung-Box Test on Residuals (lag=10):\n", lb_test)
+        # 如果 p-value > 0.05，则不能拒绝原假设（残差是白噪声）
+
+    except Exception as e:
+        print(f"拟合 ARIMA({p},{d},{q}) 模型时出错: {e}")
+        model_fit = None # 标记模型未成功拟合
+else:
+    print("statsmodels 未安装或数据未加载，无法执行练习 3。")
+    model_fit = None
+```
+
+**分析:**
+
+*   在 Markdown 单元格中解读模型摘要：
+    *   系数 (`coef`) 是否显著 (P>|z| < 0.05)？
+    *   记录 AIC 和 BIC 值。
+*   根据残差图和 ACF 图（以及 Ljung-Box 检验的 p 值），判断残差是否接近白噪声。如果不是，可能需要调整 ARIMA 的阶数 (p, d, q)。可以尝试不同的 p, q 组合，比较 AIC/BIC 和残差诊断结果。
+
+## 练习 4: ARIMA 模型预测与评估
+
+**目标:** 使用训练好的 ARIMA 模型进行预测，并评估其性能。
+
+**使用练习 3 训练好的 `model_fit` 和测试集 `test_data`。**
+
+*前置条件检查：确保 `model_fit` 成功生成。*
+
+```python
+if model_fit is not None:
+    # 1. 进行预测
+    print("\n使用 ARIMA 模型进行预测...")
+    # 使用 forecast 方法预测未来 len(test_data) 步
+    forecast_result = model_fit.get_forecast(steps=len(test_data))
+    forecast_values = forecast_result.predicted_mean
+    conf_int = forecast_result.conf_int(alpha=0.05) # 95% 置信区间
+
+    # 2. 评估预测
+    rmse_arima = np.sqrt(mean_squared_error(test_data, forecast_values))
+    mae_arima = mean_absolute_error(test_data, forecast_values)
+    mape_arima = mean_absolute_percentage_error(test_data, forecast_values)
+    print(f"\n--- ARIMA({p},{d},{q}) 预测评估 ---")
+    print(f"RMSE: {rmse_arima:.4f}")
+    print(f"MAE: {mae_arima:.4f}")
+    print(f"MAPE: {mape_arima:.2f}%")
+
+    # 3. 可视化预测
+    plt.figure(figsize=(12, 6))
+    plt.plot(train_data.index, train_data, label='Train')
+    plt.plot(test_data.index, test_data, label='Test (Actual)')
+    plt.plot(test_data.index, forecast_values, label=f'ARIMA({p},{d},{q}) Forecast (RMSE:{rmse_arima:.2f})', color='red')
+    # 绘制置信区间
+    plt.fill_between(test_data.index, conf_int.iloc[:, 0], conf_int.iloc[:, 1], color='red', alpha=0.1, label='95% Confidence Interval')
+    plt.title('ARIMA Model Forecast vs Actual')
+    plt.legend()
+    plt.show()
+
+else:
+    print("ARIMA 模型未成功拟合，无法执行练习 4。")
+
+```
+
+**分析:**
+
+*   在 Markdown 单元格中，将 ARIMA 模型的评估结果（RMSE, MAE, MAPE）与练习 1 中最好的基准模型进行比较。ARIMA 模型是否带来了提升？
+
+## 练习 5: (可选) 使用 `auto_arima`
+
+**目标:** 体验自动 ARIMA 定阶工具。
+
+*前置条件检查：确保 `pmdarima` 库已安装且数据已加载。*
+
+```python
+if pmdarima_installed and data_loaded:
+    print("\n运行 auto_arima (这可能需要一些时间)...")
+    # seasonal=False 适用于非季节性数据
+    # 如果你的数据有明显季节性，设置 seasonal=True, 并指定季节周期 m (例如 m=12 for monthly, m=7 for daily with weekly seasonality)
+    # 调整 max_p, max_q, max_P, max_Q 可以控制搜索范围
+    # test='adf' 使用 ADF 检验自动确定 d
+    # information_criterion='aic' (默认) 或 'bic'
+    auto_model = pm.auto_arima(train_data,
+                               start_p=1, start_q=1,
+                               max_p=3, max_q=3, # 限制搜索范围以节省时间
+                               m=1,              # 假设非季节性 (m=1)
+                               seasonal=False,   # 明确指定非季节性
+                               d=None,           # 让其自动检测 d
+                               test='adf',       # 使用 ADF 测试确定 d
+                               stepwise=True,    # 使用 stepwise 算法加速搜索
+                               suppress_warnings=True,
+                               error_action='ignore',
+                               trace=True)       # 显示搜索过程
+
+    print("\n--- auto_arima 结果 ---")
+    print(auto_model.summary())
+
+    # 使用 auto_arima 找到的模型进行预测
+    auto_predictions = auto_model.predict(n_periods=len(test_data))
+    rmse_auto = np.sqrt(mean_squared_error(test_data, auto_predictions))
+    mae_auto = mean_absolute_error(test_data, auto_predictions)
+    mape_auto = mean_absolute_percentage_error(test_data, auto_predictions)
+    print(f"\n--- Auto ARIMA 预测评估 ---")
+    print(f"RMSE: {rmse_auto:.4f}, MAE: {mae_auto:.4f}, MAPE: {mape_auto:.2f}%")
+
+    # 可视化对比 (确保 model_fit 和 forecast_values 存在)
+    if 'model_fit' in locals() and model_fit is not None and 'forecast_values' in locals():
+        plt.figure(figsize=(12, 6))
+        plt.plot(train_data.index, train_data, label='Train')
+        plt.plot(test_data.index, test_data, label='Test (Actual)')
+        plt.plot(test_data.index, forecast_values, label=f'Manual ARIMA({p},{d},{q}) (RMSE:{rmse_arima:.2f})', color='red')
+        plt.plot(test_data.index, auto_predictions, label=f'Auto ARIMA {auto_model.order} (RMSE:{rmse_auto:.2f})', linestyle=':', color='green')
+        plt.title('Manual ARIMA vs Auto ARIMA Forecast')
+        plt.legend()
+        plt.show()
+    else:
+        print("手动 ARIMA 模型未成功拟合或未预测，无法进行可视化对比。")
+
+else:
+    print("pmdarima 库未安装或数据未加载，无法执行 auto_arima 练习。")
+```
+
+**分析:**
+
+*   比较 `auto_arima` 找到的模型阶数与你手动选择的阶数。
+*   比较 `auto_arima` 模型的性能与你手动选择的 ARIMA 模型以及基准模型的性能。
+
+## 练习 6: 项目四 - ARIMA 建模与报告
+
+**目标:** 完成项目四的 ARIMA 建模部分，并撰写报告。
+
+1.  **ARIMA 建模:** 将练习 1-4 (或 1-5) 的步骤应用于你的项目四数据。
+    *   建立基准模型。
+    *   确定差分阶数 `d` (以及可能的季节性差分阶数 `D` 和周期 `m`)。
+    *   使用 ACF/PACF 图（或 `auto_arima`）确定 `p`, `q` (以及可能的季节性阶数 `P`, `Q`)。
+    *   拟合 ARIMA(p, d, q) 或 SARIMA(p, d, q)(P, D, Q, m) 模型。
+    *   进行模型诊断（检查残差）。
+    *   生成预测。
+    *   评估模型性能 (RMSE, MAE, MAPE)。
+    *   与基准模型比较。
+2.  **结果解读:**
+    *   在 Markdown 单元格中，解释你的 ARIMA/SARIMA 模型的预测结果。
+    *   结合你的业务场景，讨论预测结果的意义。例如，预测未来销售额是上升还是下降？幅度如何？是否存在显著的季节性波动？
+3.  **撰写报告:**
+    *   完成项目四的最终报告（`.md` 或 `.pdf`）。
+    *   **结构建议:**
+        *   引言：项目目标，数据集描述。
+        *   数据探索与预处理：EDA 发现（趋势、季节性），平稳性检验与处理（包括差分阶数 `d` 和可能的季节性差分 `D`, `m`）。
+        *   模型构建：
+            *   基准模型及其性能。
+            *   ARIMA/SARIMA 模型定阶过程 (ACF/PACF 分析或 auto_arima，说明选择的 `p,d,q` 和 `P,D,Q,m`）。
+            *   最终 ARIMA/SARIMA 模型的摘要和残差诊断。
+        *   模型评估：ARIMA/SARIMA 模型在测试集上的性能（RMSE, MAE, MAPE），与基准模型的对比。
+        *   **业务预测解读:** 对预测结果的解释和商业意义分析。
+        *   结论与讨论：总结模型效果，讨论局限性（例如，ARIMA 未考虑外部因素），未来改进方向（例如，尝试 SARIMAX、Prophet、深度学习模型等）。
+    *   确保报告包含所有必要的代码、图表、分析和结论。
+
+**提交项目四的最终 Notebook 和报告。**
+
+**下周我们将学习如何解释复杂模型，进入模型可解释性 (XAI) 的世界！**

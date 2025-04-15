@@ -1,15 +1,7 @@
 ---
 title: "第九周：课堂练习与实验"
 subtitle: "高级模型评估与不平衡数据处理"
-format:
-  html:
-    toc: true
-    toc-location: left
-    code-fold: show
-    theme: cosmo
 ---
-
-# 第九周：课堂练习与实验
 
 本周我们聚焦于更深入的模型评估技术，特别是处理不平衡数据集时的挑战和方法。我们将练习绘制和解读 P-R 曲线，理解不同的交叉验证策略，并应用 SMOTE 和代价敏感学习来处理类别不平衡问题。
 

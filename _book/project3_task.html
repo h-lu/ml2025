@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="陆海波">
-<meta name="dcterms.date" content="2025-04-15">
 
-<title>机器学习Python</title>
+<title>项目三：用户分群分析与业务策略制定 – 机器学习Python</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -32,7 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./week1_lecture.html" rel="next">
+<link href="./project4_task.html" rel="next">
+<link href="./project2_task.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -83,7 +82,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html"><span class="chapter-title">index.html</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./project1_task.html">项目</a></li><li class="breadcrumb-item"><a href="./project3_task.html"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -110,7 +109,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">index.html</span></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -246,7 +245,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./project3_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></a>
+  <a href="./project3_task.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -266,34 +265,42 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#项目背景" id="toc-项目背景" class="nav-link active" data-scroll-target="#项目背景">项目背景</a></li>
+  <li><a href="#项目目标" id="toc-项目目标" class="nav-link" data-scroll-target="#项目目标">项目目标</a></li>
+  <li><a href="#项目阶段" id="toc-项目阶段" class="nav-link" data-scroll-target="#项目阶段">项目阶段</a>
+  <ul class="collapse">
+  <li><a href="#第一阶段k-means-聚类第七周" id="toc-第一阶段k-means-聚类第七周" class="nav-link" data-scroll-target="#第一阶段k-means-聚类第七周">第一阶段：K-Means 聚类（第七周）</a></li>
+  <li><a href="#第二阶段优化与深入分析第八周" id="toc-第二阶段优化与深入分析第八周" class="nav-link" data-scroll-target="#第二阶段优化与深入分析第八周">第二阶段：优化与深入分析（第八周）</a></li>
+  </ul></li>
+  <li><a href="#提交要求" id="toc-提交要求" class="nav-link" data-scroll-target="#提交要求">提交要求</a>
+  <ul class="collapse">
+  <li><a href="#代码文件" id="toc-代码文件" class="nav-link" data-scroll-target="#代码文件">代码文件</a></li>
+  <li><a href="#项目报告" id="toc-项目报告" class="nav-link" data-scroll-target="#项目报告">项目报告</a></li>
+  </ul></li>
+  <li><a href="#评分标准" id="toc-评分标准" class="nav-link" data-scroll-target="#评分标准">评分标准</a></li>
+  <li><a href="#截止时间" id="toc-截止时间" class="nav-link" data-scroll-target="#截止时间">截止时间</a></li>
+  <li><a href="#注意事项" id="toc-注意事项" class="nav-link" data-scroll-target="#注意事项">注意事项</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./project1_task.html">项目</a></li><li class="breadcrumb-item"><a href="./project3_task.html"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">机器学习Python</h1>
+<h1 class="title"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>陆海波 </p>
-          </div>
-  </div>
     
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">April 15, 2025</p>
-    </div>
-  </div>
   
     
   </div>
@@ -303,8 +310,135 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="项目背景" class="level2">
+<h2 class="anchored" data-anchor-id="项目背景">项目背景</h2>
+<p>在商业分析中，用户分群（Customer Segmentation）是一种将用户基于其特征和行为模式划分为不同群体的方法。通过聚类分析，我们可以发现用户的自然分组，从而制定差异化的营销策略和服务方案。</p>
+</section>
+<section id="项目目标" class="level2">
+<h2 class="anchored" data-anchor-id="项目目标">项目目标</h2>
+<ol type="1">
+<li>应用 K-Means 和 DBSCAN 聚类算法进行用户分群</li>
+<li>评估和优化聚类效果</li>
+<li>对不同用户群体进行特征分析</li>
+<li>提出基于数据的商业策略建议</li>
+</ol>
+</section>
+<section id="项目阶段" class="level2">
+<h2 class="anchored" data-anchor-id="项目阶段">项目阶段</h2>
+<section id="第一阶段k-means-聚类第七周" class="level3">
+<h3 class="anchored" data-anchor-id="第一阶段k-means-聚类第七周">第一阶段：K-Means 聚类（第七周）</h3>
+<ol type="1">
+<li><strong>数据预处理</strong>
+<ul>
+<li>特征选择与工程</li>
+<li>处理缺失值和异常值</li>
+<li>特征标准化（使用 StandardScaler）</li>
+</ul></li>
+<li><strong>K 值选择</strong>
+<ul>
+<li>使用肘部法则（Elbow Method）</li>
+<li>计算轮廓系数（Silhouette Score）</li>
+<li>结合业务理解确定最终 K 值</li>
+</ul></li>
+<li><strong>初步聚类</strong>
+<ul>
+<li>使用选定的 K 值进行 K-Means 聚类</li>
+<li>使用 PCA 或 t-SNE 进行可视化</li>
+<li>初步评估聚类效果</li>
+</ul></li>
+</ol>
+</section>
+<section id="第二阶段优化与深入分析第八周" class="level3">
+<h3 class="anchored" data-anchor-id="第二阶段优化与深入分析第八周">第二阶段：优化与深入分析（第八周）</h3>
+<ol type="1">
+<li><strong>DBSCAN 尝试（可选）</strong>
+<ul>
+<li>使用 K-距离图选择 eps 和 min_samples</li>
+<li>运行 DBSCAN 并评估结果</li>
+<li>与 K-Means 结果对比</li>
+</ul></li>
+<li><strong>最终模型选择</strong>
+<ul>
+<li>对比 K-Means 和 DBSCAN 结果</li>
+<li>基于评估指标选择最终模型</li>
+<li>确定最终的聚类方案</li>
+</ul></li>
+<li><strong>深入业务解读（核心）</strong>
+<ul>
+<li>分析各簇的特征分布</li>
+<li>计算关键统计指标</li>
+<li>可视化簇间差异</li>
+<li>创建用户画像</li>
+<li>提出商业建议</li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="提交要求" class="level2">
+<h2 class="anchored" data-anchor-id="提交要求">提交要求</h2>
+<section id="代码文件" class="level3">
+<h3 class="anchored" data-anchor-id="代码文件">代码文件</h3>
+<ul>
+<li>完整的文档</li>
+<li>包含所有数据处理、建模和分析代码</li>
+<li>代码需有清晰的注释</li>
+<li>必须包含可视化结果</li>
+</ul>
+</section>
+<section id="项目报告" class="level3">
+<h3 class="anchored" data-anchor-id="项目报告">项目报告</h3>
+<ol type="1">
+<li><strong>项目概述</strong>
+<ul>
+<li>背景和目标</li>
+<li>数据描述</li>
+<li>方法论</li>
+</ul></li>
+<li><strong>技术实现</strong>
+<ul>
+<li>预处理步骤</li>
+<li>K 值/参数选择过程</li>
+<li>模型评估结果</li>
+</ul></li>
+<li><strong>业务分析（重点）</strong>
+<ul>
+<li>各用户群体特征描述</li>
+<li>详细的用户画像</li>
+<li>具体的商业建议</li>
+<li>可视化支持</li>
+</ul></li>
+<li><strong>结论与建议</strong>
+<ul>
+<li>主要发现</li>
+<li>实施建议</li>
+<li>后续改进方向</li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="评分标准" class="level2">
+<h2 class="anchored" data-anchor-id="评分标准">评分标准</h2>
+<ul>
+<li>技术实现（30%）：代码质量、方法使用的正确性</li>
+<li>分析深度（40%）：用户画像的深度、业务建议的可行性</li>
+<li>可视化（20%）：图表的清晰度和信息量</li>
+<li>报告质量（10%）：结构完整性、表达清晰度</li>
+</ul>
+</section>
+<section id="截止时间" class="level2">
+<h2 class="anchored" data-anchor-id="截止时间">截止时间</h2>
+<p>第九周第一次课前提交</p>
+</section>
+<section id="注意事项" class="level2">
+<h2 class="anchored" data-anchor-id="注意事项">注意事项</h2>
+<ol type="1">
+<li>重点关注业务解读部分，确保分析有深度和实用价值</li>
+<li>可视化需要清晰、专业，并能支持你的分析结论</li>
+<li>商业建议需要具体、可行，并与数据分析结果相关联</li>
+</ol>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -729,10 +863,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="./project2_task.html" class="pagination-link" aria-label="项目二：房价预测模型构建与优化">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">项目二：房价预测模型构建与优化</span></span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./week1_lecture.html" class="pagination-link" aria-label="第一周：机器学习世界初探与工具准备">
-        <span class="nav-page-text"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./project4_task.html" class="pagination-link" aria-label="项目四：时间序列预测与业务应用">
+        <span class="nav-page-text"><span class="chapter-title">项目四：时间序列预测与业务应用</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

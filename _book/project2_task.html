@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="陆海波">
-<meta name="dcterms.date" content="2025-04-15">
 
-<title>机器学习Python</title>
+<title>项目二：房价预测模型构建与优化 – 机器学习Python</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -32,7 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./week1_lecture.html" rel="next">
+<link href="./project3_task.html" rel="next">
+<link href="./project1_task.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -83,7 +82,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html"><span class="chapter-title">index.html</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./project1_task.html">项目</a></li><li class="breadcrumb-item"><a href="./project2_task.html"><span class="chapter-title">项目二：房价预测模型构建与优化</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -110,7 +109,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">index.html</span></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">index.html</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -241,7 +240,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./project2_task.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">项目二：房价预测模型构建与优化</span></a>
+  <a href="./project2_task.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">项目二：房价预测模型构建与优化</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -266,34 +265,42 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#项目背景" id="toc-项目背景" class="nav-link active" data-scroll-target="#项目背景">项目背景</a></li>
+  <li><a href="#项目目标" id="toc-项目目标" class="nav-link" data-scroll-target="#项目目标">项目目标</a></li>
+  <li><a href="#项目阶段" id="toc-项目阶段" class="nav-link" data-scroll-target="#项目阶段">项目阶段</a>
+  <ul class="collapse">
+  <li><a href="#第一阶段基础回归模型第五周" id="toc-第一阶段基础回归模型第五周" class="nav-link" data-scroll-target="#第一阶段基础回归模型第五周">第一阶段：基础回归模型（第五周）</a></li>
+  <li><a href="#第二阶段进阶模型与优化第六周" id="toc-第二阶段进阶模型与优化第六周" class="nav-link" data-scroll-target="#第二阶段进阶模型与优化第六周">第二阶段：进阶模型与优化（第六周）</a></li>
+  </ul></li>
+  <li><a href="#提交要求" id="toc-提交要求" class="nav-link" data-scroll-target="#提交要求">提交要求</a>
+  <ul class="collapse">
+  <li><a href="#代码文件" id="toc-代码文件" class="nav-link" data-scroll-target="#代码文件">代码文件</a></li>
+  <li><a href="#项目报告" id="toc-项目报告" class="nav-link" data-scroll-target="#项目报告">项目报告</a></li>
+  </ul></li>
+  <li><a href="#评分标准" id="toc-评分标准" class="nav-link" data-scroll-target="#评分标准">评分标准</a></li>
+  <li><a href="#截止时间" id="toc-截止时间" class="nav-link" data-scroll-target="#截止时间">截止时间</a></li>
+  <li><a href="#注意事项" id="toc-注意事项" class="nav-link" data-scroll-target="#注意事项">注意事项</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./project1_task.html">项目</a></li><li class="breadcrumb-item"><a href="./project2_task.html"><span class="chapter-title">项目二：房价预测模型构建与优化</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">机器学习Python</h1>
+<h1 class="title"><span class="chapter-title">项目二：房价预测模型构建与优化</span></h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>陆海波 </p>
-          </div>
-  </div>
     
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">April 15, 2025</p>
-    </div>
-  </div>
   
     
   </div>
@@ -303,8 +310,123 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="项目背景" class="level2">
+<h2 class="anchored" data-anchor-id="项目背景">项目背景</h2>
+<p>房价预测是一个典型的回归问题，涉及多个特征变量对目标变量（房价）的影响。通过构建准确的预测模型，可以帮助房地产行业相关方做出更好的决策。</p>
+</section>
+<section id="项目目标" class="level2">
+<h2 class="anchored" data-anchor-id="项目目标">项目目标</h2>
+<ol type="1">
+<li>实现并比较多种回归算法</li>
+<li>深入理解特征工程和模型优化</li>
+<li>评估和解释模型性能</li>
+<li>提供可行的业务应用建议</li>
+</ol>
+</section>
+<section id="项目阶段" class="level2">
+<h2 class="anchored" data-anchor-id="项目阶段">项目阶段</h2>
+<section id="第一阶段基础回归模型第五周" class="level3">
+<h3 class="anchored" data-anchor-id="第一阶段基础回归模型第五周">第一阶段：基础回归模型（第五周）</h3>
+<ol type="1">
+<li><strong>数据准备</strong>
+<ul>
+<li>数据清洗和预处理</li>
+<li>特征选择与工程</li>
+<li>数据集划分（训练集、验证集、测试集）</li>
+</ul></li>
+<li><strong>基础模型实现</strong>
+<ul>
+<li>线性回归（Linear Regression）</li>
+<li>多项式回归（Polynomial Regression）</li>
+<li>模型评估与比较</li>
+</ul></li>
+</ol>
+</section>
+<section id="第二阶段进阶模型与优化第六周" class="level3">
+<h3 class="anchored" data-anchor-id="第二阶段进阶模型与优化第六周">第二阶段：进阶模型与优化（第六周）</h3>
+<ol type="1">
+<li><strong>正则化模型</strong>
+<ul>
+<li>Ridge 回归（L2正则化）</li>
+<li>Lasso 回归（L1正则化）</li>
+<li>参数调优（网格搜索/交叉验证）</li>
+</ul></li>
+<li><strong>集成学习模型</strong>
+<ul>
+<li>XGBoost 实现</li>
+<li>特征重要性分析</li>
+<li>模型优化与调参</li>
+</ul></li>
+<li><strong>模型评估与选择</strong>
+<ul>
+<li>MSE、RMSE、MAE 计算</li>
+<li>R² 得分评估</li>
+<li>残差分析</li>
+<li>最终模型选择</li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="提交要求" class="level2">
+<h2 class="anchored" data-anchor-id="提交要求">提交要求</h2>
+<section id="代码文件" class="level3">
+<h3 class="anchored" data-anchor-id="代码文件">代码文件</h3>
+<ul>
+<li>完整的 Jupyter Notebook</li>
+<li>包含所有模型实现代码</li>
+<li>详细的注释说明</li>
+<li>可视化结果</li>
+</ul>
+</section>
+<section id="项目报告" class="level3">
+<h3 class="anchored" data-anchor-id="项目报告">项目报告</h3>
+<ol type="1">
+<li><strong>方法论</strong>
+<ul>
+<li>数据预处理策略</li>
+<li>特征工程方法</li>
+<li>模型选择理由</li>
+</ul></li>
+<li><strong>实验结果</strong>
+<ul>
+<li>各模型性能对比</li>
+<li>参数调优过程</li>
+<li>特征重要性分析</li>
+<li>可视化展示</li>
+</ul></li>
+<li><strong>业务应用</strong>
+<ul>
+<li>模型应用场景</li>
+<li>预测结果解释</li>
+<li>实施建议</li>
+</ul></li>
+</ol>
+</section>
+</section>
+<section id="评分标准" class="level2">
+<h2 class="anchored" data-anchor-id="评分标准">评分标准</h2>
+<ul>
+<li>技术实现（40%）：代码质量、模型实现的正确性</li>
+<li>模型优化（30%）：特征工程和参数调优的效果</li>
+<li>结果分析（20%）：评估的完整性和解释的合理性</li>
+<li>报告质量（10%）：结构和表达</li>
+</ul>
+</section>
+<section id="截止时间" class="level2">
+<h2 class="anchored" data-anchor-id="截止时间">截止时间</h2>
+<p>第七周第一次课前提交</p>
+</section>
+<section id="注意事项" class="level2">
+<h2 class="anchored" data-anchor-id="注意事项">注意事项</h2>
+<ol type="1">
+<li>特别关注特征工程的影响</li>
+<li>详细记录参数调优过程</li>
+<li>注意模型预测结果的实际应用价值</li>
+<li>可以尝试其他回归算法，但需要充分说明选择理由</li>
+</ol>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -729,10 +851,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="./project1_task.html" class="pagination-link" aria-label="项目一：电商用户行为分析与购买预测">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">项目一：电商用户行为分析与购买预测</span></span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./week1_lecture.html" class="pagination-link" aria-label="第一周：机器学习世界初探与工具准备">
-        <span class="nav-page-text"><span class="chapter-title">第一周：机器学习世界初探与工具准备</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./project3_task.html" class="pagination-link" aria-label="项目三：用户分群分析与业务策略制定">
+        <span class="nav-page-text"><span class="chapter-title">项目三：用户分群分析与业务策略制定</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
